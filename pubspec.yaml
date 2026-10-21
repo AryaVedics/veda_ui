@@ -1,0 +1,39 @@
+name: veda_ui
+description: "The look every Véda app shares: colours, display font, tab bar, header, cards, logo menu, and the on-phone data file."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Véda's locally patched copy of phosphor_flutter 2.1.0 (Thin and Fill only;
+  # upstream subclasses IconData, which this Flutter SDK no longer allows).
+  # Re-exported from veda_ui.dart, so apps only depend on veda_ui.
+  phosphor_flutter:
+    path: third_party/phosphor_flutter
+
+  # The one JSON file each app keeps its data in, on the phone.
+  path_provider: ^2.1.0
+  # "Export my data" hands that file to the phone's share sheet.
+  share_plus: ^10.1.0
+  # Véda Link, stage 1: picking the file Véda exported (see BRIDGE.md).
+  file_picker: ^10.3.0
+  # The logo menu's links to the website and support page.
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  fonts:
+    # Véda's display serif, for titles only. Apps use it as kDisplayFont
+    # ('packages/veda_ui/Marcellus').
+    - family: Marcellus
+      fonts:
+        - asset: assets/fonts/Marcellus-Regular.ttf

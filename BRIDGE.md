@@ -1,0 +1,114 @@
+# Véda Link: how the Véda apps share with each other (decided 2026-10-22)
+
+## The rule
+**Every app publishes the one kind of entry it owns, and any Véda app can
+read another app's entries when it has a use for them, with the person's
+permission.** A small family network, not a hub: the apps talk to each other,
+not only to Véda. Two goals decide what is read where:
+
+1. **Charts live in the app that owns the "other thing", never in Véda,** so
+   Véda stays uncluttered (Routine charts readings around a product change;
+   Lifestyle charts them next to sleep; Cycle by phase; Sun by UV day).
+2. **Nothing is logged twice.** If Cycle knows your period days, Véda's Cycle
+   tab shows them instead of asking again; if Sun logged sunscreen, Routine's
+   checklist can show it as done.
+
+**One owner per kind of entry.** Only the owner writes it; everyone else
+shows it read-only, marked with where it came from ("from Véda Cycle").
+Unlinking hands the job back, and the reader may keep what it was shown as
+its own copy if the person wants it.
+
+| Kind of entry | Owner | Read by, and what for |
+|---|---|---|
+| Skin readings | Véda | every companion, for its charts |
+| Daily check-ins (sleep, water, exercise, stress) and food | Véda Lifestyle | Véda (its Lifestyle tab and food card, so nothing is entered twice); Cycle (sleep and stress by phase) |
+| Period days and estimated phase | Véda Cycle | Véda (its Cycle tab); Lifestyle (phase beside sleep and stress). Symptoms are not shared beyond Véda |
+| Products started and stopped, daily checklist | Véda Routine | Sun (which sunscreen, its SPF); later Véda's Trends markers, only if it stays uncluttered |
+| Sunscreen put on, UV by day | Véda Sun | Routine (tick "sunscreen" on the checklist); Lifestyle (sun days beside sleep) |
+
+Cycle is the most sensitive: its sharing switch is off until turned on, and
+even then it publishes only period days and the estimated phase.
+
+## What crosses
+From Véda: only what a chart needs, per reading: when it was taken, the
+time of day (morning, midday, evening), the Skin Score, and the seven
+measurements. From a companion: only the entries in the table above, in
+the same shape Véda already stores them.
+
+Never: photos, face geometry, per-region detail, raw measurement values,
+account details, email, consent records. (`veda_ui/lib/src/veda_link.dart`
+drops everything else on the way in, and a test checks it.)
+
+## Where it goes
+Nowhere off the phone. No server, no account, no cloud copy. The companion
+keeps its own copy in `veda_readings.json` in its app storage, so its charts
+work offline; "Delete everything" in the companion removes it.
+
+## Stage 1 (built now): hand the file over
+1. In Véda: Profile, Export my data. Save the file (Files, Drive, anywhere).
+2. In the companion: Profile, "Bring in my Véda readings", pick that file.
+
+Works with the Véda that is already in the stores; nothing in Véda changes.
+Good enough for tinkering: re-import whenever you want fresher readings.
+
+## Stage 2 (later, before any companion app is released): automatic, with permission
+Every app publishes its own feed and can read the others' the same way.
+Described below for Véda's readings; every other feed in the table works
+identically (its own provider or App Group file, its own switch):
+
+- **Véda** gets one switch in Profile: "Let my other Véda apps use my
+  readings". Off by default. While on, Véda keeps a small `veda-link/1` file
+  up to date (same fields as above). Turning it off deletes that file.
+- **The companion** gets one switch: "Show my Véda readings here". Both
+  switches must be on.
+- **Android:** Véda publishes the file through a read-only content provider
+  (`com.aryavedics.skin.link`) protected by a *signature* permission
+  (`com.aryavedics.permission.VEDA_LINK`). Only apps signed with the same
+  certificate can read it; no other app on the phone can.
+- **iPhone:** Véda writes the file into a shared App Group container
+  (`group.com.aryavedics.veda`) that only Véda-family apps under the same
+  Apple developer team can open.
+- The companion reads it when it opens and replaces its copy. When Véda's
+  switch is off, the companion forgets its copy.
+- **Every other direction:** each app publishes its own feed the same way
+  (its own content provider under the same signature permission, or its own
+  file in the App Group), behind one switch, "Share my entries with my other
+  Véda apps". Each reader lists in Profile which apps it is using, with a
+  switch to stop. Véda's Cycle and
+  check-in data already live only on the phone, and entries read from a
+  companion stay there too: they are never sent to Véda's server.
+
+### Decisions this forces now
+- **One signing key for the whole family on Android.** When each companion app
+  is created in Play Console, choose to use the **same app signing key as
+  Véda**. This can only be chosen at creation and cannot be changed later.
+  Sideloaded test builds must be signed with Véda's upload key for Stage 2 to
+  work between them.
+- **Same Apple developer team** for every app (already true), with the App
+  Group capability added to each App ID.
+
+### Before Stage 2 ships
+- Véda's privacy policy gets a line: if you turn the switch on, your readings
+  are made available to your other Véda apps on the same phone; they never
+  leave the phone. Each companion's own policy says the same from its side.
+  On the lawyer list.
+- Véda needs an app update (the switch, the provider, the App Group).
+
+## Format: `veda-link/1`
+```json
+{
+  "schema": "veda-link/1",
+  "generated_at": "2026-10-22T18:00:00Z",
+  "readings": [
+    {
+      "taken_at": "2026-10-20T14:00:00Z",
+      "slot": "midday",
+      "skin_score": 88.4,
+      "scores": { "redness": 89, "texture": 82, "pores": 78, "spots": 100,
+                  "acne": 88, "evenness": 95, "wrinkles": 90 }
+    }
+  ]
+}
+```
+The companion also accepts Véda's own "Export my data" file (Stage 1) and
+keeps only these fields from it.
