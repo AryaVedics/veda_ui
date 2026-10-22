@@ -13,6 +13,7 @@
 // Nothing here touches a network: the data goes from one app's private
 // storage, through the phone provider mechanism, into the other app.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
@@ -50,6 +51,9 @@ enum LinkStatus {
 
   /// Not installed.
   notInstalled,
+
+  /// Installed, but did not answer in time (try again).
+  noAnswer,
 }
 
 class LinkFeed {
@@ -111,8 +115,13 @@ class LinkBridge extends ChangeNotifier {
     notifyListeners();
   }
 
+  // A switch must move the instant it is tapped: the flag changes and the
+  // screen is told FIRST, and the slower work (saving, publishing, asking the
+  // other apps) follows. Waiting for it before redrawing left the switch
+  // looking dead until the next rebuild.
   Future<void> setShare(bool on) async {
     _share = on;
+    notifyListeners();
     await (await SharedPreferences.getInstance()).setBool(_shareKey, on);
     // On: publish what we have. Off: stop serving anything at once.
     await _write(on ? _lastPublished : null);
@@ -121,13 +130,16 @@ class LinkBridge extends ChangeNotifier {
 
   Future<void> setUse(bool on) async {
     _use = on;
-    await (await SharedPreferences.getInstance()).setBool(_useKey, on);
     if (on) {
-      await refresh();
+      for (final app in others) {
+        _others[app] = const LinkRead(LinkStatus.unknown); // "checking…"
+      }
     } else {
       _others.clear();
-      notifyListeners();
     }
+    notifyListeners();
+    await (await SharedPreferences.getInstance()).setBool(_useKey, on);
+    if (on) await refresh();
   }
 
   /// Hand over this app's feed. Remembered, and only served if sharing is on.
@@ -146,7 +158,11 @@ class LinkBridge extends ChangeNotifier {
             'data': data,
           });
     try {
-      await _channel.invokeMethod('publish', {'feed': text});
+      await _channel
+          .invokeMethod('publish', {'feed': text})
+          .timeout(const Duration(seconds: 6));
+    } on TimeoutException {
+      debugPrint('Véda Link: publishing took too long');
     } on MissingPluginException {
       // Not on Android (tests, other platforms): nothing to serve.
     } on PlatformException catch (e) {
@@ -157,17 +173,25 @@ class LinkBridge extends ChangeNotifier {
   /// Ask every other family app for its feed. Does nothing if reading is off.
   Future<void> refresh() async {
     if (!_use) return;
-    for (final app in others) {
-      _others[app] = await _readOne(app);
-    }
-    notifyListeners();
+    // All at once, each result shown as soon as it arrives: waking another
+    // app can take a moment, and one slow app must not hold up the rest.
+    await Future.wait([
+      for (final app in others)
+        _readOne(app).then((r) {
+          if (!_use) return;
+          _others[app] = r;
+          notifyListeners();
+        }),
+    ]);
   }
 
   Future<LinkRead> _readOne(LinkApp app) async {
     try {
-      final r = await _channel.invokeMapMethod<String, Object?>('read', {
-        'authority': app.authority,
-      });
+      final r = await _channel
+          .invokeMapMethod<String, Object?>('read', {
+            'authority': app.authority,
+          })
+          .timeout(const Duration(seconds: 8));
       switch (r?['status']) {
         case 'ok':
           final j = jsonDecode(r!['feed'] as String) as Map<String, Object?>;
@@ -188,6 +212,8 @@ class LinkBridge extends ChangeNotifier {
         default:
           return const LinkRead(LinkStatus.notInstalled);
       }
+    } on TimeoutException {
+      return const LinkRead(LinkStatus.noAnswer);
     } on MissingPluginException {
       return const LinkRead(LinkStatus.notInstalled);
     } catch (_) {

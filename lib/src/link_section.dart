@@ -45,6 +45,8 @@ class LinkSection extends StatelessWidget {
         return 'installed, but not allowed (different signing key)';
       case LinkStatus.notInstalled:
         return 'not installed';
+      case LinkStatus.noAnswer:
+        return 'did not answer in time; open it once and come back';
       case LinkStatus.unknown:
         return 'checking…';
     }

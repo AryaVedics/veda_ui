@@ -2,6 +2,9 @@ package com.aryavedics.veda_ui
 
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -18,6 +21,13 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
 
+    // Both calls touch storage or another process, so they run off the
+    // platform thread. A read that waits on a sleeping or starting app used to
+    // park that thread, and every later call (publish too) queued behind it,
+    // which left the switches and the "checking…" lines stuck.
+    private val workers = Executors.newCachedThreadPool()
+    private val main = Handler(Looper.getMainLooper())
+
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
         channel = MethodChannel(binding.binaryMessenger, "com.aryavedics.veda_ui/link")
@@ -29,21 +39,23 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
             "publish" -> {
                 val feed = call.argument<String>("feed")
                 val file = VedaLinkProvider.feedFile(context)
-                try {
-                    if (feed == null) {
-                        if (file.exists()) file.delete()
-                    } else {
-                        val tmp = java.io.File(file.path + ".tmp")
-                        tmp.writeText(feed, Charsets.UTF_8)
-                        tmp.renameTo(file)
+                workers.execute {
+                    try {
+                        if (feed == null) {
+                            if (file.exists()) file.delete()
+                        } else {
+                            val tmp = java.io.File(file.path + ".tmp")
+                            tmp.writeText(feed, Charsets.UTF_8)
+                            tmp.renameTo(file)
+                        }
+                        // Anyone watching this feed is told it changed.
+                        context.contentResolver.notifyChange(
+                            Uri.parse("content://${context.packageName}.link/feed"), null
+                        )
+                        main.post { result.success(true) }
+                    } catch (e: Exception) {
+                        main.post { result.error("publish_failed", e.message, null) }
                     }
-                    // Anyone watching this feed is told it changed.
-                    context.contentResolver.notifyChange(
-                        Uri.parse("content://${context.packageName}.link/feed"), null
-                    )
-                    result.success(true)
-                } catch (e: Exception) {
-                    result.error("publish_failed", e.message, null)
                 }
             }
 
@@ -53,34 +65,9 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
                     result.error("bad_args", "authority is required", null)
                     return
                 }
-                try {
-                    val cursor = context.contentResolver.query(
-                        Uri.parse("content://$authority/feed"), null, null, null, null
-                    )
-                    if (cursor == null) {
-                        // The provider is not there: the app is not installed.
-                        result.success(mapOf("status" to "missing"))
-                        return
-                    }
-                    cursor.use {
-                        if (it.moveToFirst()) {
-                            result.success(
-                                mapOf(
-                                    "status" to "ok",
-                                    "feed" to it.getString(0),
-                                    "updated_at" to it.getLong(1)
-                                )
-                            )
-                        } else {
-                            // Installed and allowed, but the person has sharing off.
-                            result.success(mapOf("status" to "empty"))
-                        }
-                    }
-                } catch (e: SecurityException) {
-                    // Installed, but signed with a different key: not allowed.
-                    result.success(mapOf("status" to "denied"))
-                } catch (e: Exception) {
-                    result.success(mapOf("status" to "missing"))
+                workers.execute {
+                    val answer = read(authority)
+                    main.post { result.success(answer) }
                 }
             }
 
@@ -88,7 +75,42 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    /** Asks one family app's provider for its feed. Never throws. */
+    private fun read(authority: String): Map<String, Any?> {
+        val uri = Uri.parse("content://$authority/feed")
+        // Unstable: if the other app dies while answering, this one survives.
+        val client = try {
+            context.contentResolver.acquireUnstableContentProviderClient(uri)
+        } catch (e: Exception) {
+            null
+        } ?: return mapOf("status" to "missing") // not installed
+        return try {
+            val cursor = client.query(uri, null, null, null, null)
+                ?: return mapOf("status" to "missing")
+            cursor.use {
+                if (it.moveToFirst()) {
+                    mapOf(
+                        "status" to "ok",
+                        "feed" to it.getString(0),
+                        "updated_at" to it.getLong(1)
+                    )
+                } else {
+                    // Installed and allowed, but the person has sharing off.
+                    mapOf("status" to "empty")
+                }
+            }
+        } catch (e: SecurityException) {
+            // Installed, but signed with a different key: not allowed.
+            mapOf("status" to "denied")
+        } catch (e: Exception) {
+            mapOf("status" to "missing")
+        } finally {
+            client.close()
+        }
+    }
+
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        workers.shutdown()
     }
 }

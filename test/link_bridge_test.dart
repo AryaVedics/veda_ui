@@ -40,7 +40,9 @@ void main() {
   test('nothing is served until sharing is turned on, and it stops when turned off', () async {
     final b = bridge(LinkApp.cycle);
     await b.load();
-    await b.publish({'period_days': ['2026-10-01']});
+    await b.publish({
+      'period_days': ['2026-10-01'],
+    });
     expect(phone.published, isNull); // sharing is off: nothing leaves the app
 
     await b.setShare(true);
@@ -50,7 +52,10 @@ void main() {
     expect((feed['data'] as Map)['period_days'], ['2026-10-01']);
 
     await b.setShare(false);
-    expect(phone.published, isNull); // switched off: the feed is removed at once
+    expect(
+      phone.published,
+      isNull,
+    ); // switched off: the feed is removed at once
   });
 
   test('the switches are remembered', () async {
@@ -70,7 +75,7 @@ void main() {
       'feed': jsonEncode({
         'schema': 'veda-link/2',
         'app': 'cycle',
-        'data': {'phase': 'luteal'}
+        'data': {'phase': 'luteal'},
       }),
       'updated_at': DateTime.now().millisecondsSinceEpoch,
     };
@@ -80,7 +85,10 @@ void main() {
     final b = bridge(LinkApp.routine);
     await b.load();
     await b.refresh();
-    expect(b.readOf(LinkApp.cycle).status, LinkStatus.unknown); // reading is off
+    expect(
+      b.readOf(LinkApp.cycle).status,
+      LinkStatus.unknown,
+    ); // reading is off
 
     await b.setUse(true);
     expect(b.readOf(LinkApp.cycle).status, LinkStatus.connected);
@@ -91,6 +99,30 @@ void main() {
     expect(b.others, isNot(contains(LinkApp.routine)));
 
     await b.setUse(false);
-    expect(b.feedOf(LinkApp.cycle), isNull); // reading off: everything forgotten
+    expect(
+      b.feedOf(LinkApp.cycle),
+      isNull,
+    ); // reading off: everything forgotten
   });
+
+  test(
+    'a switch moves the moment it is tapped, before the slow work finishes',
+    () async {
+      final b = bridge(LinkApp.lifestyle);
+      await b.load();
+      var told = 0;
+      b.addListener(() => told++);
+      final pending = b.setShare(true); // not awaited on purpose
+      expect(b.share, isTrue); // already on
+      expect(told, greaterThanOrEqualTo(1)); // and the screen has been told
+      await pending;
+      final pending2 = b.setUse(true);
+      expect(b.use, isTrue);
+      expect(
+        b.readOf(LinkApp.cycle).status,
+        LinkStatus.unknown,
+      ); // "checking…" at once
+      await pending2;
+    },
+  );
 }
