@@ -157,6 +157,33 @@ class VedaLinkStore extends JsonStore<VedaLinkData> {
     return readings.length;
   }
 
+  /// Takes the readings from Véda's live feed (Véda Link, the "data" part of
+  /// its feed). Returns whether anything changed; the same readings again do
+  /// nothing, so listeners are not woken for no reason.
+  Future<bool> takeLive(Map<String, Object?> feedData) async {
+    final rows = (feedData['readings'] as List?) ?? const [];
+    final readings = <VedaReading>[];
+    for (final r in rows) {
+      if (r is! Map) continue;
+      try {
+        readings.add(VedaReading.fromJson(r.cast<String, Object?>()));
+      } catch (_) {
+        // A row this app cannot read is skipped, not fatal.
+      }
+    }
+    readings.sort((a, b) => a.takenAt.compareTo(b.takenAt));
+    final mine = data.readings;
+    if (mine.length == readings.length &&
+        [
+          for (var i = 0; i < mine.length; i++)
+            jsonEncode(mine[i].toJson()) == jsonEncode(readings[i].toJson()),
+        ].every((same) => same)) {
+      return false;
+    }
+    await set(VedaLinkData(readings: readings, importedAt: clock()));
+    return true;
+  }
+
   /// Lets the person pick the file Véda exported. Null if they cancelled.
   Future<int?> pickAndImport() async {
     final picked = await FilePicker.platform.pickFiles(

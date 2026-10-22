@@ -81,6 +81,7 @@ void main() {
     };
     phone.providers['com.aryavedics.sun.link'] = {'status': 'empty'};
     phone.providers['com.aryavedics.lifestyle.link'] = {'status': 'denied'};
+    phone.providers['com.aryavedics.skin.link'] = {'status': 'old_version'};
 
     final b = bridge(LinkApp.routine);
     await b.load();
@@ -95,7 +96,7 @@ void main() {
     expect(b.feedOf(LinkApp.cycle)!.data['phase'], 'luteal');
     expect(b.readOf(LinkApp.sun).status, LinkStatus.sharingOff);
     expect(b.readOf(LinkApp.lifestyle).status, LinkStatus.notAllowed);
-    expect(b.readOf(LinkApp.skin).status, LinkStatus.notInstalled);
+    expect(b.readOf(LinkApp.skin).status, LinkStatus.oldVersion);
     expect(b.others, isNot(contains(LinkApp.routine)));
 
     await b.setUse(false);
@@ -125,4 +126,20 @@ void main() {
       await pending2;
     },
   );
+
+  test('live readings from Veda fill the charts, and the same readings again change nothing', () async {
+    final store = VedaLinkStore(file: MemoryJsonFile());
+    await store.load();
+    final data = {
+      'readings': [
+        {'taken_at': '2026-10-20T14:00:00.000Z', 'slot': 'midday', 'skin_score': 86, 'scores': {'redness': 84}},
+        {'taken_at': '2026-10-19T08:00:00.000Z', 'slot': 'morning', 'skin_score': 80, 'scores': {'redness': 78}},
+        {'bad': 'row'},
+      ],
+    };
+    expect(await store.takeLive(data), isTrue);
+    expect(store.data.readings, hasLength(2));
+    expect(store.data.readings.first.slot, 'morning'); // oldest first
+    expect(await store.takeLive(data), isFalse);
+  });
 }

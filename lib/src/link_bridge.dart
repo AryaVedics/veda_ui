@@ -20,6 +20,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'veda_link.dart';
+
 /// The apps of the family, with the id each publishes under.
 enum LinkApp {
   sun('sun', 'com.aryavedics.sun.link', 'Véda Sun'),
@@ -51,6 +53,9 @@ enum LinkStatus {
 
   /// Not installed.
   notInstalled,
+
+  /// Installed, but an older version that does not share yet.
+  oldVersion,
 
   /// Installed, but did not answer in time (try again).
   noAnswer,
@@ -209,6 +214,8 @@ class LinkBridge extends ChangeNotifier {
           return const LinkRead(LinkStatus.sharingOff);
         case 'denied':
           return const LinkRead(LinkStatus.notAllowed);
+        case 'old_version':
+          return const LinkRead(LinkStatus.oldVersion);
         default:
           return const LinkRead(LinkStatus.notInstalled);
       }
@@ -230,10 +237,15 @@ class LinkRefresher extends StatefulWidget {
     required this.bridge,
     required this.child,
     this.onResume,
+    this.readings,
   });
 
   final LinkBridge bridge;
   final Widget child;
+
+  /// Where Véda's readings go when its feed is connected, so the charts fill
+  /// in by themselves (the import file stays as the fallback).
+  final VedaLinkStore? readings;
 
   /// Also run on open and resume, e.g. to republish a feed that depends on
   /// today's date.
@@ -249,12 +261,19 @@ class _LinkRefresherState extends State<LinkRefresher>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    widget.bridge.addListener(_takeReadings);
     _go();
+  }
+
+  void _takeReadings() {
+    final data = widget.bridge.feedOf(LinkApp.skin)?.data;
+    if (data != null) widget.readings?.takeLive(data);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    widget.bridge.removeListener(_takeReadings);
     super.dispose();
   }
 

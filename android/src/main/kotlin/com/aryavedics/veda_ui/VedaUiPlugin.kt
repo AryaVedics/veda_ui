@@ -83,10 +83,10 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
             context.contentResolver.acquireUnstableContentProviderClient(uri)
         } catch (e: Exception) {
             null
-        } ?: return mapOf("status" to "missing") // not installed
+        } ?: return notThere(authority)
         return try {
             val cursor = client.query(uri, null, null, null, null)
-                ?: return mapOf("status" to "missing")
+                ?: return notThere(authority)
             cursor.use {
                 if (it.moveToFirst()) {
                     mapOf(
@@ -107,6 +107,22 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
         } finally {
             client.close()
         }
+    }
+
+    /**
+     * No provider answered. If the app itself is installed (the package is
+     * the authority without ".link"), it is an older version that does not
+     * share yet; otherwise it is not installed.
+     */
+    private fun notThere(authority: String): Map<String, Any?> {
+        val pkg = authority.removeSuffix(".link")
+        val installed = try {
+            context.packageManager.getPackageInfo(pkg, 0)
+            true
+        } catch (e: Exception) {
+            false
+        }
+        return mapOf("status" to if (installed) "old_version" else "missing")
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
