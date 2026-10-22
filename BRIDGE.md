@@ -44,14 +44,7 @@ Nowhere off the phone. No server, no account, no cloud copy. The companion
 keeps its own copy in `veda_readings.json` in its app storage, so its charts
 work offline; "Delete everything" in the companion removes it.
 
-## Stage 1 (built now): hand the file over
-1. In Véda: Profile, Export my data. Save the file (Files, Drive, anywhere).
-2. In the companion: Profile, "Bring in my Véda readings", pick that file.
-
-Works with the Véda that is already in the stores; nothing in Véda changes.
-Good enough for tinkering: re-import whenever you want fresher readings.
-
-## Stage 2 (later, before any companion app is released): automatic, with permission
+## How it works: automatic, with permission
 Every app publishes its own feed and can read the others' the same way.
 Described below for Véda's readings; every other feed in the table works
 identically (its own provider or App Group file, its own switch):
@@ -121,5 +114,5 @@ identically (its own provider or App Group file, its own switch):
   ]
 }
 ```
-The companion also accepts Véda's own "Export my data" file (Stage 1) and
-keeps only these fields from it.
+There is no manual import: the readings only arrive live over the link
+(a hand-made import went stale with every new reading, so nobody would use it).

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -46,58 +45,18 @@ void main() {
     }
   });
 
-  test(
-    'Véda\'s own export file becomes readings, and nothing else is kept',
-    () {
-      final export = jsonEncode({
-        'account': {'id': 7, 'email': 'someone@example.com'},
-        'consent_history': [],
-        'scans': [
-          {
-            'created_at': '2026-10-20T14:00:00Z',
-            'time_of_day': 'midday',
-            'scores': {'redness': 89, 'texture': 82, 'skin_score': 88.4},
-            'raw': {'redness': 1.2},
-            'per_region': {'cheek': 3},
-          },
-          {
-            'created_at': '2026-10-19T08:00:00Z',
-            'time_of_day': 'morning',
-            'scores': {'redness': 80},
-          },
-        ],
-      });
-      final readings = parseVedaReadings(export);
-      expect(readings, hasLength(2));
-      expect(readings.first.slot, 'morning'); // oldest first
-      expect(readings.last.skinScore, 88.4);
-      expect(readings.last.scores, {'redness': 89.0, 'texture': 82.0});
-      final kept = jsonEncode([for (final r in readings) r.toJson()]);
-      expect(kept.contains('example.com'), isFalse);
-      expect(kept.contains('per_region'), isFalse);
-    },
-  );
-
   test('the store round-trips through its file', () async {
     final file = MemoryJsonFile();
     final store = VedaLinkStore(file: file);
     await store.load();
-    final n = await store.importText(
-      jsonEncode({
-        'schema': 'veda-link/1',
-        'readings': [
-          {'taken_at': '2026-10-20T14:00:00Z', 'skin_score': 86, 'scores': {}},
-        ],
-      }),
-    );
-    expect(n, 1);
+    await store.takeLive({
+      'readings': [
+        {'taken_at': '2026-10-20T14:00:00Z', 'skin_score': 86, 'scores': {}},
+      ],
+    });
     final again = VedaLinkStore(file: file);
     await again.load();
     expect(again.data.readings.single.skinScore, 86);
-  });
-
-  test('a file that is not from Véda is refused', () {
-    expect(() => parseVedaReadings('{"hello": 1}'), throwsFormatException);
   });
 
   test('group averages count each day once, and only days that have both', () {

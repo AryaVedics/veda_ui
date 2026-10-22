@@ -1,5 +1,5 @@
-// The parts of Profile every companion app has: its Véda readings (Véda
-// Link), exporting its data, deleting everything, and a few plain words about
+// The parts of Profile every companion app has: whether Véda's readings are
+// coming in (Véda Link), exporting its data, deleting everything, and a few plain words about
 // what the app is and is not.
 
 import 'package:flutter/material.dart';
@@ -8,45 +8,26 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'app_colors.dart';
 import 'common.dart';
 import 'json_store.dart';
+import 'link_bridge.dart';
 import 'veda_link.dart';
 
-/// "Your Véda readings": bring them in from Véda's export, or forget them.
+/// "Véda": whether Véda's readings are coming in live, and how to switch that
+/// on. The readings themselves arrive by Véda Link (see LinkRefresher); there
+/// is nothing to import by hand.
 class VedaLinkSection extends StatelessWidget {
-  const VedaLinkSection({super.key, required this.link, required this.why});
+  const VedaLinkSection({
+    super.key,
+    required this.link,
+    required this.bridge,
+    required this.why,
+  });
 
   final VedaLinkStore link;
+  final LinkBridge bridge;
 
   /// What this app does with them, in one line: "To chart them next to
   /// your sleep and water."
   final String why;
-
-  Future<void> _import(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final n = await link.pickAndImport();
-      if (n == null) return;
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            n == 1 ? '1 reading brought in.' : '$n readings brought in.',
-          ),
-        ),
-      );
-    } on FormatException {
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text(
-            'That file is not a Véda export. In Véda, use '
-            'Profile, Export my data.',
-          ),
-        ),
-      );
-    } catch (_) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('The file could not be read.')),
-      );
-    }
-  }
 
   Future<void> _forget(BuildContext context) async {
     await link.deleteEverything();
@@ -62,25 +43,30 @@ class VedaLinkSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: link,
+      listenable: Listenable.merge([link, bridge]),
       builder: (context, _) {
         final readings = link.data.readings;
         final has = readings.isNotEmpty;
+        final live = bridge.use &&
+            bridge.readOf(LinkApp.skin).status == LinkStatus.connected;
         return CardBox(
           padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
           child: Column(
             children: [
               ProfileRow(
                 icon: PhosphorIconsThin.sparkle,
-                title: has
-                    ? 'Update my Véda readings'
-                    : 'Bring in my Véda readings',
-                subtitle: has
-                    ? '${readings.length} readings, up to ${dayMonth(readings.last.takenAt)}. '
-                          'In Véda: Profile, Export my data, then pick the file here.'
-                    : '$why In Véda: Profile, Export my data, then pick the file here. '
-                          'Only the dates and scores are kept, on this phone.',
-                onTap: () => _import(context),
+                title: live ? 'Live from Véda' : 'Véda is not connected',
+                subtitle: live
+                    ? (has
+                          ? '${readings.length} readings, latest '
+                                '${dayMonth(readings.last.takenAt)}. They update '
+                                'whenever you open this app.'
+                          : 'Connected. Your readings appear here after your '
+                                'next scan in Véda.')
+                    : '$why In Véda: Profile, "Let my other Véda apps use my '
+                          'readings". Here: switch on "Use entries from my '
+                          'other Véda apps" above. Only dates and scores, kept '
+                          'on this phone.',
               ),
               if (has)
                 ProfileRow(

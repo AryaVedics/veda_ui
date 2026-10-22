@@ -22,8 +22,6 @@ dependencies:
   share_plus: ^10.1.0
   # Véda Link's two on/off switches.
   shared_preferences: ^2.3.0
-  # Véda Link, stage 1: picking the file Véda exported (see BRIDGE.md).
-  file_picker: ^10.3.0
   # The logo menu's links to the website and support page.
   url_launcher: ^6.3.0
 
