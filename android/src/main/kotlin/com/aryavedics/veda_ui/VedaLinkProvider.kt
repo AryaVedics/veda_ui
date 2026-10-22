@@ -30,7 +30,7 @@ class VedaLinkProvider : ContentProvider() {
         val ctx = context ?: return cursor
         val file = feedFile(ctx)
         if (file.exists()) {
-            cursor.addRow(arrayOf(file.readText(Charsets.UTF_8), file.lastModified()))
+            cursor.addRow(arrayOf<Any?>(file.readText(Charsets.UTF_8), file.lastModified()))
         }
         return cursor
     }

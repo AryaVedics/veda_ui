@@ -11,7 +11,6 @@ import 'app_colors.dart';
 import 'brand.dart';
 import 'common.dart';
 import 'theme.dart';
-import 'veda_link.dart';
 
 /// "A difference, not proof of a cause."
 class ChartCaveat extends StatelessWidget {
@@ -27,111 +26,6 @@ class ChartCaveat extends StatelessWidget {
             style: TextStyle(
                 fontSize: 11.5, height: 1.4, color: context.colors.textMuted)),
       );
-}
-
-/// One bar: a label, an average Skin Score, and the days it rests on.
-class BarRow {
-  const BarRow(this.label, this.average, this.days);
-
-  final String label;
-  final double? average;
-  final int days;
-}
-
-/// Average Skin Score per group, as horizontal bars. Groups with no days are
-/// shown quietly empty rather than hidden, so the person sees what is missing.
-class GroupBars extends StatelessWidget {
-  const GroupBars({super.key, required this.rows, this.labelWidth = 118});
-
-  final List<BarRow> rows;
-  final double labelWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Column(children: [
-      for (final r in rows)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(children: [
-            SizedBox(
-              width: labelWidth,
-              child: Text(r.label,
-                  style: TextStyle(fontSize: 13, color: colors.textSecondary)),
-            ),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, c) {
-                  final frac = r.average == null
-                      ? 0.0
-                      : ((r.average! - 60) / 40).clamp(0.04, 1.0);
-                  return Stack(children: [
-                    Container(
-                      height: 16,
-                      decoration: BoxDecoration(
-                          color: colors.cardSunken,
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    Container(
-                      height: 16,
-                      width: c.maxWidth * frac,
-                      decoration: BoxDecoration(
-                          color: colors.accent,
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ]);
-                },
-              ),
-            ),
-            SizedBox(
-              width: 62,
-              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                Text(r.average == null ? '–' : r.average!.round().toString(),
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: colors.accentText)),
-                const SizedBox(width: 6),
-                Text('${r.days}d',
-                    style: TextStyle(fontSize: 11, color: colors.textMuted)),
-              ]),
-            ),
-          ]),
-        ),
-    ]);
-  }
-}
-
-/// Averages [scoreOf] days into groups: for each group name, the mean Skin
-/// Score of the days where [groupOf] says the day belongs to it.
-List<BarRow> groupAverages({
-  required VedaLinkData readings,
-  required List<String> groups,
-  required String? Function(DateTime day) groupOf,
-}) {
-  final byDay = <DateTime, List<double>>{};
-  for (final r in readings.readings) {
-    final s = r.skinScore;
-    if (s == null) continue;
-    byDay.putIfAbsent(dayOf(r.takenAt), () => []).add(s);
-  }
-  final sums = {for (final g in groups) g: <double>[]};
-  byDay.forEach((day, scores) {
-    final g = groupOf(day);
-    if (g != null && sums.containsKey(g)) {
-      sums[g]!.add(scores.reduce((a, b) => a + b) / scores.length);
-    }
-  });
-  return [
-    for (final g in groups)
-      BarRow(
-        g,
-        sums[g]!.isEmpty
-            ? null
-            : sums[g]!.reduce((a, b) => a + b) / sums[g]!.length,
-        sums[g]!.length,
-      ),
-  ];
 }
 
 /// One day on the trend chart.

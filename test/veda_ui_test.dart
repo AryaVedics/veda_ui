@@ -83,24 +83,26 @@ void main() {
     expect(() => parseVedaReadings('{"hello": 1}'), throwsFormatException);
   });
 
-  test('chart averages count each day once, and only days that have both', () {
+  test('group averages count each day once, and only days that have both', () {
     final data = VedaLinkData(readings: [
-      VedaReading(takenAt: DateTime(2026, 10, 1, 8), skinScore: 80),
-      VedaReading(takenAt: DateTime(2026, 10, 1, 20), skinScore: 90), // same day: averaged to 85
-      VedaReading(takenAt: DateTime(2026, 10, 2, 9), skinScore: 70),
-      VedaReading(takenAt: DateTime(2026, 10, 3, 9), skinScore: 95), // no entry that day
+      VedaReading(takenAt: DateTime(2026, 10, 1, 8), skinScore: 80, scores: {'redness': 70}),
+      VedaReading(takenAt: DateTime(2026, 10, 1, 20), skinScore: 90, scores: {'redness': 90}), // same day: averaged
+      VedaReading(takenAt: DateTime(2026, 10, 2, 9), skinScore: 70, scores: {'redness': 60}),
+      VedaReading(takenAt: DateTime(2026, 10, 3, 9), skinScore: 95, scores: {'redness': 99}), // no entry that day
     ]);
-    final rows = groupAverages(
+    final rows = groupMetrics(
       readings: data,
       groups: ['short', 'long'],
       groupOf: (d) => d.day == 1 ? 'long' : d.day == 2 ? 'short' : null,
     );
-    expect(rows[0].average, 70);
     expect(rows[0].days, 1);
-    expect(rows[1].average, 85);
+    expect(rows[0].skinScore, 70);
+    expect(rows[0].scores['redness'], 60);
     expect(rows[1].days, 1);
-    final none = groupAverages(
+    expect(rows[1].skinScore, 85);
+    expect(rows[1].scores['redness'], 80);
+    final none = groupMetrics(
         readings: const VedaLinkData(), groups: ['x'], groupOf: (_) => 'x');
-    expect(none.single.average, isNull);
+    expect(none.single.isEmpty, isTrue);
   });
 }
