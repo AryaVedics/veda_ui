@@ -1,0 +1,40 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Véda Link, live sharing between the Véda apps on one phone (see
+         veda_ui/BRIDGE.md). Every app publishes ONE feed through a content
+         provider whose read permission is a signature permission: only apps
+         signed with the same key as the publisher can read it, and no other
+         app on the phone can. Each app defines its own permission name (from
+         its own application id), so two family apps can never clash over a
+         duplicate definition. -->
+    <permission
+        android:name="${applicationId}.permission.READ_FEED"
+        android:protectionLevel="signature" />
+
+    <!-- The family's feeds this app may read, if the person turns reading on.
+         An app that is not installed, or is signed with a different key, is
+         simply not granted, and reading it returns nothing. -->
+    <uses-permission android:name="com.aryavedics.sun.permission.READ_FEED" />
+    <uses-permission android:name="com.aryavedics.lifestyle.permission.READ_FEED" />
+    <uses-permission android:name="com.aryavedics.cycle.permission.READ_FEED" />
+    <uses-permission android:name="com.aryavedics.routine.permission.READ_FEED" />
+    <uses-permission android:name="com.aryavedics.skin.permission.READ_FEED" />
+
+    <!-- Android 11+ hides other apps' providers unless they are declared. -->
+    <queries>
+        <provider android:authorities="com.aryavedics.sun.link" />
+        <provider android:authorities="com.aryavedics.lifestyle.link" />
+        <provider android:authorities="com.aryavedics.cycle.link" />
+        <provider android:authorities="com.aryavedics.routine.link" />
+        <provider android:authorities="com.aryavedics.skin.link" />
+    </queries>
+
+    <application>
+        <provider
+            android:name="com.aryavedics.veda_ui.VedaLinkProvider"
+            android:authorities="${applicationId}.link"
+            android:exported="true"
+            android:readPermission="${applicationId}.permission.READ_FEED"
+            android:writePermission="${applicationId}.permission.READ_FEED" />
+    </application>
+</manifest>

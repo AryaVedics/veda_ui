@@ -20,6 +20,8 @@ dependencies:
   path_provider: ^2.1.0
   # "Export my data" hands that file to the phone's share sheet.
   share_plus: ^10.1.0
+  # Véda Link's two on/off switches.
+  shared_preferences: ^2.3.0
   # Véda Link, stage 1: picking the file Véda exported (see BRIDGE.md).
   file_picker: ^10.3.0
   # The logo menu's links to the website and support page.
@@ -31,6 +33,11 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.aryavedics.veda_ui
+        pluginClass: VedaUiPlugin
   fonts:
     # Véda's display serif, for titles only. Apps use it as kDisplayFont
     # ('packages/veda_ui/Marcellus').

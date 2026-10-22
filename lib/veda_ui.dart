@@ -12,9 +12,12 @@ export 'package:phosphor_flutter/phosphor_flutter.dart';
 
 export 'src/app_colors.dart';
 export 'src/brand.dart';
+export 'src/charts.dart';
 export 'src/common.dart';
 export 'src/heart_pulse_icon.dart';
 export 'src/json_store.dart';
+export 'src/link_bridge.dart';
+export 'src/link_section.dart';
 export 'src/logo_menu.dart';
 export 'src/profile_sections.dart';
 export 'src/theme.dart';

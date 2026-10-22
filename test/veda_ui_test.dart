@@ -82,4 +82,25 @@ void main() {
   test('a file that is not from Véda is refused', () {
     expect(() => parseVedaReadings('{"hello": 1}'), throwsFormatException);
   });
+
+  test('chart averages count each day once, and only days that have both', () {
+    final data = VedaLinkData(readings: [
+      VedaReading(takenAt: DateTime(2026, 10, 1, 8), skinScore: 80),
+      VedaReading(takenAt: DateTime(2026, 10, 1, 20), skinScore: 90), // same day: averaged to 85
+      VedaReading(takenAt: DateTime(2026, 10, 2, 9), skinScore: 70),
+      VedaReading(takenAt: DateTime(2026, 10, 3, 9), skinScore: 95), // no entry that day
+    ]);
+    final rows = groupAverages(
+      readings: data,
+      groups: ['short', 'long'],
+      groupOf: (d) => d.day == 1 ? 'long' : d.day == 2 ? 'short' : null,
+    );
+    expect(rows[0].average, 70);
+    expect(rows[0].days, 1);
+    expect(rows[1].average, 85);
+    expect(rows[1].days, 1);
+    final none = groupAverages(
+        readings: const VedaLinkData(), groups: ['x'], groupOf: (_) => 'x');
+    expect(none.single.average, isNull);
+  });
 }
