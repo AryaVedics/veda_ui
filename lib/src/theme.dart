@@ -21,14 +21,21 @@ ThemeData vedaTheme(AppColors colors) {
       backgroundColor: colors.card,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       titleTextStyle: TextStyle(
-          fontSize: 19, fontFamily: kDisplayFont, color: colors.textPrimary),
-      contentTextStyle:
-          TextStyle(fontSize: 14, color: colors.textSecondary, height: 1.5),
+        fontSize: 19,
+        fontFamily: kDisplayFont,
+        color: colors.textPrimary,
+      ),
+      contentTextStyle: TextStyle(
+        fontSize: 14,
+        color: colors.textSecondary,
+        height: 1.5,
+      ),
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: colors.card,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
       showDragHandle: true,
       dragHandleColor: colors.divider,
     ),
@@ -66,10 +73,15 @@ ThemeData vedaTheme(AppColors colors) {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.resolveWith((s) =>
-          s.contains(WidgetState.selected) ? colors.accent : colors.textMuted),
-      trackColor: WidgetStateProperty.resolveWith((s) =>
-          s.contains(WidgetState.selected) ? colors.accentDim : colors.cardSunken),
+      thumbColor: WidgetStateProperty.resolveWith(
+        (s) =>
+            s.contains(WidgetState.selected) ? colors.accent : colors.textMuted,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.selected)
+            ? colors.accentDim
+            : colors.cardSunken,
+      ),
     ),
     splashColor: colors.accentDim.withValues(alpha: 0.3),
     highlightColor: colors.accentDim.withValues(alpha: 0.15),

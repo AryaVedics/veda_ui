@@ -24,7 +24,10 @@ class DataReveal extends StatefulWidget {
   /// of the remaining duration to finish. A single item (count == 1) just
   /// runs the full duration.
   final Widget Function(
-      BuildContext context, double Function(int index, int count) tAt) builder;
+    BuildContext context,
+    double Function(int index, int count) tAt,
+  )
+  builder;
   final Duration duration;
 
   @override
@@ -33,8 +36,10 @@ class DataReveal extends StatefulWidget {
 
 class _DataRevealState extends State<DataReveal>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller =
-      AnimationController(vsync: this, duration: widget.duration)..forward();
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+  )..forward();
 
   @override
   void dispose() {
@@ -48,8 +53,11 @@ class _DataRevealState extends State<DataReveal>
     }
     final start = (index / count) * 0.5;
     final end = (start + 0.6).clamp(0.0, 1.0);
-    return Interval(start, end, curve: Curves.easeOutCubic)
-        .transform(_controller.value);
+    return Interval(
+      start,
+      end,
+      curve: Curves.easeOutCubic,
+    ).transform(_controller.value);
   }
 
   @override

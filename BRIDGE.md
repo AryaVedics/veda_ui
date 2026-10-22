@@ -61,10 +61,17 @@ identically (its own provider or App Group file, its own switch):
   up to date (same fields as above). Turning it off deletes that file.
 - **The companion** gets one switch: "Show my Véda readings here". Both
   switches must be on.
-- **Android:** Véda publishes the file through a read-only content provider
-  (`com.aryavedics.skin.link`) protected by a *signature* permission
-  (`com.aryavedics.permission.VEDA_LINK`). Only apps signed with the same
-  certificate can read it; no other app on the phone can.
+- **Android:** each app publishes its feed through a read-only content provider
+  (`<applicationId>.link`). The provider checks WHO is asking at query time
+  (`FamilyKeys.kt`): the caller must be one of the family's packages AND signed
+  with one of OUR pinned certificates (Google Play app signing key, and the
+  upload key). A certificate cannot be faked, so another app using our package
+  name is refused. This replaces Android's "same signing key" permission, so
+  each app keeps its own key: Véda's Play-managed key cannot be exported, and
+  forcing all apps onto one key was not possible for the Play-installed Véda.
+  The Android debug key is NOT pinned (a test key is not one to trust inside a
+  shipped app); test builds are signed with the upload key via a local,
+  uncommitted `android/key.properties` instead.
 - **iPhone:** Véda writes the file into a shared App Group container
   (`group.com.aryavedics.veda`) that only Véda-family apps under the same
   Apple developer team can open.
@@ -79,13 +86,17 @@ identically (its own provider or App Group file, its own switch):
   companion stay there too: they are never sent to Véda's server.
 
 ### Decisions this forces now
-- **One signing key for the whole family on Android.** When each companion app
-  is created in Play Console, choose to use the **same app signing key as
-  Véda**. This can only be chosen at creation and cannot be changed later.
-  Sideloaded test builds must be signed with Véda's upload key for Stage 2 to
-  work between them.
+- **Pinned certificates.** The two Véda fingerprints (Play app signing key and
+  upload key) are in `FamilyKeys.kt` (veda_ui and Véda's own copy). When a
+  companion app is created in Play Console, add ITS Play app signing
+  certificate there too (Play Console, Test and release, App integrity, App
+  signing key certificate, SHA-256). If a key is ever rotated, change it in
+  both copies and release both.
+- **Test builds** of the companions are signed with the upload key (copy
+  Véda's `android/key.properties` into each companion's `android/`). A build
+  made without it (a teammate's machine) works but will not link.
 - **Same Apple developer team** for every app (already true), with the App
-  Group capability added to each App ID.
+  Group capability added to each App ID (iPhone, later).
 
 ### Before Stage 2 ships
 - Véda's privacy policy gets a line: if you turn the switch on, your readings

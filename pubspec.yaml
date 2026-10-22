@@ -33,6 +33,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  # Only for the chart screenshots test (test/screenshots_test.dart).
+  assets:
+    - assets/branding/
   plugin:
     platforms:
       android:

@@ -52,8 +52,10 @@ List<GroupMetrics> groupMetrics({
     for (final key in [skinScoreName, ...kVedaMetrics]) {
       final values = [
         for (final r in rs)
-          if (key == skinScoreName ? r.skinScore != null : r.scores[key] != null)
-            key == skinScoreName ? r.skinScore! : r.scores[key]!
+          if (key == skinScoreName
+              ? r.skinScore != null
+              : r.scores[key] != null)
+            key == skinScoreName ? r.skinScore! : r.scores[key]!,
       ];
       if (values.isNotEmpty) {
         avg[key] = values.reduce((a, b) => a + b) / values.length;
@@ -66,7 +68,10 @@ List<GroupMetrics> groupMetrics({
       () {
         final days = perGroup[g]!;
         double? mean(String key) {
-          final v = [for (final d in days) if (d[key] != null) d[key]!];
+          final v = [
+            for (final d in days)
+              if (d[key] != null) d[key]!,
+          ];
           return v.isEmpty ? null : v.reduce((a, b) => a + b) / v.length;
         }
 
@@ -93,6 +98,7 @@ class GroupMetricsCard extends StatefulWidget {
     required this.groups,
     required this.caveat,
     this.empty,
+    this.defaultStyle = MetricStyle.petals,
   });
 
   final String title;
@@ -105,22 +111,29 @@ class GroupMetricsCard extends StatefulWidget {
   /// Shown instead of the chart when there is nothing to chart yet.
   final String? empty;
 
+  /// The style shown until the person picks one (then theirs is remembered).
+  final MetricStyle defaultStyle;
+
   @override
   State<GroupMetricsCard> createState() => _GroupMetricsCardState();
 }
 
 class _GroupMetricsCardState extends State<GroupMetricsCard> {
-  MetricStyle _style = MetricStyle.petals;
+  late MetricStyle _style = widget.defaultStyle;
   String? _picked;
 
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      final saved = prefs.getString(_styleKey);
-      final s = MetricStyle.values.where((v) => v.name == saved).firstOrNull;
-      if (s != null && mounted) setState(() => _style = s);
-    }).catchError((_) {});
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          final saved = prefs.getString(_styleKey);
+          final s = MetricStyle.values
+              .where((v) => v.name == saved)
+              .firstOrNull;
+          if (s != null && mounted) setState(() => _style = s);
+        })
+        .catchError((_) {});
   }
 
   void _setStyle(MetricStyle s) {
@@ -133,7 +146,9 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
   GroupMetrics? get _current {
     final withDays = widget.groups.where((g) => !g.isEmpty).toList();
     if (withDays.isEmpty) return null;
-    return widget.groups.where((g) => g.label == _picked && !g.isEmpty).firstOrNull ??
+    return widget.groups
+            .where((g) => g.label == _picked && !g.isEmpty)
+            .firstOrNull ??
         withDays.first;
   }
 
@@ -144,70 +159,106 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
     return ChartCard(
       title: widget.title,
       subtitle: widget.subtitle,
-      empty: widget.empty ??
+      empty:
+          widget.empty ??
           (current == null
               ? 'Nothing to show yet: this fills in once a day has both a Véda '
-                  'reading and an entry here.'
+                    'reading and an entry here.'
               : null),
       child: current == null
           ? const SizedBox.shrink()
-          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final g in widget.groups)
-                  ChoiceChip(
-                    label: Text(g.isEmpty ? g.label : '${g.label} · ${g.days}d'),
-                    selected: g.label == current.label,
-                    labelStyle: TextStyle(
-                        fontSize: 13,
-                        color: g.label == current.label
-                            ? colors.accentText
-                            : g.isEmpty
-                                ? colors.textMuted
-                                : colors.textSecondary),
-                    onSelected: g.isEmpty ? null : (_) => setState(() => _picked = g.label),
-                  ),
-              ]),
-              const SizedBox(height: 14),
-              if (current.skinScore != null)
-                Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text(current.skinScore!.round().toString(),
-                      style: TextStyle(
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final g in widget.groups)
+                      ChoiceChip(
+                        label: Text(
+                          g.isEmpty ? g.label : '${g.label} · ${g.days}d',
+                        ),
+                        selected: g.label == current.label,
+                        labelStyle: TextStyle(
+                          fontSize: 13,
+                          color: g.label == current.label
+                              ? colors.accentText
+                              : g.isEmpty
+                              ? colors.textMuted
+                              : colors.textSecondary,
+                        ),
+                        onSelected: g.isEmpty
+                            ? null
+                            : (_) => setState(() => _picked = g.label),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                if (current.skinScore != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        current.skinScore!.round().toString(),
+                        style: TextStyle(
                           fontSize: 34,
                           height: 1,
                           fontFamily: kDisplayFont,
-                          color: colors.accentText)),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'average Skin Score over ${current.days} '
-                        '${current.days == 1 ? 'day' : 'days'}',
-                        style: TextStyle(fontSize: 12.5, color: colors.textMuted)),
+                          color: colors.accentText,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 3),
+                        child: Text(
+                          'average Skin Score over ${current.days} '
+                          '${current.days == 1 ? 'day' : 'days'}',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: colors.textMuted,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ]),
-              const SizedBox(height: 12),
-              MetricStyleToggle(value: _style, onChanged: _setStyle),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 310,
-                child: SwipeableChartPager<MetricStyle>(
-                  value: _style,
-                  values: const [MetricStyle.rings, MetricStyle.petals, MetricStyle.bars],
-                  onChanged: _setStyle,
-                  builder: (s) => Center(
-                    child: switch (s) {
-                      MetricStyle.bars => MetricBarsView(
-                          scores: current.scores, colors: colors, onTap: (_) {}),
-                      MetricStyle.rings => MetricRingsView(
-                          scores: current.scores, colors: colors, onTap: (_) {}),
-                      MetricStyle.petals => MetricPetalsView(
-                          scores: current.scores, colors: colors, onTap: (_) {}),
-                    },
+                const SizedBox(height: 12),
+                MetricStyleToggle(value: _style, onChanged: _setStyle),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 285,
+                  child: SwipeableChartPager<MetricStyle>(
+                    value: _style,
+                    values: const [
+                      MetricStyle.rings,
+                      MetricStyle.petals,
+                      MetricStyle.bars,
+                    ],
+                    onChanged: _setStyle,
+                    builder: (s) => Center(
+                      child: switch (s) {
+                        MetricStyle.bars => MetricBarsView(
+                          scores: current.scores,
+                          colors: colors,
+                          onTap: (_) {},
+                        ),
+                        MetricStyle.rings => MetricRingsView(
+                          scores: current.scores,
+                          colors: colors,
+                          onTap: (_) {},
+                        ),
+                        MetricStyle.petals => MetricPetalsView(
+                          scores: current.scores,
+                          colors: colors,
+                          onTap: (_) {},
+                        ),
+                      },
+                    ),
                   ),
                 ),
-              ),
-              ChartCaveat(widget.caveat),
-            ]),
+                ChartCaveat(widget.caveat),
+              ],
+            ),
     );
   }
 }

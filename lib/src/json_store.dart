@@ -71,7 +71,7 @@ class MemoryJsonFile implements JsonFile {
 /// A store holding one immutable data value [T] that round-trips through JSON.
 abstract class JsonStore<T> extends ChangeNotifier {
   JsonStore(this._file, {DateTime Function()? clock})
-      : clock = clock ?? DateTime.now;
+    : clock = clock ?? DateTime.now;
 
   final JsonFile _file;
   final DateTime Function() clock;
@@ -132,6 +132,7 @@ Future<void> shareJsonFile(String fileName, String json, String subject) async {
   final dir = await getTemporaryDirectory();
   final file = File('${dir.path}/$fileName');
   await file.writeAsString(json);
-  await Share.shareXFiles([XFile(file.path, mimeType: 'application/json')],
-      subject: subject);
+  await Share.shareXFiles([
+    XFile(file.path, mimeType: 'application/json'),
+  ], subject: subject);
 }

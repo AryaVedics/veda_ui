@@ -8,20 +8,27 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class VedaTab {
-  const VedaTab(
-      {required this.icon, required this.selectedIcon, required this.label});
+  const VedaTab({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
 
   final Widget icon;
   final Widget selectedIcon;
   final String label;
 
   /// A tab from a Phosphor icon pair (thin when idle, filled when selected).
-  static VedaTab of(AppColors colors, IconData thin, IconData fill, String label) =>
-      VedaTab(
-        icon: Icon(thin, size: 24, color: colors.textMuted),
-        selectedIcon: Icon(fill, size: 24, color: colors.accentText),
-        label: label,
-      );
+  static VedaTab of(
+    AppColors colors,
+    IconData thin,
+    IconData fill,
+    String label,
+  ) => VedaTab(
+    icon: Icon(thin, size: 24, color: colors.textMuted),
+    selectedIcon: Icon(fill, size: 24, color: colors.accentText),
+    label: label,
+  );
 }
 
 class VedaTabBar extends StatelessWidget {
@@ -88,8 +95,9 @@ class VedaTabBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(1),
                       boxShadow: [
                         BoxShadow(
-                            color: colors.accent.withValues(alpha: 0.6),
-                            blurRadius: 6),
+                          color: colors.accent.withValues(alpha: 0.6),
+                          blurRadius: 6,
+                        ),
                       ],
                     ),
                   ),
@@ -100,7 +108,9 @@ class VedaTabBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    height: 24, child: selected ? tab.selectedIcon : tab.icon),
+                  height: 24,
+                  child: selected ? tab.selectedIcon : tab.icon,
+                ),
                 const SizedBox(height: 4),
                 Text(
                   tab.label,

@@ -21,11 +21,16 @@ class ChartCaveat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(2, 10, 2, 0),
-        child: Text('$extra A difference, not proof of a cause.',
-            style: TextStyle(
-                fontSize: 11.5, height: 1.4, color: context.colors.textMuted)),
-      );
+    padding: const EdgeInsets.fromLTRB(2, 10, 2, 0),
+    child: Text(
+      '$extra A difference, not proof of a cause.',
+      style: TextStyle(
+        fontSize: 11.5,
+        height: 1.4,
+        color: context.colors.textMuted,
+      ),
+    ),
+  );
 }
 
 /// One day on the trend chart.
@@ -60,37 +65,57 @@ class TrendChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    Widget key(Widget swatch, String t) => Row(mainAxisSize: MainAxisSize.min, children: [
-          swatch,
-          const SizedBox(width: 6),
-          Text(t, style: TextStyle(fontSize: 12, color: colors.textSecondary)),
-        ]);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SizedBox(
-        height: 170,
-        width: double.infinity,
-        child: CustomPaint(painter: _TrendPainter(days, colors)),
-      ),
-      const SizedBox(height: 8),
-      Wrap(spacing: 16, runSpacing: 6, children: [
-        key(Container(width: 20, height: 3, color: colors.accent), 'Skin Score'),
-        key(
-            Container(
+    Widget key(Widget swatch, String t) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        swatch,
+        const SizedBox(width: 6),
+        Text(t, style: TextStyle(fontSize: 12, color: colors.textSecondary)),
+      ],
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 170,
+          width: double.infinity,
+          child: CustomPaint(painter: _TrendPainter(days, colors)),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 16,
+          runSpacing: 6,
+          children: [
+            key(
+              Container(width: 20, height: 3, color: colors.accent),
+              'Skin Score',
+            ),
+            key(
+              Container(
                 width: 12,
                 height: 11,
                 decoration: BoxDecoration(
-                    color: colors.textMuted.withValues(alpha: 0.55),
-                    borderRadius: BorderRadius.circular(2))),
-            barLabel),
-        key(
-            Container(
+                  color: colors.textMuted.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              barLabel,
+            ),
+            key(
+              Container(
                 width: 7,
                 height: 7,
                 decoration: BoxDecoration(
-                    color: colors.accentText, shape: BoxShape.circle)),
-            markLabel),
-      ]),
-    ]);
+                  color: colors.accentText,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              markLabel,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -106,7 +131,9 @@ class _TrendPainter extends CustomPainter {
     final n = days.length;
     final w = size.width / n;
     final plotH = size.height - 22; // room for the dots underneath
-    final maxBar = days.map((d) => d.bar ?? 0).fold<double>(0, (a, b) => a > b ? a : b);
+    final maxBar = days
+        .map((d) => d.bar ?? 0)
+        .fold<double>(0, (a, b) => a > b ? a : b);
 
     // Bars first, so the line sits on top.
     final barPaint = Paint()..color = colors.textMuted.withValues(alpha: 0.55);
@@ -116,13 +143,18 @@ class _TrendPainter extends CustomPainter {
       final h = (b / maxBar) * plotH * 0.55;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            Rect.fromLTWH(i * w + 1.5, plotH - h, w - 3, h), const Radius.circular(2)),
+          Rect.fromLTWH(i * w + 1.5, plotH - h, w - 3, h),
+          const Radius.circular(2),
+        ),
         barPaint,
       );
     }
 
     // The score line: scaled to the range actually seen, with a little air.
-    final scores = [for (final d in days) if (d.score != null) d.score!];
+    final scores = [
+      for (final d in days)
+        if (d.score != null) d.score!,
+    ];
     if (scores.isNotEmpty) {
       var lo = scores.reduce((a, b) => a < b ? a : b);
       var hi = scores.reduce((a, b) => a > b ? a : b);
@@ -131,7 +163,8 @@ class _TrendPainter extends CustomPainter {
         lo = mid - 6;
         hi = mid + 6;
       }
-      double y(double s) => plotH - ((s - lo) / (hi - lo)) * plotH * 0.9 - plotH * 0.05;
+      double y(double s) =>
+          plotH - ((s - lo) / (hi - lo)) * plotH * 0.9 - plotH * 0.05;
       final line = Paint()
         ..color = colors.accent
         ..style = PaintingStyle.stroke
@@ -154,7 +187,8 @@ class _TrendPainter extends CustomPainter {
         last = p;
       }
       canvas.drawPath(path, line);
-      if (last != null) canvas.drawCircle(last, 5.5, Paint()..color = kMarkerWhite);
+      if (last != null)
+        canvas.drawCircle(last, 5.5, Paint()..color = kMarkerWhite);
     }
 
     // Dots under the days that are marked.
@@ -167,7 +201,8 @@ class _TrendPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_TrendPainter old) => old.days != days || old.colors != colors;
+  bool shouldRepaint(_TrendPainter old) =>
+      old.days != days || old.colors != colors;
 }
 
 /// The card around a chart, with its title and a quiet explainer, and the
@@ -193,19 +228,36 @@ class ChartCard extends StatelessWidget {
     final colors = context.colors;
     return CardBox(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
             style: TextStyle(
-                fontSize: 18, fontFamily: kDisplayFont, color: colors.textPrimary)),
-        const SizedBox(height: 3),
-        Text(subtitle, style: TextStyle(fontSize: 12.5, color: colors.textMuted)),
-        const SizedBox(height: 12),
-        if (empty != null)
-          Text(empty!,
-              style: TextStyle(fontSize: 13.5, height: 1.45, color: colors.textSecondary))
-        else
-          child,
-      ]),
+              fontSize: 18,
+              fontFamily: kDisplayFont,
+              color: colors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 12.5, color: colors.textMuted),
+          ),
+          const SizedBox(height: 12),
+          if (empty != null)
+            Text(
+              empty!,
+              style: TextStyle(
+                fontSize: 13.5,
+                height: 1.45,
+                color: colors.textSecondary,
+              ),
+            )
+          else
+            child,
+        ],
+      ),
     );
   }
 }
@@ -222,35 +274,50 @@ class BrandFooter extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 32, bottom: 8),
       child: Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset(brand.markAsset, width: 140, height: 140),
-          const SizedBox(height: 8),
-          Text('VÉDA ${brand.word}',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(brand.markAsset, width: 140, height: 140),
+            const SizedBox(height: 8),
+            Text(
+              'VÉDA ${brand.word}',
               style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: kDisplayFont,
-                  letterSpacing: 2.5,
-                  color: colors.textPrimary,
-                  height: 1)),
-          const SizedBox(height: 6),
-          Text.rich(TextSpan(
-            style: TextStyle(
-                fontSize: 11, fontFamily: kDisplayFont, color: colors.textMuted),
-            children: const [
+                fontSize: 20,
+                fontFamily: kDisplayFont,
+                letterSpacing: 2.5,
+                color: colors.textPrimary,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text.rich(
               TextSpan(
-                  text: '/VAY-duh/ ',
-                  style: TextStyle(fontStyle: FontStyle.italic)),
-              TextSpan(text: '· noun'),
-            ],
-          )),
-          const SizedBox(height: 4),
-          Text('Sanskrit: sacred knowledge; wisdom.',
-              style: TextStyle(
-                  fontSize: 10.5,
+                style: TextStyle(
+                  fontSize: 11,
                   fontFamily: kDisplayFont,
-                  letterSpacing: 0.2,
-                  color: colors.textSecondary)),
-        ]),
+                  color: colors.textMuted,
+                ),
+                children: const [
+                  TextSpan(
+                    text: '/VAY-duh/ ',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  TextSpan(text: '· noun'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Sanskrit: sacred knowledge; wisdom.',
+              style: TextStyle(
+                fontSize: 10.5,
+                fontFamily: kDisplayFont,
+                letterSpacing: 0.2,
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

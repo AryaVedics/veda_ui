@@ -11,7 +11,7 @@
 //   use    "Use entries from my other Véda apps"       (read the others' feeds)
 //
 // Nothing here touches a network: the data goes from one app's private
-// storage, through the phone's own provider mechanism, into the other app.
+// storage, through the phone provider mechanism, into the other app.
 
 import 'dart:convert';
 
@@ -53,7 +53,11 @@ enum LinkStatus {
 }
 
 class LinkFeed {
-  const LinkFeed({required this.app, required this.updatedAt, required this.data});
+  const LinkFeed({
+    required this.app,
+    required this.updatedAt,
+    required this.data,
+  });
 
   final LinkApp app;
   final DateTime updatedAt;
@@ -71,8 +75,8 @@ class LinkRead {
 
 class LinkBridge extends ChangeNotifier {
   LinkBridge(this.self, {MethodChannel? channel, DateTime Function()? clock})
-      : _channel = channel ?? const MethodChannel('com.aryavedics.veda_ui/link'),
-        _clock = clock ?? DateTime.now;
+    : _channel = channel ?? const MethodChannel('com.aryavedics.veda_ui/link'),
+      _clock = clock ?? DateTime.now;
 
   /// The app this is running inside.
   final LinkApp self;
@@ -89,7 +93,8 @@ class LinkBridge extends ChangeNotifier {
   bool get use => _use;
 
   final Map<LinkApp, LinkRead> _others = {};
-  LinkRead readOf(LinkApp app) => _others[app] ?? const LinkRead(LinkStatus.unknown);
+  LinkRead readOf(LinkApp app) =>
+      _others[app] ?? const LinkRead(LinkStatus.unknown);
 
   /// The feed of [app], if it is connected right now.
   LinkFeed? feedOf(LinkApp app) => readOf(app).feed;
@@ -160,8 +165,9 @@ class LinkBridge extends ChangeNotifier {
 
   Future<LinkRead> _readOne(LinkApp app) async {
     try {
-      final r = await _channel
-          .invokeMapMethod<String, Object?>('read', {'authority': app.authority});
+      final r = await _channel.invokeMapMethod<String, Object?>('read', {
+        'authority': app.authority,
+      });
       switch (r?['status']) {
         case 'ok':
           final j = jsonDecode(r!['feed'] as String) as Map<String, Object?>;
@@ -169,7 +175,9 @@ class LinkBridge extends ChangeNotifier {
             LinkStatus.connected,
             LinkFeed(
               app: app,
-              updatedAt: DateTime.fromMillisecondsSinceEpoch(r['updated_at'] as int),
+              updatedAt: DateTime.fromMillisecondsSinceEpoch(
+                r['updated_at'] as int,
+              ),
               data: ((j['data'] as Map?) ?? const {}).cast<String, Object?>(),
             ),
           );
@@ -191,7 +199,12 @@ class LinkBridge extends ChangeNotifier {
 /// Keeps the feeds fresh: reads the others when the app opens and every time
 /// it comes back to the front, which is when the person is looking.
 class LinkRefresher extends StatefulWidget {
-  const LinkRefresher({super.key, required this.bridge, required this.child, this.onResume});
+  const LinkRefresher({
+    super.key,
+    required this.bridge,
+    required this.child,
+    this.onResume,
+  });
 
   final LinkBridge bridge;
   final Widget child;
@@ -204,7 +217,8 @@ class LinkRefresher extends StatefulWidget {
   State<LinkRefresher> createState() => _LinkRefresherState();
 }
 
-class _LinkRefresherState extends State<LinkRefresher> with WidgetsBindingObserver {
+class _LinkRefresherState extends State<LinkRefresher>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

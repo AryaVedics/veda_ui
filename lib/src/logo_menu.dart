@@ -59,7 +59,9 @@ Future<void> showLogoMenu(BuildContext context) async {
         final cardWidth = _MenuCard.width.clamp(0.0, box.maxWidth - 16);
         final centered = origin.dx + size.width / 2 - cardWidth / 2;
         final left = centered.clamp(
-            8.0, (box.maxWidth - cardWidth - 8).clamp(8.0, double.infinity));
+          8.0,
+          (box.maxWidth - cardWidth - 8).clamp(8.0, double.infinity),
+        );
         final top = (origin.dy + size.height).clamp(0.0, box.maxHeight);
         return Stack(
           children: [
@@ -69,7 +71,8 @@ Future<void> showLogoMenu(BuildContext context) async {
               width: cardWidth,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                    maxHeight: (box.maxHeight - top - 8).clamp(0.0, 600.0)),
+                  maxHeight: (box.maxHeight - top - 8).clamp(0.0, 600.0),
+                ),
                 child: SingleChildScrollView(child: _MenuCard(items: items)),
               ),
             ),
@@ -92,30 +95,39 @@ class _MenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    Widget item(IconData icon, String label, VoidCallback onTap,
-            {bool primary = false}) =>
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-            child: Row(children: [
-              Icon(icon,
-                  size: 19,
-                  color: primary ? colors.accentText : colors.textSecondary),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(label,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color:
-                            primary ? colors.textPrimary : colors.textSecondary,
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.w400)),
+    Widget item(
+      IconData icon,
+      String label,
+      VoidCallback onTap, {
+      bool primary = false,
+    }) => InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 19,
+              color: primary ? colors.accentText : colors.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: primary ? colors.textPrimary : colors.textSecondary,
+                  decoration: TextDecoration.none,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ]),
-          ),
-        );
+            ),
+          ],
+        ),
+      ),
+    );
 
     // Pops with the thing to do, so it runs after the menu has closed.
     void pick(BuildContext c, VoidCallback action) =>
@@ -127,25 +139,39 @@ class _MenuCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-            color: colors.card, borderRadius: BorderRadius.circular(16)),
+          color: colors.card,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Builder(
           builder: (c) => Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (final it in items)
-                item(it.icon, it.label, () => pick(c, it.onTap),
-                    primary: it.primary),
+                item(
+                  it.icon,
+                  it.label,
+                  () => pick(c, it.onTap),
+                  primary: it.primary,
+                ),
               if (items.isNotEmpty)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   child: Divider(height: 1, color: colors.divider),
                 ),
-              item(PhosphorIconsThin.globe, 'Our website',
-                  () => pick(c, () => _openUrl(kWebsiteUrl))),
-              item(PhosphorIconsThin.chatCircle, 'Support',
-                  () => pick(c, () => _openUrl('$kWebsiteUrl/support'))),
+              item(
+                PhosphorIconsThin.globe,
+                'Our website',
+                () => pick(c, () => _openUrl(kWebsiteUrl)),
+              ),
+              item(
+                PhosphorIconsThin.chatCircle,
+                'Support',
+                () => pick(c, () => _openUrl('$kWebsiteUrl/support')),
+              ),
             ],
           ),
         ),

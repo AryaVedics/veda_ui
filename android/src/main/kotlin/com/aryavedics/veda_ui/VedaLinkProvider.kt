@@ -5,14 +5,14 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
+import android.os.Binder
 import java.io.File
 
 /**
  * The app's own feed, read-only to other Véda apps. The Dart side writes the
  * feed text into this app's private storage (see [feedFile]); this provider
- * only hands that text over, to apps that hold the signature permission
- * declared in AndroidManifest.xml. It never reads another app's data, writes
- * nothing, and returns an empty result when the person has not turned
+ * only hands that text over, to Véda apps that pass FamilyKeys.isFamily. It
+ * never reads another app's data, writes nothing, and returns an empty result when the person has not turned
  * sharing on (the Dart side then deletes the file).
  */
 class VedaLinkProvider : ContentProvider() {
@@ -26,8 +26,12 @@ class VedaLinkProvider : ContentProvider() {
         selectionArgs: Array<out String>?,
         sortOrder: String?
     ): Cursor {
+        val ctx = context ?: return MatrixCursor(arrayOf("feed", "updated_at"))
+        // Only another Véda app, signed with one of our certificates (see FamilyKeys).
+        if (!FamilyKeys.isFamily(ctx, Binder.getCallingUid())) {
+            throw SecurityException("Only Véda apps may read this feed")
+        }
         val cursor = MatrixCursor(arrayOf("feed", "updated_at"))
-        val ctx = context ?: return cursor
         val file = feedFile(ctx)
         if (file.exists()) {
             cursor.addRow(arrayOf<Any?>(file.readText(Charsets.UTF_8), file.lastModified()))

@@ -2,26 +2,19 @@
 
     <!-- Véda Link, live sharing between the Véda apps on one phone (see
          veda_ui/BRIDGE.md). Every app publishes ONE feed through a content
-         provider whose read permission is a signature permission: only apps
-         signed with the same key as the publisher can read it, and no other
-         app on the phone can. Each app defines its own permission name (from
-         its own application id), so two family apps can never clash over a
-         duplicate definition. -->
-    <permission
-        android:name="${applicationId}.permission.READ_FEED"
-        android:protectionLevel="signature" />
+         provider. The provider checks WHO is asking (FamilyKeys.kt): the
+         caller must be a Véda app signed with one of our pinned certificates,
+         so each app can keep its own signing key. -->
 
-    <!-- The family's feeds this app may read, if the person turns reading on.
-         An app that is not installed, or is signed with a different key, is
-         simply not granted, and reading it returns nothing. -->
-    <uses-permission android:name="com.aryavedics.sun.permission.READ_FEED" />
-    <uses-permission android:name="com.aryavedics.lifestyle.permission.READ_FEED" />
-    <uses-permission android:name="com.aryavedics.cycle.permission.READ_FEED" />
-    <uses-permission android:name="com.aryavedics.routine.permission.READ_FEED" />
-    <uses-permission android:name="com.aryavedics.skin.permission.READ_FEED" />
-
-    <!-- Android 11+ hides other apps' providers unless they are declared. -->
+    <!-- Android 11+ hides other apps unless they are declared: we need to see
+         the family's packages (to check who is asking) and their providers
+         (to read their feeds). -->
     <queries>
+        <package android:name="com.aryavedics.skin" />
+        <package android:name="com.aryavedics.sun" />
+        <package android:name="com.aryavedics.lifestyle" />
+        <package android:name="com.aryavedics.cycle" />
+        <package android:name="com.aryavedics.routine" />
         <provider android:authorities="com.aryavedics.sun.link" />
         <provider android:authorities="com.aryavedics.lifestyle.link" />
         <provider android:authorities="com.aryavedics.cycle.link" />
@@ -33,8 +26,6 @@
         <provider
             android:name="com.aryavedics.veda_ui.VedaLinkProvider"
             android:authorities="${applicationId}.link"
-            android:exported="true"
-            android:readPermission="${applicationId}.permission.READ_FEED"
-            android:writePermission="${applicationId}.permission.READ_FEED" />
+            android:exported="true" />
     </application>
 </manifest>

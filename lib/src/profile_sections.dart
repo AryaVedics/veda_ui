@@ -25,15 +25,26 @@ class VedaLinkSection extends StatelessWidget {
     try {
       final n = await link.pickAndImport();
       if (n == null) return;
-      messenger.showSnackBar(SnackBar(
-          content: Text(n == 1 ? '1 reading brought in.' : '$n readings brought in.')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            n == 1 ? '1 reading brought in.' : '$n readings brought in.',
+          ),
+        ),
+      );
     } on FormatException {
-      messenger.showSnackBar(const SnackBar(
-          content: Text('That file is not a Véda export. In Véda, use '
-              'Profile, Export my data.')));
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'That file is not a Véda export. In Véda, use '
+            'Profile, Export my data.',
+          ),
+        ),
+      );
     } catch (_) {
       messenger.showSnackBar(
-          const SnackBar(content: Text('The file could not be read.')));
+        const SnackBar(content: Text('The file could not be read.')),
+      );
     }
   }
 
@@ -41,7 +52,10 @@ class VedaLinkSection extends StatelessWidget {
     await link.deleteEverything();
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Your Véda readings were removed from this app.')));
+        const SnackBar(
+          content: Text('Your Véda readings were removed from this app.'),
+        ),
+      );
     }
   }
 
@@ -54,25 +68,29 @@ class VedaLinkSection extends StatelessWidget {
         final has = readings.isNotEmpty;
         return CardBox(
           padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-          child: Column(children: [
-            ProfileRow(
-              icon: PhosphorIconsThin.sparkle,
-              title: has ? 'Update my Véda readings' : 'Bring in my Véda readings',
-              subtitle: has
-                  ? '${readings.length} readings, up to ${dayMonth(readings.last.takenAt)}. '
-                      'In Véda: Profile, Export my data, then pick the file here.'
-                  : '$why In Véda: Profile, Export my data, then pick the file here. '
-                      'Only the dates and scores are kept, on this phone.',
-              onTap: () => _import(context),
-            ),
-            if (has)
+          child: Column(
+            children: [
               ProfileRow(
-                icon: PhosphorIconsThin.eraser,
-                title: 'Remove my Véda readings',
-                subtitle: 'From this app only. Véda keeps its own.',
-                onTap: () => _forget(context),
+                icon: PhosphorIconsThin.sparkle,
+                title: has
+                    ? 'Update my Véda readings'
+                    : 'Bring in my Véda readings',
+                subtitle: has
+                    ? '${readings.length} readings, up to ${dayMonth(readings.last.takenAt)}. '
+                          'In Véda: Profile, Export my data, then pick the file here.'
+                    : '$why In Véda: Profile, Export my data, then pick the file here. '
+                          'Only the dates and scores are kept, on this phone.',
+                onTap: () => _import(context),
               ),
-          ]),
+              if (has)
+                ProfileRow(
+                  icon: PhosphorIconsThin.eraser,
+                  title: 'Remove my Véda readings',
+                  subtitle: 'From this app only. Véda keeps its own.',
+                  onTap: () => _forget(context),
+                ),
+            ],
+          ),
         );
       },
     );
@@ -108,11 +126,13 @@ class DataSection extends StatelessWidget {
         content: Text('$whatIsDeleted This cannot be undone.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(c, true),
-              child: const Text('Delete')),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
@@ -120,8 +140,9 @@ class DataSection extends StatelessWidget {
     await store.deleteEverything();
     await alsoDelete?.call();
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Everything was deleted.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Everything was deleted.')));
     }
   }
 
@@ -129,21 +150,26 @@ class DataSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return CardBox(
       padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-      child: Column(children: [
-        ProfileRow(
-          icon: PhosphorIconsThin.export,
-          title: 'Export my data',
-          subtitle: 'Everything $appName holds, in one file.',
-          onTap: () => shareJsonFile(
-              exportFileName, store.exportJson(), 'My $appName data'),
-        ),
-        ProfileRow(
-          icon: PhosphorIconsThin.trash,
-          title: 'Delete everything',
-          subtitle: 'From this phone. Nothing is kept anywhere else.',
-          onTap: () => _delete(context),
-        ),
-      ]),
+      child: Column(
+        children: [
+          ProfileRow(
+            icon: PhosphorIconsThin.export,
+            title: 'Export my data',
+            subtitle: 'Everything $appName holds, in one file.',
+            onTap: () => shareJsonFile(
+              exportFileName,
+              store.exportJson(),
+              'My $appName data',
+            ),
+          ),
+          ProfileRow(
+            icon: PhosphorIconsThin.trash,
+            title: 'Delete everything',
+            subtitle: 'From this phone. Nothing is kept anywhere else.',
+            onTap: () => _delete(context),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -155,9 +181,14 @@ class AboutNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-        child: Text(text,
-            style: TextStyle(
-                fontSize: 12.5, height: 1.5, color: context.colors.textMuted)),
-      );
+    padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 12.5,
+        height: 1.5,
+        color: context.colors.textMuted,
+      ),
+    ),
+  );
 }

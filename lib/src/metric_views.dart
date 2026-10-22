@@ -21,49 +21,52 @@ import 'metric_info.dart';
 
 enum MetricStyle { bars, rings, petals }
 
-
 /// The row of three small buttons that switches between styles.
 /// Whatever is picked here is remembered as the default for next time.
 class MetricStyleToggle extends StatelessWidget {
-  const MetricStyleToggle(
-      {super.key, required this.value, required this.onChanged});
+  const MetricStyleToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   final MetricStyle value;
   final ValueChanged<MetricStyle> onChanged;
 
   @override
   Widget build(BuildContext context) => ChartStyleToggle<MetricStyle>(
-        value: value,
-        onChanged: onChanged,
-        options: const [
-          (
-            value: MetricStyle.rings,
-            icon: PhosphorIconsThin.chartDonut,
-            label: 'Rings'
-          ),
-          (
-            value: MetricStyle.petals,
-            icon: PhosphorIconsThin.flower,
-            label: 'Petals'
-          ),
-          (
-            value: MetricStyle.bars,
-            icon: PhosphorIconsThin.chartBar,
-            label: 'Bars'
-          ),
-        ],
-      );
+    value: value,
+    onChanged: onChanged,
+    options: const [
+      (
+        value: MetricStyle.rings,
+        icon: PhosphorIconsThin.chartDonut,
+        label: 'Rings',
+      ),
+      (
+        value: MetricStyle.petals,
+        icon: PhosphorIconsThin.flower,
+        label: 'Petals',
+      ),
+      (
+        value: MetricStyle.bars,
+        icon: PhosphorIconsThin.chartBar,
+        label: 'Bars',
+      ),
+    ],
+  );
 }
 
 /// The chart-style switch itself, for any set of views — Today's
 /// Rings/Petals/Bars, Cycle's Flower/Rings, Lifestyle's Bars/Rings — so
 /// every chart in the app switches with the exact same buttons.
 class ChartStyleToggle<T> extends StatelessWidget {
-  const ChartStyleToggle(
-      {super.key,
-      required this.value,
-      required this.onChanged,
-      required this.options});
+  const ChartStyleToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    required this.options,
+  });
 
   final T value;
   final ValueChanged<T> onChanged;
@@ -92,15 +95,19 @@ class ChartStyleToggle<T> extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(option.icon,
-                    size: 14,
-                    color: selected ? colors.accentText : colors.textMuted),
+                Icon(
+                  option.icon,
+                  size: 14,
+                  color: selected ? colors.accentText : colors.textMuted,
+                ),
                 const SizedBox(width: 5),
-                Text(option.label,
-                    style: TextStyle(
-                        fontSize: 10.5,
-                        color:
-                            selected ? colors.accentText : colors.textMuted)),
+                Text(
+                  option.label,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: selected ? colors.accentText : colors.textMuted,
+                  ),
+                ),
               ],
             ),
           ),
@@ -146,8 +153,9 @@ class SwipeableChartPager<T> extends StatefulWidget {
 }
 
 class _SwipeableChartPagerState<T> extends State<SwipeableChartPager<T>> {
-  late final PageController _controller =
-      PageController(initialPage: widget.values.indexOf(widget.value));
+  late final PageController _controller = PageController(
+    initialPage: widget.values.indexOf(widget.value),
+  );
 
   @override
   void didUpdateWidget(covariant SwipeableChartPager<T> oldWidget) {
@@ -160,8 +168,11 @@ class _SwipeableChartPagerState<T> extends State<SwipeableChartPager<T>> {
     // change instead. Comparing against the settled page, not one mid-drag,
     // is what tells the two apart.
     if (!_controller.hasClients || _controller.page?.round() == target) return;
-    _controller.animateToPage(target,
-        duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
+    _controller.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOut,
+    );
   }
 
   @override
@@ -195,11 +206,12 @@ class _SwipeableChartPagerState<T> extends State<SwipeableChartPager<T>> {
 /// already fit the card's own footprint at full detail, so there's no
 /// separate compact/expanded distinction here.
 class MetricBarsView extends StatelessWidget {
-  const MetricBarsView(
-      {super.key,
-      required this.scores,
-      required this.colors,
-      required this.onTap});
+  const MetricBarsView({
+    super.key,
+    required this.scores,
+    required this.colors,
+    required this.onTap,
+  });
 
   final Map<String, double> scores;
   final AppColors colors;
@@ -238,15 +250,21 @@ class MetricBarsView extends StatelessWidget {
                   Container(
                     width: 7,
                     height: 7,
-                    decoration:
-                        BoxDecoration(color: identity, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: identity,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 64,
-                    child: Text(info?.name ?? e.key,
-                        style: TextStyle(
-                            fontSize: 12.5, color: colors.textSecondary)),
+                    child: Text(
+                      info?.name ?? e.key,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: colors.textSecondary,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -265,12 +283,16 @@ class MetricBarsView extends StatelessWidget {
                   const SizedBox(width: 12),
                   SizedBox(
                     width: 34,
-                    child: Text(shown.toStringAsFixed(0),
-                        textAlign: TextAlign.right,
-                        maxLines: 1,
-                        softWrap: false,
-                        style: TextStyle(
-                            fontSize: 12.5, color: colors.textPrimary)),
+                    child: Text(
+                      shown.toStringAsFixed(0),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      softWrap: false,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: colors.textPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -310,25 +332,29 @@ class _MetricBarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final radius = size.height / 2;
-    final track =
-        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius));
+    final track = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(radius),
+    );
     canvas.drawRRect(track, Paint()..color = trackColor);
 
     final fillWidth = size.width * fraction;
     if (fillWidth <= 0) return;
     final fillRect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, fillWidth, size.height), Radius.circular(radius));
+      Rect.fromLTWH(0, 0, fillWidth, size.height),
+      Radius.circular(radius),
+    );
     // Same gold-into-identity-color wash as the petal chart's fill, so
     // switching styles doesn't lose the richer look — plain gold left to
     // right read as flatter than it needed to once petals had this.
     canvas.drawRRect(
-        fillRect,
-        Paint()
-          ..shader = ui.Gradient.linear(
-            Offset.zero,
-            Offset(fillWidth, 0),
-            [fillColor, veinColor.withValues(alpha: 0.6)],
-          ));
+      fillRect,
+      Paint()
+        ..shader = ui.Gradient.linear(Offset.zero, Offset(fillWidth, 0), [
+          fillColor,
+          veinColor.withValues(alpha: 0.6),
+        ]),
+    );
 
     final inset = radius * 0.8;
     if (fillWidth > inset * 2) {
@@ -349,20 +375,22 @@ class _MetricBarPainter extends CustomPainter {
     // between filled and unfilled."
     final capX = (fillWidth - 1).clamp(0.0, size.width - 1);
     canvas.drawLine(
-        Offset(capX, 0),
-        Offset(capX, size.height),
-        Paint()
-          ..strokeWidth = size.height * 0.9
-          ..strokeCap = StrokeCap.round
-          ..color = _tipColor.withValues(alpha: 0.5)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+      Offset(capX, 0),
+      Offset(capX, size.height),
+      Paint()
+        ..strokeWidth = size.height * 0.9
+        ..strokeCap = StrokeCap.round
+        ..color = _tipColor.withValues(alpha: 0.5)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
     canvas.drawLine(
-        Offset(capX, 0),
-        Offset(capX, size.height),
-        Paint()
-          ..strokeWidth = size.height * 0.35
-          ..strokeCap = StrokeCap.round
-          ..color = _tipColor);
+      Offset(capX, 0),
+      Offset(capX, size.height),
+      Paint()
+        ..strokeWidth = size.height * 0.35
+        ..strokeCap = StrokeCap.round
+        ..color = _tipColor,
+    );
   }
 
   @override
@@ -379,11 +407,12 @@ class _MetricBarPainter extends CustomPainter {
 /// skin-score ring does. Sized to whatever height its parent gives it
 /// (MetricChartCard's own flexible chart area).
 class MetricRingsView extends StatelessWidget {
-  const MetricRingsView(
-      {super.key,
-      required this.scores,
-      required this.colors,
-      required this.onTap});
+  const MetricRingsView({
+    super.key,
+    required this.scores,
+    required this.colors,
+    required this.onTap,
+  });
 
   final Map<String, double> scores;
   final AppColors colors;
@@ -424,20 +453,26 @@ class MetricRingsView extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(shown.toStringAsFixed(0),
-                        style: TextStyle(
-                            fontSize: diameter * 0.24,
-                            fontWeight: FontWeight.w600,
-                            height: 1,
-                            color: colors.textPrimary)),
-                    Text(info?.name ?? e.key,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: diameter * 0.115,
-                            height: 1.2,
-                            color: colors.textMuted)),
+                    Text(
+                      shown.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: diameter * 0.24,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      info?.name ?? e.key,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: diameter * 0.115,
+                        height: 1.2,
+                        color: colors.textMuted,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -451,7 +486,7 @@ class MetricRingsView extends StatelessWidget {
       builder: (context, constraints) {
         final widthBased =
             (constraints.maxWidth - _spacing * (_crossAxisCount - 1)) /
-                _crossAxisCount;
+            _crossAxisCount;
         final heightBased =
             (constraints.maxHeight - _runSpacing * (rows - 1)) / rows;
         final diameter = math.min(widthBased, heightBased);
@@ -463,8 +498,13 @@ class MetricRingsView extends StatelessWidget {
             children: entries
                 .asMap()
                 .entries
-                .map((indexed) => ring(
-                    indexed.value, diameter, tAt(indexed.key, entries.length)))
+                .map(
+                  (indexed) => ring(
+                    indexed.value,
+                    diameter,
+                    tAt(indexed.key, entries.length),
+                  ),
+                )
                 .toList(),
           ),
         );
@@ -480,8 +520,11 @@ class MetricRingsView extends StatelessWidget {
 /// same metric, unlike Today's grid). An item with no value yet shows an
 /// empty track and "—", the same as a missing petal or quadrant.
 class ValueRingsGrid extends StatelessWidget {
-  const ValueRingsGrid(
-      {super.key, required this.items, required this.edgeColor});
+  const ValueRingsGrid({
+    super.key,
+    required this.items,
+    required this.edgeColor,
+  });
 
   /// [fraction] is how full the ring draws (0-1); [value] is the number
   /// printed in it, null for nothing yet.
@@ -502,44 +545,54 @@ class ValueRingsGrid extends StatelessWidget {
               math.min(left, 2),
           ];
     final columns = rowSizes.fold(1, math.max);
-    return LayoutBuilder(builder: (context, constraints) {
-      final rows = rowSizes.length;
-      final diameter = math.min(
-          math.min((constraints.maxWidth - _spacing * (columns - 1)) / columns,
-              (constraints.maxHeight - _spacing * (rows - 1)) / rows),
-          140.0);
-      return DataReveal(
-        builder: (context, tAt) {
-          var next = 0;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (var r = 0; r < rows; r++)
-                Padding(
-                  padding: EdgeInsets.only(top: r == 0 ? 0 : _spacing),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (var c = 0; c < rowSizes[r]; c++) ...[
-                        if (c > 0) const SizedBox(width: _spacing),
-                        _ring(colors, items[next], diameter,
-                            tAt(next++, items.length)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final rows = rowSizes.length;
+        final diameter = math.min(
+          math.min(
+            (constraints.maxWidth - _spacing * (columns - 1)) / columns,
+            (constraints.maxHeight - _spacing * (rows - 1)) / rows,
+          ),
+          140.0,
+        );
+        return DataReveal(
+          builder: (context, tAt) {
+            var next = 0;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var r = 0; r < rows; r++)
+                  Padding(
+                    padding: EdgeInsets.only(top: r == 0 ? 0 : _spacing),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var c = 0; c < rowSizes[r]; c++) ...[
+                          if (c > 0) const SizedBox(width: _spacing),
+                          _ring(
+                            colors,
+                            items[next],
+                            diameter,
+                            tAt(next++, items.length),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-            ],
-          );
-        },
-      );
-    });
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _ring(
-      AppColors colors,
-      ({String label, double? value, double fraction}) item,
-      double diameter,
-      double t) {
+    AppColors colors,
+    ({String label, double? value, double fraction}) item,
+    double diameter,
+    double t,
+  ) {
     final value = item.value;
     return SizedBox(
       width: diameter,
@@ -561,22 +614,28 @@ class ValueRingsGrid extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(value == null ? '—' : (value * t).toStringAsFixed(0),
-                    style: TextStyle(
-                        fontSize: diameter * 0.22,
-                        fontWeight: FontWeight.w600,
-                        height: 1,
-                        color: value == null
-                            ? colors.textMuted
-                            : colors.textPrimary)),
-                Text(item.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: diameter * 0.105,
-                        height: 1.3,
-                        color: colors.textMuted)),
+                Text(
+                  value == null ? '—' : (value * t).toStringAsFixed(0),
+                  style: TextStyle(
+                    fontSize: diameter * 0.22,
+                    fontWeight: FontWeight.w600,
+                    height: 1,
+                    color: value == null
+                        ? colors.textMuted
+                        : colors.textPrimary,
+                  ),
+                ),
+                Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: diameter * 0.105,
+                    height: 1.3,
+                    color: colors.textMuted,
+                  ),
+                ),
               ],
             ),
           ),
@@ -629,9 +688,15 @@ class _MetricRingPainter extends CustomPainter {
       ..strokeWidth = 1.5
       ..color = tipShade;
     canvas.drawCircle(
-        center, ringRadius + strokeWidth / 2 + edgeGap, edgePaint);
+      center,
+      ringRadius + strokeWidth / 2 + edgeGap,
+      edgePaint,
+    );
     canvas.drawCircle(
-        center, ringRadius - strokeWidth / 2 - edgeGap, edgePaint);
+      center,
+      ringRadius - strokeWidth / 2 - edgeGap,
+      edgePaint,
+    );
 
     final track = Paint()
       ..style = PaintingStyle.stroke
@@ -674,20 +739,22 @@ class _MetricRingPainter extends CustomPainter {
     final tipInner = center + tipDir * (ringRadius - strokeWidth / 2);
     final tipOuter = center + tipDir * (ringRadius + strokeWidth / 2);
     canvas.drawLine(
-        tipInner,
-        tipOuter,
-        Paint()
-          ..strokeWidth = strokeWidth * 0.9
-          ..strokeCap = StrokeCap.round
-          ..color = _tipColor.withValues(alpha: 0.5)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+      tipInner,
+      tipOuter,
+      Paint()
+        ..strokeWidth = strokeWidth * 0.9
+        ..strokeCap = StrokeCap.round
+        ..color = _tipColor.withValues(alpha: 0.5)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
     canvas.drawLine(
-        tipInner,
-        tipOuter,
-        Paint()
-          ..strokeWidth = strokeWidth * 0.4
-          ..strokeCap = StrokeCap.round
-          ..color = _tipColor);
+      tipInner,
+      tipOuter,
+      Paint()
+        ..strokeWidth = strokeWidth * 0.4
+        ..strokeCap = StrokeCap.round
+        ..color = _tipColor,
+    );
   }
 
   @override
@@ -707,11 +774,12 @@ class _MetricRingPainter extends CustomPainter {
 /// flower have room to spread out instead of being squeezed into a box
 /// only as wide as it is tall.
 class MetricPetalsView extends StatelessWidget {
-  const MetricPetalsView(
-      {super.key,
-      required this.scores,
-      required this.colors,
-      required this.onTap});
+  const MetricPetalsView({
+    super.key,
+    required this.scores,
+    required this.colors,
+    required this.onTap,
+  });
 
   final Map<String, double> scores;
   final AppColors colors;
@@ -747,7 +815,9 @@ class MetricPetalsView extends StatelessWidget {
                     entries: entries,
                     colors: colors,
                     reveals: List.generate(
-                        entries.length, (i) => tAt(i, entries.length)),
+                      entries.length,
+                      (i) => tAt(i, entries.length),
+                    ),
                   ),
                 ),
               ),
@@ -760,8 +830,11 @@ class MetricPetalsView extends StatelessWidget {
 }
 
 class _MetricPetalsPainter extends CustomPainter {
-  _MetricPetalsPainter(
-      {required this.entries, required this.colors, required this.reveals});
+  _MetricPetalsPainter({
+    required this.entries,
+    required this.colors,
+    required this.reveals,
+  });
 
   final List<MapEntry<String, double>> entries;
   final AppColors colors;
@@ -783,20 +856,23 @@ class _MetricPetalsPainter extends CustomPainter {
     final baseWidth = maxLen * 0.16;
 
     final textPainter = TextPainter(
-        textDirection: TextDirection.ltr, textAlign: TextAlign.center);
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
 
     // Petals is the default chart style — the one thing almost everyone
     // actually sees — so it earns more than the other two: a warm ambient
     // glow behind the whole flower, rather than it just sitting flat
     // against the card.
     canvas.drawCircle(
-        center,
-        maxLen * 1.3,
-        Paint()
-          ..shader = ui.Gradient.radial(center, maxLen * 1.3, [
-            colors.accent.withValues(alpha: 0.16),
-            colors.accent.withValues(alpha: 0),
-          ]));
+      center,
+      maxLen * 1.3,
+      Paint()
+        ..shader = ui.Gradient.radial(center, maxLen * 1.3, [
+          colors.accent.withValues(alpha: 0.16),
+          colors.accent.withValues(alpha: 0),
+        ]),
+    );
 
     for (var i = 0; i < n; i++) {
       final entry = entries[i];
@@ -828,10 +904,11 @@ class _MetricPetalsPainter extends CustomPainter {
       // its own axis) — what actually sells "this is a raised shape" over
       // "this is a flat sticker," more than the gradient above does alone.
       canvas.drawPath(
-          path.shift(Offset(maxLen * 0.02, maxLen * 0.03)),
-          Paint()
-            ..color = colors.canvasDeep.withValues(alpha: 0.45)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+        path.shift(Offset(maxLen * 0.02, maxLen * 0.03)),
+        Paint()
+          ..color = colors.canvasDeep.withValues(alpha: 0.45)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
 
       // Gold at the base fading into a wash of this metric's own identity
       // color toward the tip — gold still dominates (see the file header's
@@ -839,19 +916,21 @@ class _MetricPetalsPainter extends CustomPainter {
       // enough to compete with it), but seven petals no longer read as the
       // same flat shape seven times over.
       canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.fill
-            ..shader = ui.Gradient.linear(center, tip, [
-              colors.accent,
-              identity.withValues(alpha: 0.6),
-            ]));
+        path,
+        Paint()
+          ..style = PaintingStyle.fill
+          ..shader = ui.Gradient.linear(center, tip, [
+            colors.accent,
+            identity.withValues(alpha: 0.6),
+          ]),
+      );
       canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5
-            ..color = colors.accentText);
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = colors.accentText,
+      );
 
       final veinTip = along(0.92);
       // A soft pale highlight under the identity-colored vein — a bare
@@ -859,18 +938,20 @@ class _MetricPetalsPainter extends CustomPainter {
       // this wide, faint stroke underneath it is what a real petal's own
       // midrib catching the light would look like.
       canvas.drawLine(
-          center,
-          veinTip,
-          Paint()
-            ..strokeWidth = 2.5
-            ..strokeCap = StrokeCap.round
-            ..color = colors.accentText.withValues(alpha: 0.5));
+        center,
+        veinTip,
+        Paint()
+          ..strokeWidth = 2.5
+          ..strokeCap = StrokeCap.round
+          ..color = colors.accentText.withValues(alpha: 0.5),
+      );
       canvas.drawLine(
-          center,
-          veinTip,
-          Paint()
-            ..strokeWidth = 1.2
-            ..color = identity);
+        center,
+        veinTip,
+        Paint()
+          ..strokeWidth = 1.2
+          ..color = identity,
+      );
 
       // A glowing line traced along each of the two edges converging at
       // the tip — the same glow-behind-crisp-core language as the score
@@ -879,20 +960,22 @@ class _MetricPetalsPainter extends CustomPainter {
       for (final edgeControl in [c2, c3]) {
         final edgeEnd = tip + (edgeControl - tip) * 0.3;
         canvas.drawLine(
-            tip,
-            edgeEnd,
-            Paint()
-              ..strokeWidth = baseWidth * 0.28
-              ..strokeCap = StrokeCap.round
-              ..color = kMarkerWhite.withValues(alpha: 0.22)
-              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2));
+          tip,
+          edgeEnd,
+          Paint()
+            ..strokeWidth = baseWidth * 0.28
+            ..strokeCap = StrokeCap.round
+            ..color = kMarkerWhite.withValues(alpha: 0.22)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+        );
         canvas.drawLine(
-            tip,
-            edgeEnd,
-            Paint()
-              ..strokeWidth = baseWidth * 0.1
-              ..strokeCap = StrokeCap.round
-              ..color = kMarkerWhite.withValues(alpha: 0.75));
+          tip,
+          edgeEnd,
+          Paint()
+            ..strokeWidth = baseWidth * 0.1
+            ..strokeCap = StrokeCap.round
+            ..color = kMarkerWhite.withValues(alpha: 0.75),
+        );
       }
 
       // Name and value stack as one block rather than sitting side by
@@ -914,16 +997,18 @@ class _MetricPetalsPainter extends CustomPainter {
           TextSpan(
             text: '${info?.name ?? entry.key}\n',
             style: TextStyle(
-                fontSize: 9.5 * labelScale,
-                color: colors.textMuted,
-                fontWeight: FontWeight.w500),
+              fontSize: 9.5 * labelScale,
+              color: colors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           TextSpan(
             text: (entry.value * reveals[i]).toStringAsFixed(0),
             style: TextStyle(
-                fontSize: 10.5 * labelScale,
-                color: colors.textPrimary,
-                fontWeight: FontWeight.w700),
+              fontSize: 10.5 * labelScale,
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       );
@@ -932,7 +1017,8 @@ class _MetricPetalsPainter extends CustomPainter {
       // toward the petal, given the label's size and the petal's own
       // angle — a wide, mostly-horizontal label (e.g. "Evenness") needs
       // more clearance than a narrow, mostly-vertical one.
-      final reach = (textPainter.width / 2) * a.dx.abs() +
+      final reach =
+          (textPainter.width / 2) * a.dx.abs() +
           (textPainter.height / 2) * a.dy.abs();
       // Anchored to where this petal would reach at 100, not its actual
       // tip — every label sits on the same outer ring regardless of
@@ -946,12 +1032,16 @@ class _MetricPetalsPainter extends CustomPainter {
       // Floored at 0: in a box under 4px across this would go negative,
       // and clamp() with its upper bound below its lower one throws —
       // mid-paint (found 2026-09-27 rendering a squeezed chart).
-      final maxRadius =
-          math.max(0.0, math.min(size.width, size.height) / 2 - 2);
+      final maxRadius = math.max(
+        0.0,
+        math.min(size.width, size.height) / 2 - 2,
+      );
       final labelRadius = (maxLen + reach + 6).clamp(0.0, maxRadius);
       final labelPos = center + a * labelRadius;
-      textPainter.paint(canvas,
-          labelPos - Offset(textPainter.width / 2, textPainter.height / 2));
+      textPainter.paint(
+        canvas,
+        labelPos - Offset(textPainter.width / 2, textPainter.height / 2),
+      );
     }
 
     // A small medallion rather than a bare dot — seven petals converging
@@ -961,12 +1051,13 @@ class _MetricPetalsPainter extends CustomPainter {
     final centerRadius = maxLen * 0.075;
     canvas.drawCircle(center, centerRadius, Paint()..color = colors.accentText);
     canvas.drawCircle(
-        center,
-        centerRadius,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = centerRadius * 0.35
-          ..color = colors.accentDim);
+      center,
+      centerRadius,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = centerRadius * 0.35
+        ..color = colors.accentDim,
+    );
   }
 
   @override

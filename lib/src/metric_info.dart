@@ -18,12 +18,13 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class MetricInfo {
-  const MetricInfo(
-      {required this.key,
-      required this.icon,
-      required this.name,
-      required this.body,
-      required this.identityColor});
+  const MetricInfo({
+    required this.key,
+    required this.icon,
+    required this.name,
+    required this.body,
+    required this.identityColor,
+  });
 
   /// The server's key for this metric (matches ScanResult.scores), e.g.
   /// "redness" — how reading_screen.dart looks one of these up.
@@ -46,7 +47,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'redness',
     icon: PhosphorIconsThin.drop,
     name: 'Redness',
-    body: 'Extra redness across your skin, measured apart from your '
+    body:
+        'Extra redness across your skin, measured apart from your '
         'natural skin tone.',
     identityColor: Color(0xFFD1453B),
   ),
@@ -54,7 +56,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'texture',
     icon: PhosphorIconsThin.fingerprint,
     name: 'Texture',
-    body: "How rough or smooth your skin's surface looks — bumps, "
+    body:
+        "How rough or smooth your skin's surface looks — bumps, "
         'dryness, and unevenness you might feel more than see.',
     // A muted sage rather than the warm tan this used to be (2026-09-27):
     // that tan sat close enough to both Wrinkles' brown below and the
@@ -78,7 +81,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'spots',
     icon: PhosphorIconsThin.circle,
     name: 'Spots',
-    body: 'Dark spots and discoloration, counted separately from '
+    body:
+        'Dark spots and discoloration, counted separately from '
         'redness and from overall evenness.',
     identityColor: Color(0xFFC7C7CC),
   ),
@@ -86,7 +90,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'acne',
     icon: PhosphorIconsThin.bandaids,
     name: 'Acne',
-    body: 'Active breakouts — inflamed bumps, not scarring left behind '
+    body:
+        'Active breakouts — inflamed bumps, not scarring left behind '
         'afterward.',
     identityColor: Color(0xFFED93B1),
   ),
@@ -94,7 +99,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'evenness',
     icon: PhosphorIconsThin.gradient,
     name: 'Evenness',
-    body: 'How uniform your overall tone is across your face, apart '
+    body:
+        'How uniform your overall tone is across your face, apart '
         'from any spots.',
     identityColor: Color(0xFF7FAFB3),
   ),
@@ -102,7 +108,8 @@ const List<MetricInfo> metricInfoList = [
     key: 'wrinkles',
     icon: PhosphorIconsThin.waves,
     name: 'Wrinkles',
-    body: 'Fine lines and creases, mostly around the eyes and '
+    body:
+        'Fine lines and creases, mostly around the eyes and '
         'forehead.',
     identityColor: Color(0xFF9C8570),
   ),

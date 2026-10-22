@@ -30,24 +30,36 @@ class VedaLockup extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(4),
-              child: Image.asset(brand.markAsset,
-                  width: kLockupMarkSize, height: kLockupMarkSize),
+              child: Image.asset(
+                brand.markAsset,
+                width: kLockupMarkSize,
+                height: kLockupMarkSize,
+              ),
             ),
             Transform.translate(
               offset: const Offset(0, -6),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const SizedBox(width: 14),
-                Text(brand.word,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 14),
+                  Text(
+                    brand.word,
                     style: TextStyle(
-                        fontSize: 10,
-                        fontFamily: kDisplayFont,
-                        height: 1,
-                        letterSpacing: 2,
-                        color: colors.textMuted)),
-                const SizedBox(width: 3),
-                Icon(PhosphorIconsThin.caretDown,
-                    size: 9, color: colors.textMuted),
-              ]),
+                      fontSize: 10,
+                      fontFamily: kDisplayFont,
+                      height: 1,
+                      letterSpacing: 2,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Icon(
+                    PhosphorIconsThin.caretDown,
+                    size: 9,
+                    color: colors.textMuted,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -68,11 +80,14 @@ class ScreenHeader extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(title,
-              style: TextStyle(
-                  fontSize: 23,
-                  fontFamily: kDisplayFont,
-                  color: colors.textPrimary)),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 23,
+              fontFamily: kDisplayFont,
+              color: colors.textPrimary,
+            ),
+          ),
         ),
         for (final a in actions) ...[a, const SizedBox(width: 10)],
         const VedaLockup(),
@@ -95,16 +110,16 @@ class HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Icon(icon, size: 22, color: context.colors.textPrimary),
-          ),
-        ),
-      );
+    message: tooltip,
+    child: InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(icon, size: 22, color: context.colors.textPrimary),
+      ),
+    ),
+  );
 }
 
 class CardBox extends StatelessWidget {
@@ -115,14 +130,14 @@ class CardBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: context.colors.card,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        padding: padding ?? const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: child,
-      );
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: context.colors.card,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    padding: padding ?? const EdgeInsets.fromLTRB(16, 14, 16, 14),
+    child: child,
+  );
 }
 
 class SectionLabel extends StatelessWidget {
@@ -131,10 +146,12 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 8, top: 4),
-        child: Text(text,
-            style: TextStyle(fontSize: 13, color: context.colors.textSecondary)),
-      );
+    padding: const EdgeInsets.only(bottom: 8, top: 4),
+    child: Text(
+      text,
+      style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
+    ),
+  );
 }
 
 /// A gentle empty state: what this place is for, and the one thing to do.
@@ -153,10 +170,15 @@ class EmptyNote extends StatelessWidget {
         children: [
           Icon(icon, size: 30, color: colors.accentText),
           const SizedBox(height: 10),
-          Text(text,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 14, height: 1.5, color: colors.textSecondary)),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: colors.textSecondary,
+            ),
+          ),
         ],
       ),
     );
@@ -181,12 +203,15 @@ class GoldButton extends StatelessWidget {
           backgroundColor: colors.accent,
           foregroundColor: colors.onAccent,
           disabledBackgroundColor: colors.accentDim,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
         onPressed: onPressed,
-        child: Text(label,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
@@ -217,28 +242,35 @@ class ProfileRow extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-        child: Row(children: [
-          Icon(icon, size: 22, color: colors.accentText),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: TextStyle(fontSize: 15, color: colors.textPrimary)),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 2),
-                  Text(subtitle!,
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: colors.accentText),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: 15, color: colors.textPrimary),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
                       style: TextStyle(
-                          fontSize: 12.5,
-                          height: 1.35,
-                          color: colors.textMuted)),
+                        fontSize: 12.5,
+                        height: 1.35,
+                        color: colors.textMuted,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          ?trailing,
-        ]),
+            ?trailing,
+          ],
+        ),
       ),
     );
   }
@@ -262,31 +294,62 @@ class ChoiceRow<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Wrap(spacing: 8, runSpacing: 8, children: [
-      for (final o in options)
-        ChoiceChip(
-          label: Text(label(o)),
-          selected: o == selected,
-          labelStyle: TextStyle(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final o in options)
+          ChoiceChip(
+            label: Text(label(o)),
+            selected: o == selected,
+            labelStyle: TextStyle(
               fontSize: 13,
-              color: o == selected ? colors.accentText : colors.textSecondary),
-          // Tapping the selected one again clears it: nothing is required.
-          onSelected: (_) => onSelected(o == selected ? null : o),
-        ),
-    ]);
+              color: o == selected ? colors.accentText : colors.textSecondary,
+            ),
+            // Tapping the selected one again clears it: nothing is required.
+            onSelected: (_) => onSelected(o == selected ? null : o),
+          ),
+      ],
+    );
   }
 }
 
 const _months = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 const _longMonths = [
-  'January', 'February', 'March', 'April', 'May', 'June', 'July',
-  'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 const _days = [
-  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
 String shortDate(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
