@@ -13,6 +13,7 @@ export 'package:phosphor_flutter/phosphor_flutter.dart';
 export 'src/app_colors.dart';
 export 'src/brand.dart';
 export 'src/breathing.dart';
+export 'src/chart_style.dart';
 export 'src/charts.dart';
 export 'src/common.dart';
 export 'src/group_metrics.dart';

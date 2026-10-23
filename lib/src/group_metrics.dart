@@ -7,9 +7,9 @@
 // proof of a cause", because a handful of days can look like a pattern.
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
+import 'chart_style.dart';
 import 'charts.dart';
 import 'common.dart';
 import 'metric_ghost.dart';
@@ -87,8 +87,6 @@ List<GroupMetrics> groupMetrics({
 /// The key the Skin Score is kept under inside a group's averages.
 const skinScoreName = 'skin_score';
 
-const _styleKey = 'metric_chart_style';
-
 /// The card: a chip per group, then the picked group's measurements in the
 /// style chosen (remembered, shared by every chart in the app).
 class GroupMetricsCard extends StatefulWidget {
@@ -99,7 +97,6 @@ class GroupMetricsCard extends StatefulWidget {
     required this.groups,
     required this.caveat,
     this.empty,
-    this.defaultStyle = MetricStyle.petals,
   });
 
   final String title;
@@ -112,36 +109,32 @@ class GroupMetricsCard extends StatefulWidget {
   /// Shown instead of the chart when there is nothing to chart yet.
   final String? empty;
 
-  /// The style shown until the person picks one (then theirs is remembered).
-  final MetricStyle defaultStyle;
-
   @override
   State<GroupMetricsCard> createState() => _GroupMetricsCardState();
 }
 
 class _GroupMetricsCardState extends State<GroupMetricsCard> {
-  late MetricStyle _style = widget.defaultStyle;
   String? _picked;
+
+  // The one choice every chart in the app follows (see ChartStylePref).
+  MetricStyle get _style => ChartStylePref.instance.style.value;
+
+  void _setStyle(MetricStyle s) => ChartStylePref.instance.set(s);
 
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance()
-        .then((prefs) {
-          final saved = prefs.getString(_styleKey);
-          final s = MetricStyle.values
-              .where((v) => v.name == saved)
-              .firstOrNull;
-          if (s != null && mounted) setState(() => _style = s);
-        })
-        .catchError((_) {});
+    ChartStylePref.instance.style.addListener(_changed);
   }
 
-  void _setStyle(MetricStyle s) {
-    setState(() => _style = s);
-    SharedPreferences.getInstance()
-        .then((p) => p.setString(_styleKey, s.name))
-        .catchError((_) => false);
+  @override
+  void dispose() {
+    ChartStylePref.instance.style.removeListener(_changed);
+    super.dispose();
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
   }
 
   GroupMetrics? get _current {
