@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
 import 'charts.dart';
 import 'common.dart';
+import 'metric_ghost.dart';
 import 'metric_views.dart';
 import 'theme.dart';
 import 'veda_link.dart';
@@ -159,14 +160,45 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
     return ChartCard(
       title: widget.title,
       subtitle: widget.subtitle,
-      empty:
-          widget.empty ??
-          (current == null
-              ? 'Nothing to show yet: this fills in once a day has both a Véda '
-                    'reading and an entry here.'
-              : null),
+      empty: null,
       child: current == null
-          ? const SizedBox.shrink()
+          // Nothing to chart yet: a soft ghost of the real chart, breathing,
+          // with a line saying what will fill it.
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MetricStyleToggle(value: _style, onChanged: _setStyle),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 250,
+                  child: SwipeableChartPager<MetricStyle>(
+                    value: _style,
+                    values: const [
+                      MetricStyle.rings,
+                      MetricStyle.petals,
+                      MetricStyle.bars,
+                    ],
+                    onChanged: _setStyle,
+                    builder: (s) => GhostMetricChart(
+                      style: s,
+                      keys: kVedaMetrics,
+                      colors: colors,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.empty ??
+                      'Nothing to show yet: this fills in once a day has both '
+                          'a Véda reading and an entry here.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
+            )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

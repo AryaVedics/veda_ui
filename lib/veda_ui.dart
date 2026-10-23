@@ -12,6 +12,7 @@ export 'package:phosphor_flutter/phosphor_flutter.dart';
 
 export 'src/app_colors.dart';
 export 'src/brand.dart';
+export 'src/breathing.dart';
 export 'src/charts.dart';
 export 'src/common.dart';
 export 'src/group_metrics.dart';
@@ -21,6 +22,7 @@ export 'src/link_bridge.dart';
 export 'src/link_section.dart';
 export 'src/logo_menu.dart';
 export 'src/metric_info.dart' show MetricInfo, metricInfoByKey, metricInfoList;
+export 'src/metric_ghost.dart' show GhostMetricChart;
 export 'src/metric_views.dart';
 export 'src/profile_sections.dart';
 export 'src/theme.dart';
