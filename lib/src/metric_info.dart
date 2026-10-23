@@ -155,6 +155,35 @@ const familyMetricInfo = <MetricInfo>[
     body: 'Water against your daily goal.',
     identityColor: Color(0xFF87B8D9),
   ),
+  // The four parts of a cycle (Véda Cycle), for views by phase.
+  MetricInfo(
+    key: 'period',
+    icon: PhosphorIconsThin.drop,
+    name: 'Period',
+    body: 'The days of your period.',
+    identityColor: Color(0xFFE08AA3),
+  ),
+  MetricInfo(
+    key: 'follicular',
+    icon: PhosphorIconsThin.flowerLotus,
+    name: 'Follicular',
+    body: 'From the end of your period to just before ovulation (estimated).',
+    identityColor: Color(0xFFA8D5BA),
+  ),
+  MetricInfo(
+    key: 'ovulation',
+    icon: PhosphorIconsThin.sun,
+    name: 'Ovulation',
+    body: 'The days around estimated ovulation.',
+    identityColor: Color(0xFFF0D482),
+  ),
+  MetricInfo(
+    key: 'luteal',
+    icon: PhosphorIconsThin.moon,
+    name: 'Luteal',
+    body: 'From after ovulation to your next period (estimated).',
+    identityColor: Color(0xFFB59AD6),
+  ),
 ];
 
 final Map<String, MetricInfo> metricInfoByKey = {
