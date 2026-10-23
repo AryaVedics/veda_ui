@@ -115,6 +115,48 @@ const List<MetricInfo> metricInfoList = [
   ),
 ];
 
+/// The parts of the family's other scores (Véda Lifestyle's Wellness Score),
+/// so the Rings, Petals and Bars views can draw them with names and colors of
+/// their own. Kept apart from [metricInfoList], which is Véda's seven skin
+/// measurements.
+const familyMetricInfo = <MetricInfo>[
+  MetricInfo(
+    key: 'sleep',
+    icon: PhosphorIconsThin.moonStars,
+    name: 'Sleep',
+    body: 'Hours slept and how steady your bedtime is.',
+    identityColor: Color(0xFF9FA8DA),
+  ),
+  MetricInfo(
+    key: 'movement',
+    icon: PhosphorIconsThin.personSimpleRun,
+    name: 'Movement',
+    body: 'Active minutes against your weekly goal.',
+    identityColor: Color(0xFFE59A8A),
+  ),
+  MetricInfo(
+    key: 'nutrition',
+    icon: PhosphorIconsThin.forkKnife,
+    name: 'Nutrition',
+    body: 'How steadily you logged food, and your own macro goals.',
+    identityColor: Color(0xFF9CC9A0),
+  ),
+  MetricInfo(
+    key: 'mood',
+    icon: PhosphorIconsThin.smiley,
+    name: 'Mood',
+    body: 'Stress and energy, as you rated them.',
+    identityColor: Color(0xFFE6C97A),
+  ),
+  MetricInfo(
+    key: 'hydration',
+    icon: PhosphorIconsThin.drop,
+    name: 'Hydration',
+    body: 'Water against your daily goal.',
+    identityColor: Color(0xFF87B8D9),
+  ),
+];
+
 final Map<String, MetricInfo> metricInfoByKey = {
-  for (final m in metricInfoList) m.key: m,
+  for (final m in [...metricInfoList, ...familyMetricInfo]) m.key: m,
 };
