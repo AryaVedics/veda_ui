@@ -96,6 +96,52 @@ class ScreenHeader extends StatelessWidget {
   }
 }
 
+/// A screen laid out like Véda's: the [header] (title and logo) stays fixed at
+/// the top and only the [children] scroll beneath it.
+class PinnedHeaderList extends StatelessWidget {
+  const PinnedHeaderList({
+    super.key,
+    required this.header,
+    required this.children,
+    this.padding = const EdgeInsets.fromLTRB(20, 12, 20, 24),
+    this.controller,
+  });
+
+  final Widget header;
+  final List<Widget> children;
+
+  /// Around the whole screen: the header takes the top, the list the rest.
+  final EdgeInsets padding;
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      Padding(
+        padding: EdgeInsets.fromLTRB(
+          padding.left,
+          padding.top,
+          padding.right,
+          0,
+        ),
+        child: header,
+      ),
+      Expanded(
+        child: ListView(
+          controller: controller,
+          padding: EdgeInsets.fromLTRB(
+            padding.left,
+            8,
+            padding.right,
+            padding.bottom,
+          ),
+          children: children,
+        ),
+      ),
+    ],
+  );
+}
+
 class HeaderIconButton extends StatelessWidget {
   const HeaderIconButton({
     super.key,

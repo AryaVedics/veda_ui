@@ -6,82 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
+import 'backup.dart';
 import 'common.dart';
 import 'json_store.dart';
-import 'link_bridge.dart';
-import 'veda_link.dart';
-
-/// "Véda": whether Véda's readings are coming in live, and how to switch that
-/// on. The readings themselves arrive by Véda Link (see LinkRefresher); there
-/// is nothing to import by hand.
-class VedaLinkSection extends StatelessWidget {
-  const VedaLinkSection({
-    super.key,
-    required this.link,
-    required this.bridge,
-    required this.why,
-  });
-
-  final VedaLinkStore link;
-  final LinkBridge bridge;
-
-  /// What this app does with them, in one line: "To chart them next to
-  /// your sleep and water."
-  final String why;
-
-  Future<void> _forget(BuildContext context) async {
-    await link.deleteEverything();
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Your Véda readings were removed from this app.'),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([link, bridge]),
-      builder: (context, _) {
-        final readings = link.data.readings;
-        final has = readings.isNotEmpty;
-        final live = bridge.use &&
-            bridge.readOf(LinkApp.skin).status == LinkStatus.connected;
-        return CardBox(
-          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-          child: Column(
-            children: [
-              ProfileRow(
-                icon: PhosphorIconsThin.sparkle,
-                title: live ? 'Live from Véda' : 'Véda is not connected',
-                subtitle: live
-                    ? (has
-                          ? '${readings.length} readings, latest '
-                                '${dayMonth(readings.last.takenAt)}. They update '
-                                'whenever you open this app.'
-                          : 'Connected. Your readings appear here after your '
-                                'next scan in Véda.')
-                    : '$why In Véda: Profile, "Let my other Véda apps use my '
-                          'readings". Here: switch on "Use entries from my '
-                          'other Véda apps" above. Only dates and scores, kept '
-                          'on this phone.',
-              ),
-              if (has)
-                ProfileRow(
-                  icon: PhosphorIconsThin.eraser,
-                  title: 'Remove my Véda readings',
-                  subtitle: 'From this app only. Véda keeps its own.',
-                  onTap: () => _forget(context),
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 /// Export and delete, for the app's own data file.
 class DataSection extends StatelessWidget {
@@ -90,6 +17,7 @@ class DataSection extends StatelessWidget {
     required this.appName,
     required this.store,
     required this.exportFileName,
+    required this.backupKey,
     required this.whatIsDeleted,
     this.alsoDelete,
   });
@@ -97,6 +25,9 @@ class DataSection extends StatelessWidget {
   final String appName;
   final JsonStore store;
   final String exportFileName;
+
+  /// "cycle", "lifestyle", "sun": names the backup file and binds it to this app.
+  final String backupKey;
 
   /// "Your sunscreen log and UV history are deleted from this phone."
   final String whatIsDeleted;
@@ -134,28 +65,41 @@ class DataSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardBox(
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-      child: Column(
-        children: [
-          ProfileRow(
-            icon: PhosphorIconsThin.export,
-            title: 'Export my data',
-            subtitle: 'Everything $appName holds, in one file.',
-            onTap: () => shareJsonFile(
-              exportFileName,
-              store.exportJson(),
-              'My $appName data',
-            ),
+    final backup = BackupController(
+      appKey: backupKey,
+      appName: appName,
+      exportJson: store.exportJson,
+      restoreJson: store.restoreJson,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BackupCard(controller: backup),
+        const SizedBox(height: 12),
+        CardBox(
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+          child: Column(
+            children: [
+              ProfileRow(
+                icon: PhosphorIconsThin.export,
+                title: 'Export my data',
+                subtitle: 'Everything $appName holds, in a file you can read.',
+                onTap: () => shareJsonFile(
+                  exportFileName,
+                  store.exportJson(),
+                  'My $appName data',
+                ),
+              ),
+              ProfileRow(
+                icon: PhosphorIconsThin.trash,
+                title: 'Delete everything',
+                subtitle: 'From this phone. Nothing is kept anywhere else.',
+                onTap: () => _delete(context),
+              ),
+            ],
           ),
-          ProfileRow(
-            icon: PhosphorIconsThin.trash,
-            title: 'Delete everything',
-            subtitle: 'From this phone. Nothing is kept anywhere else.',
-            onTap: () => _delete(context),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

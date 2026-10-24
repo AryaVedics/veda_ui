@@ -32,6 +32,14 @@ class VedaLinkProvider : ContentProvider() {
             throw SecurityException("Only Véda apps may read this feed")
         }
         val cursor = MatrixCursor(arrayOf("feed", "updated_at"))
+        // An app the person has unlinked from this one sees an empty feed, the
+        // same as sharing being off.
+        val blocked = blockedFile(ctx)
+        if (blocked.exists()) {
+            val off = blocked.readText(Charsets.UTF_8).lines().toSet()
+            val callers = ctx.packageManager.getPackagesForUid(Binder.getCallingUid()) ?: emptyArray()
+            if (callers.any { it in off }) return cursor
+        }
         val file = feedFile(ctx)
         if (file.exists()) {
             cursor.addRow(arrayOf<Any?>(file.readText(Charsets.UTF_8), file.lastModified()))
@@ -53,8 +61,12 @@ class VedaLinkProvider : ContentProvider() {
 
     companion object {
         const val FEED_FILE = "veda_link_feed.json"
+        const val BLOCKED_FILE = "veda_link_blocked.txt"
 
         /** In the app's private files folder; the Dart side writes the same file. */
         fun feedFile(context: android.content.Context): File = File(context.filesDir, FEED_FILE)
+
+        /** The packages the person has unlinked, one per line. */
+        fun blockedFile(context: android.content.Context): File = File(context.filesDir, BLOCKED_FILE)
     }
 }

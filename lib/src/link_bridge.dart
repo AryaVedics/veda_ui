@@ -24,17 +24,38 @@ import 'veda_link.dart';
 
 /// The apps of the family, with the id each publishes under.
 enum LinkApp {
-  sun('sun', 'com.aryavedics.sun.link', 'Véda Sun'),
-  lifestyle('lifestyle', 'com.aryavedics.lifestyle.link', 'Véda Lifestyle'),
-  cycle('cycle', 'com.aryavedics.cycle.link', 'Véda Cycle'),
-  routine('routine', 'com.aryavedics.routine.link', 'Véda Routine'),
-  skin('skin', 'com.aryavedics.skin.link', 'Véda');
+  sun('sun', 'com.aryavedics.sun.link', 'Véda Sun', 'Sunscreen and UV days'),
+  lifestyle(
+    'lifestyle',
+    'com.aryavedics.lifestyle.link',
+    'Véda Lifestyle',
+    'Wellness Score, check-ins and food',
+  ),
+  cycle('cycle', 'com.aryavedics.cycle.link', 'Véda Cycle', 'Cycle phase'),
+  routine(
+    'routine',
+    'com.aryavedics.routine.link',
+    'Véda Routine',
+    'Products and routine days',
+  ),
+  skin(
+    'skin',
+    'com.aryavedics.skin.link',
+    'Véda',
+    'Skin readings, food and check-ins',
+  );
 
-  const LinkApp(this.id, this.authority, this.name);
+  const LinkApp(this.id, this.authority, this.name, this.gives);
 
   final String id;
   final String authority;
   final String name;
+
+  /// What that app gives the others, in a few words.
+  final String gives;
+
+  /// Its Android package, which the provider checks callers against.
+  String get package => 'com.aryavedics.$id';
 }
 
 /// What reading another app's feed came back with.
@@ -59,6 +80,9 @@ enum LinkStatus {
 
   /// Installed, but did not answer in time (try again).
   noAnswer,
+
+  /// The person has unlinked this app from the other one.
+  unlinked,
 }
 
 class LinkFeed {
@@ -95,6 +119,7 @@ class LinkBridge extends ChangeNotifier {
 
   static const _shareKey = 'veda_link_share';
   static const _useKey = 'veda_link_use';
+  static const _offKey = 'veda_link_off';
 
   bool _share = false;
   bool _use = false;
@@ -113,10 +138,69 @@ class LinkBridge extends ChangeNotifier {
 
   Map<String, Object?>? _lastPublished;
 
+  /// The apps the person has unlinked from this one, one by one.
+  final Set<LinkApp> _unlinked = {};
+
+  /// Whether this app and [app] are linked: connecting is on, and this pair
+  /// has not been switched off.
+  bool isLinked(LinkApp app) => _share && _use && !_unlinked.contains(app);
+
+  int get linkedCount => others.where(isLinked).length;
+
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     _share = prefs.getBool(_shareKey) ?? false;
     _use = prefs.getBool(_useKey) ?? false;
+    _unlinked
+      ..clear()
+      ..addAll([
+        for (final id in prefs.getStringList(_offKey) ?? const <String>[])
+          ...LinkApp.values.where((a) => a.id == id),
+      ]);
+    notifyListeners();
+  }
+
+  Future<void> _saveUnlinked() async => (await SharedPreferences.getInstance())
+      .setStringList(_offKey, [for (final a in _unlinked) a.id]);
+
+  /// "Connect all my Véda apps": every pair on, or everything off.
+  Future<void> connectAll(bool on) async {
+    _unlinked.clear();
+    await _saveUnlinked();
+    await setShare(on);
+    await setUse(on);
+  }
+
+  /// Links or unlinks this app with just [app]. Linking one while nothing is
+  /// connected connects that one only.
+  Future<void> setLinked(LinkApp app, bool on) async {
+    if (on && !(_share && _use)) {
+      _unlinked
+        ..clear()
+        ..addAll(others.where((a) => a != app));
+      await _saveUnlinked();
+      await setShare(true);
+      await setUse(true);
+      return;
+    }
+    if (on) {
+      _unlinked.remove(app);
+    } else {
+      _unlinked.add(app);
+    }
+    if (others.every(_unlinked.contains)) {
+      // Nothing left linked: that is the same as connecting nothing.
+      await connectAll(false);
+      return;
+    }
+    _others[app] = on
+        ? const LinkRead(LinkStatus.unknown)
+        : const LinkRead(LinkStatus.unlinked);
+    notifyListeners();
+    await _saveUnlinked();
+    // Who may read our feed changes now, and whose feed we read.
+    await _write(_share ? _lastPublished : null);
+    if (on) await refresh();
     notifyListeners();
   }
 
@@ -164,7 +248,10 @@ class LinkBridge extends ChangeNotifier {
           });
     try {
       await _channel
-          .invokeMethod('publish', {'feed': text})
+          .invokeMethod('publish', {
+            'feed': text,
+            'blocked': [for (final a in _unlinked) a.package],
+          })
           .timeout(const Duration(seconds: 6));
     } on TimeoutException {
       debugPrint('Véda Link: publishing took too long');
@@ -182,11 +269,14 @@ class LinkBridge extends ChangeNotifier {
     // app can take a moment, and one slow app must not hold up the rest.
     await Future.wait([
       for (final app in others)
-        _readOne(app).then((r) {
-          if (!_use) return;
-          _others[app] = r;
-          notifyListeners();
-        }),
+        (_unlinked.contains(app)
+                ? Future.value(const LinkRead(LinkStatus.unlinked))
+                : _readOne(app))
+            .then((r) {
+              if (!_use) return;
+              _others[app] = r;
+              notifyListeners();
+            }),
     ]);
   }
 

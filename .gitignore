@@ -5,3 +5,6 @@ build/
 *.iml
 .idea/
 test/goldens/_sheet*.png
+
+# golden-test failure images
+test/failures/

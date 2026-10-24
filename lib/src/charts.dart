@@ -54,13 +54,15 @@ class TrendChart extends StatelessWidget {
   const TrendChart({
     super.key,
     required this.days,
-    required this.barLabel,
-    required this.markLabel,
+    this.barLabel,
+    this.markLabel,
   });
 
   final List<TrendDay> days;
-  final String barLabel;
-  final String markLabel;
+
+  /// What the bars are, and what the dots are; null leaves that out of the key.
+  final String? barLabel;
+  final String? markLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -90,28 +92,30 @@ class TrendChart extends StatelessWidget {
               Container(width: 20, height: 3, color: colors.accent),
               'Skin Score',
             ),
-            key(
-              Container(
-                width: 12,
-                height: 11,
-                decoration: BoxDecoration(
-                  color: colors.textMuted.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(2),
+            if (barLabel != null)
+              key(
+                Container(
+                  width: 12,
+                  height: 11,
+                  decoration: BoxDecoration(
+                    color: colors.textMuted.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
+                barLabel!,
               ),
-              barLabel,
-            ),
-            key(
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: colors.accentText,
-                  shape: BoxShape.circle,
+            if (markLabel != null)
+              key(
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: colors.accentText,
+                    shape: BoxShape.circle,
+                  ),
                 ),
+                markLabel!,
               ),
-              markLabel,
-            ),
           ],
         ),
       ],

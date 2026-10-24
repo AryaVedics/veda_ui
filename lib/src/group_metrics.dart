@@ -6,10 +6,13 @@
 // with the number of days it rests on. Always captioned "A difference, not
 // proof of a cause", because a handful of days can look like a pattern.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 import 'chart_style.dart';
+import 'hud_bars.dart';
 import 'charts.dart';
 import 'common.dart';
 import 'metric_ghost.dart';
@@ -97,7 +100,17 @@ class GroupMetricsCard extends StatefulWidget {
     required this.groups,
     required this.caveat,
     this.empty,
+    this.hud = false,
+    this.ghostKeys = kVedaMetrics,
   });
+
+  /// The measurements the ghost chart shows while there is nothing to chart:
+  /// the seven Véda ones, or for a card of the person's own wellness parts
+  /// (sleep, movement and so on) those.
+  final List<String> ghostKeys;
+
+  /// Bars in the readout look (see MetricBarsView.hud).
+  final bool hud;
 
   final String title;
   final String subtitle;
@@ -163,7 +176,9 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                 MetricStyleToggle(value: _style, onChanged: _setStyle),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 250,
+                  height: widget.hud
+                      ? math.max(250.0, hudBarsHeight(widget.ghostKeys.length) + 8)
+                      : 250,
                   child: SwipeableChartPager<MetricStyle>(
                     value: _style,
                     values: const [
@@ -173,8 +188,9 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                     ],
                     onChanged: _setStyle,
                     builder: (s) => GhostMetricChart(
+                      hud: widget.hud,
                       style: s,
-                      keys: kVedaMetrics,
+                      keys: widget.ghostKeys,
                       colors: colors,
                     ),
                   ),
@@ -251,7 +267,12 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                 MetricStyleToggle(value: _style, onChanged: _setStyle),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 285,
+                  height: widget.hud
+                      ? math.max(
+                          285.0,
+                          hudBarsHeight(current.scores.length) + 8,
+                        )
+                      : 285,
                   child: SwipeableChartPager<MetricStyle>(
                     value: _style,
                     values: const [
@@ -266,6 +287,7 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                           scores: current.scores,
                           colors: colors,
                           onTap: (_) {},
+                          hud: widget.hud,
                         ),
                         MetricStyle.rings => MetricRingsView(
                           scores: current.scores,

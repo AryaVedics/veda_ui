@@ -17,6 +17,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
 import 'data_reveal.dart';
+import 'hud_bars.dart';
 import 'metric_info.dart';
 
 enum MetricStyle { bars, rings, petals }
@@ -211,7 +212,12 @@ class MetricBarsView extends StatelessWidget {
     required this.scores,
     required this.colors,
     required this.onTap,
+    this.hud = false,
   });
+
+  /// The readout look (label and number above a thick bracketed track), as on
+  /// Véda's Lifestyle tab, instead of the slim one-line rows.
+  final bool hud;
 
   final Map<String, double> scores;
   final AppColors colors;
@@ -219,6 +225,7 @@ class MetricBarsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (hud) return HudBarsView(scores: scores, colors: colors, onTap: onTap);
     final entries = scores.entries.toList();
     return DataReveal(
       builder: (context, tAt) => Column(
@@ -257,12 +264,17 @@ class MetricBarsView extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 64,
-                    child: Text(
-                      info?.name ?? e.key,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: colors.textSecondary,
+                    width: 78,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        info?.name ?? e.key,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: colors.textSecondary,
+                        ),
                       ),
                     ),
                   ),
@@ -406,6 +418,15 @@ class _MetricBarPainter extends CustomPainter {
 /// showing its value and name inside the ring the same way the big
 /// skin-score ring does. Sized to whatever height its parent gives it
 /// (MetricChartCard's own flexible chart area).
+/// How many rings sit on each row: four across, except five, which sit three
+/// over two (rather than stranding the last one alone on a second row).
+List<int> ringRowSizes(int count, {int perRow = 4}) {
+  if (count == 5) return const [3, 2];
+  return [
+    for (var left = count; left > 0; left -= perRow) math.min(left, perRow),
+  ];
+}
+
 class MetricRingsView extends StatelessWidget {
   const MetricRingsView({
     super.key,
@@ -425,7 +446,9 @@ class MetricRingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final entries = scores.entries.toList();
-    final rows = (entries.length / _crossAxisCount).ceil();
+    final rowSizes = ringRowSizes(entries.length, perRow: _crossAxisCount);
+    final rows = rowSizes.length;
+    final columns = rowSizes.fold(1, math.max);
 
     Widget ring(MapEntry<String, double> e, double diameter, double t) {
       final info = metricInfoByKey[e.key];
@@ -485,28 +508,35 @@ class MetricRingsView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final widthBased =
-            (constraints.maxWidth - _spacing * (_crossAxisCount - 1)) /
-            _crossAxisCount;
+            (constraints.maxWidth - _spacing * (columns - 1)) / columns;
         final heightBased =
             (constraints.maxHeight - _runSpacing * (rows - 1)) / rows;
         final diameter = math.min(widthBased, heightBased);
         return DataReveal(
-          builder: (context, tAt) => Wrap(
-            alignment: WrapAlignment.center,
-            spacing: _spacing,
-            runSpacing: _runSpacing,
-            children: entries
-                .asMap()
-                .entries
-                .map(
-                  (indexed) => ring(
-                    indexed.value,
-                    diameter,
-                    tAt(indexed.key, entries.length),
+          builder: (context, tAt) {
+            var next = 0;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var r = 0; r < rows; r++) ...[
+                  if (r > 0) const SizedBox(height: _runSpacing),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var c = 0; c < rowSizes[r]; c++) ...[
+                        if (c > 0) const SizedBox(width: _spacing),
+                        ring(
+                          entries[next],
+                          diameter,
+                          tAt(next++, entries.length),
+                        ),
+                      ],
+                    ],
                   ),
-                )
-                .toList(),
-          ),
+                ],
+              ],
+            );
+          },
         );
       },
     );

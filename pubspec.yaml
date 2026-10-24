@@ -20,6 +20,9 @@ dependencies:
   path_provider: ^2.1.0
   # "Export my data" hands that file to the phone's share sheet.
   share_plus: ^10.1.0
+  # Backups: the file sealed with a passphrase, and picking one to restore.
+  cryptography: ^2.7.0
+  file_picker: ^8.1.2
   # Véda Link's two on/off switches.
   shared_preferences: ^2.3.0
   # The logo menu's links to the website and support page.

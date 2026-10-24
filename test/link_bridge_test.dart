@@ -9,11 +9,13 @@ import 'package:veda_ui/veda_ui.dart';
 /// providers would give.
 class FakePhone {
   String? published;
+  List<Object?>? blocked;
   final Map<String, Map<String, Object?>> providers = {};
 
   Future<Object?> handle(MethodCall call) async {
     if (call.method == 'publish') {
       published = call.arguments['feed'] as String?;
+      blocked = call.arguments['blocked'] as List?;
       return true;
     }
     if (call.method == 'read') {
@@ -36,6 +38,72 @@ void main() {
   });
 
   LinkBridge bridge(LinkApp app) => LinkBridge(app, channel: channel);
+
+  test('one app at a time: unlink keeps that pair apart, link one alone, connect all', () async {
+    phone.providers['com.aryavedics.skin.link'] = {
+      'status': 'ok',
+      'feed': jsonEncode({
+        'data': {'readings': []},
+      }),
+      'updated_at': DateTime.now().millisecondsSinceEpoch,
+    };
+    phone.providers['com.aryavedics.cycle.link'] = {
+      'status': 'ok',
+      'feed': jsonEncode({
+        'data': {'period_days': []},
+      }),
+      'updated_at': DateTime.now().millisecondsSinceEpoch,
+    };
+    final b = bridge(LinkApp.lifestyle);
+    await b.load();
+    await b.publish({'days': {}});
+    expect(b.linkedCount, 0);
+
+    // Linking Véda alone connects Véda only: the others stay apart.
+    await b.setLinked(LinkApp.skin, true);
+    expect(b.isLinked(LinkApp.skin), isTrue);
+    expect(b.isLinked(LinkApp.cycle), isFalse);
+    expect(b.linkedCount, 1);
+    expect(b.readOf(LinkApp.skin).status, LinkStatus.connected);
+    expect(b.readOf(LinkApp.cycle).status, LinkStatus.unlinked);
+    expect(phone.published, isNotNull);
+    expect(
+      phone.blocked,
+      containsAll([
+        'com.aryavedics.cycle',
+        'com.aryavedics.sun',
+        'com.aryavedics.routine',
+      ]),
+    );
+    expect(phone.blocked, isNot(contains('com.aryavedics.skin')));
+
+    // Connect all: every pair, nothing blocked.
+    await b.connectAll(true);
+    expect(b.linkedCount, b.others.length);
+    expect(phone.blocked, isEmpty);
+    expect(b.readOf(LinkApp.cycle).status, LinkStatus.connected);
+
+    // Unlink Cycle: its feed is no longer read, and it is turned away from ours.
+    await b.setLinked(LinkApp.cycle, false);
+    expect(b.isLinked(LinkApp.cycle), isFalse);
+    expect(b.readOf(LinkApp.cycle).status, LinkStatus.unlinked);
+    expect(b.feedOf(LinkApp.cycle), isNull);
+    expect(phone.blocked, ['com.aryavedics.cycle']);
+
+    // It is remembered.
+    final again = bridge(LinkApp.lifestyle);
+    await again.load();
+    expect(again.isLinked(LinkApp.cycle), isFalse);
+    expect(again.isLinked(LinkApp.skin), isTrue);
+
+    // Unlinking the very last one is the same as connecting nothing.
+    for (final app in b.others) {
+      await b.setLinked(app, false);
+    }
+    expect(b.share, isFalse);
+    expect(b.use, isFalse);
+    expect(phone.published, isNull);
+  });
 
   test('nothing is served until sharing is turned on, and it stops when turned off', () async {
     final b = bridge(LinkApp.cycle);
@@ -132,8 +200,18 @@ void main() {
     await store.load();
     final data = {
       'readings': [
-        {'taken_at': '2026-10-20T14:00:00.000Z', 'slot': 'midday', 'skin_score': 86, 'scores': {'redness': 84}},
-        {'taken_at': '2026-10-19T08:00:00.000Z', 'slot': 'morning', 'skin_score': 80, 'scores': {'redness': 78}},
+        {
+          'taken_at': '2026-10-20T14:00:00.000Z',
+          'slot': 'midday',
+          'skin_score': 86,
+          'scores': {'redness': 84},
+        },
+        {
+          'taken_at': '2026-10-19T08:00:00.000Z',
+          'slot': 'morning',
+          'skin_score': 80,
+          'scores': {'redness': 78},
+        },
         {'bad': 'row'},
       ],
     };

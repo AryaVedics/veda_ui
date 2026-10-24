@@ -159,7 +159,7 @@ void main() {
 
   for (final style in MetricStyle.values) {
     testWidgets('lifestyle ${style.name}', (t) async {
-      await shoot(t, 'lifestyle_${style.name}', AppColors.forest, lifeBrand, [
+      await shoot(t, 'lifestyle_${style.name}', AppColors.nightfall, lifeBrand, [
         const Text(
           'Days',
           style: TextStyle(
@@ -170,6 +170,7 @@ void main() {
         ),
         const SizedBox(height: 14),
         GroupMetricsCard(
+          hud: true,
           title: 'Your skin by sleep',
           subtitle: 'Your Véda measurements on days you slept...',
           caveat: 'Days with both a Véda reading and a check-in.',
@@ -266,7 +267,7 @@ void main() {
 
   for (final e in {
     'sun': (AppColors.umber, sunBrand),
-    'lifestyle': (AppColors.forest, lifeBrand),
+    'lifestyle': (AppColors.nightfall, lifeBrand),
     'cycle': (AppColors.wine, cycleBrand),
   }.entries) {
     testWidgets('footer ${e.key}', (t) async {

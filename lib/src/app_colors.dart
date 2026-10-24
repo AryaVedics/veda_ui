@@ -4,7 +4,7 @@
 // hardcode a hex in a widget. That keeps the palette rules enforceable:
 //
 //   base    canvas, cards, chrome, supporting text, neutral states (each
-//           app's own hue: indigo, peacock, forest, wine, umber)
+//           app's own hue: indigo, peacock, nightfall, wine, umber)
 //   gold    readings, the primary action, active selection, and anything
 //           asking for attention (the same in every app)
 //   magenta anything drawn over a camera feed or a photograph
@@ -110,20 +110,20 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayLight: _overlayLight,
   );
 
-  /// Véda Lifestyle: forest green.
-  static const forest = AppColors(
-    canvas: Color(0xFF1F4532),
-    canvasDeep: Color(0xFF183C2A),
-    card: Color(0xFF2A5D44),
-    cardSunken: Color(0xFF25523C),
+  /// Véda Lifestyle: midnight blue (the night sky behind its stars).
+  static const nightfall = AppColors(
+    canvas: Color(0xFF0F1D3F),
+    canvasDeep: Color(0xFF09122B),
+    card: Color(0xFF1A3166),
+    cardSunken: Color(0xFF142757),
     accent: _accent,
     accentDim: _accentDim,
     accentText: _accentText,
     onAccent: _onAccent,
-    textPrimary: Color(0xFFECFAF3),
-    textSecondary: Color(0xFFC3EBD7),
-    textMuted: Color(0xFFA2D9BE),
-    divider: Color(0xFF377355),
+    textPrimary: Color(0xFFEAF1FC),
+    textSecondary: Color(0xFFC2D2EC),
+    textMuted: Color(0xFF96ACD4),
+    divider: Color(0xFF2B4580),
     overlay: _overlay,
     overlayLight: _overlayLight,
   );
@@ -167,7 +167,7 @@ class AppColors extends ThemeExtension<AppColors> {
   static const all = {
     'midnight': midnight,
     'peacock': peacock,
-    'forest': forest,
+    'nightfall': nightfall,
     'wine': wine,
     'umber': umber,
   };

@@ -8,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app_colors.dart';
+import 'open_veda.dart';
 
 /// The website every app links to.
 const String kWebsiteUrl = 'https://aryavedics.com';
@@ -22,7 +23,19 @@ class VedaMenuItem {
 }
 
 class LogoMenuScope extends InheritedWidget {
-  const LogoMenuScope({super.key, required this.items, required super.child});
+  const LogoMenuScope({
+    super.key,
+    required this.items,
+    this.onLink,
+    required super.child,
+  });
+
+  /// Opens the Connect card, for the "Link my Véda apps" shortcut. Null hides
+  /// the shortcut (Véda's store builds, until Véda Link ships).
+  final VoidCallback? onLink;
+
+  static VoidCallback? linkOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<LogoMenuScope>()?.onLink;
 
   /// The app's own shortcuts, shown above the website and support links.
   final List<VedaMenuItem> items;
@@ -40,6 +53,7 @@ void _openUrl(String url) =>
 /// Opens the menu under the widget [context] belongs to (the logo).
 Future<void> showLogoMenu(BuildContext context) async {
   final items = LogoMenuScope.maybeOf(context) ?? const [];
+  final onLink = LogoMenuScope.linkOf(context);
   final box = context.findRenderObject() as RenderBox?;
   final origin = box == null ? Offset.zero : box.localToGlobal(Offset.zero);
   final size = box?.size ?? Size.zero;
@@ -73,7 +87,9 @@ Future<void> showLogoMenu(BuildContext context) async {
                 constraints: BoxConstraints(
                   maxHeight: (box.maxHeight - top - 8).clamp(0.0, 600.0),
                 ),
-                child: SingleChildScrollView(child: _MenuCard(items: items)),
+                child: SingleChildScrollView(
+                  child: _MenuCard(items: items, onLink: onLink),
+                ),
               ),
             ),
           ],
@@ -85,7 +101,9 @@ Future<void> showLogoMenu(BuildContext context) async {
 }
 
 class _MenuCard extends StatelessWidget {
-  const _MenuCard({required this.items});
+  const _MenuCard({required this.items, this.onLink});
+
+  final VoidCallback? onLink;
 
   static const double width = 244;
 
@@ -162,6 +180,17 @@ class _MenuCard extends StatelessWidget {
                   ),
                   child: Divider(height: 1, color: colors.divider),
                 ),
+              if (onLink != null)
+                item(
+                  PhosphorIconsThin.shareNetwork,
+                  'Link my Véda apps',
+                  () => pick(c, onLink!),
+                ),
+              item(
+                PhosphorIconsThin.arrowSquareOut,
+                'Open Véda',
+                () => pick(c, openVeda),
+              ),
               item(
                 PhosphorIconsThin.globe,
                 'Our website',

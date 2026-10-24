@@ -31,7 +31,7 @@ class VedaTab {
   );
 }
 
-class VedaTabBar extends StatelessWidget {
+class VedaTabBar extends StatefulWidget {
   const VedaTabBar({
     super.key,
     required this.tabs,
@@ -46,19 +46,52 @@ class VedaTabBar extends StatelessWidget {
   static const height = 64.0;
 
   @override
+  State<VedaTabBar> createState() => _VedaTabBarState();
+}
+
+class _VedaTabBarState extends State<VedaTabBar> {
+  /// How far a swipe along the bar must travel to change the tab, as in Véda.
+  static const _swipeThreshold = 50.0;
+
+  double? _dragStartX;
+
+  List<VedaTab> get tabs => widget.tabs;
+  int get selectedIndex => widget.selectedIndex;
+  ValueChanged<int> get onSelected => widget.onSelected;
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    final start = _dragStartX;
+    if (start == null) return;
+    final delta = details.globalPosition.dx - start;
+    if (delta.abs() < _swipeThreshold) return;
+    if (delta > 0 && selectedIndex > 0) {
+      onSelected(selectedIndex - 1);
+      _dragStartX = null;
+    } else if (delta < 0 && selectedIndex < tabs.length - 1) {
+      onSelected(selectedIndex + 1);
+      _dragStartX = null;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Material(
-      color: colors.card,
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: height,
-          child: Row(
-            children: [
-              for (var i = 0; i < tabs.length; i++)
-                Expanded(child: _tab(colors, i)),
-            ],
+    return GestureDetector(
+      onHorizontalDragStart: (d) => _dragStartX = d.globalPosition.dx,
+      onHorizontalDragUpdate: _onDragUpdate,
+      onHorizontalDragEnd: (_) => _dragStartX = null,
+      child: Material(
+        color: colors.card,
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: VedaTabBar.height,
+            child: Row(
+              children: [
+                for (var i = 0; i < tabs.length; i++)
+                  Expanded(child: _tab(colors, i)),
+              ],
+            ),
           ),
         ),
       ),

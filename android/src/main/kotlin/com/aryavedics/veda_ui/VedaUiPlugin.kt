@@ -38,9 +38,17 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
         when (call.method) {
             "publish" -> {
                 val feed = call.argument<String>("feed")
+                val blocked = call.argument<List<String>>("blocked") ?: emptyList()
                 val file = VedaLinkProvider.feedFile(context)
                 workers.execute {
                     try {
+                        // Apps the person has unlinked: the provider turns them away.
+                        val blockedFile = VedaLinkProvider.blockedFile(context)
+                        if (blocked.isEmpty()) {
+                            if (blockedFile.exists()) blockedFile.delete()
+                        } else {
+                            blockedFile.writeText(blocked.joinToString("\n"), Charsets.UTF_8)
+                        }
                         if (feed == null) {
                             if (file.exists()) file.delete()
                         } else {
@@ -59,6 +67,20 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
+            "deviceInfo" -> {
+                // For a support email: the app, its version, and the phone.
+                val pm = context.packageManager
+                val pkg = pm.getPackageInfo(context.packageName, 0)
+                result.success(
+                    mapOf(
+                        "version" to (pkg.versionName ?: ""),
+                        "build" to (if (android.os.Build.VERSION.SDK_INT >= 28) pkg.longVersionCode else @Suppress("DEPRECATION") pkg.versionCode.toLong()),
+                        "model" to "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}",
+                        "android" to android.os.Build.VERSION.RELEASE,
+                    )
+                )
+            }
+
             "read" -> {
                 val authority = call.argument<String>("authority")
                 if (authority == null) {
@@ -68,6 +90,18 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
                 workers.execute {
                     val answer = read(authority)
                     main.post { result.success(answer) }
+                }
+            }
+
+            "openApp" -> {
+                val pkg = call.argument<String>("package")
+                val intent = pkg?.let { context.packageManager.getLaunchIntentForPackage(it) }
+                if (intent == null) {
+                    result.success("missing")
+                } else {
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                    result.success("opened")
                 }
             }
 

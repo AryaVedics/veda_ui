@@ -119,6 +119,14 @@ abstract class JsonStore<T> extends ChangeNotifier {
   String exportJson() =>
       const JsonEncoder.withIndent('  ').convert(toJson(_data));
 
+  /// Replaces everything with a backup's [json]. A file that could not be read
+  /// no longer blocks saving once the person has chosen to restore.
+  Future<void> restoreJson(String json) async {
+    final next = fromJson((jsonDecode(json) as Map).cast<String, Object?>());
+    loadFailed = false;
+    await set(next);
+  }
+
   Future<void> deleteEverything() async {
     _data = empty;
     loadFailed = false;

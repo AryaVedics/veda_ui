@@ -10,8 +10,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'hud_bars.dart';
 import 'metric_info.dart';
-import 'metric_views.dart' show MetricStyle;
+import 'metric_views.dart' show MetricStyle, ringRowSizes;
 
 /// A plausible-looking fraction for part [i]: not data, just enough variation
 /// that the ghost does not look like a flat line.
@@ -25,11 +26,15 @@ class GhostMetricChart extends StatelessWidget {
     required this.style,
     required this.keys,
     required this.colors,
+    this.hud = false,
   });
 
   final MetricStyle style;
   final List<String> keys;
   final AppColors colors;
+
+  /// Bars in the readout look (see MetricBarsView.hud).
+  final bool hud;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,9 @@ class GhostMetricChart extends StatelessWidget {
     return Center(
       child: switch (style) {
         MetricStyle.bars => _FitRowsToHeight(
-          child: _BarsPlaceholder(colors: colors, infos: infos),
+          child: hud
+              ? HudGhostBars(colors: colors, infos: infos)
+              : _BarsPlaceholder(colors: colors, infos: infos),
         ),
         MetricStyle.rings => _RingsPlaceholder(colors: colors, infos: infos),
         MetricStyle.petals => _PetalsPlaceholder(colors: colors, infos: infos),
@@ -136,14 +143,25 @@ class _BarsPlaceholderState extends State<_BarsPlaceholder>
                     width: 7,
                     height: 7,
                     decoration: BoxDecoration(
-                        color: m.identityColor, shape: BoxShape.circle),
+                      color: m.identityColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 64,
-                    child: Text(m.name,
+                    width: 78,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        m.name,
+                        maxLines: 1,
                         style: TextStyle(
-                            fontSize: 12.5, color: colors.textSecondary)),
+                          fontSize: 12.5,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -163,10 +181,11 @@ class _BarsPlaceholderState extends State<_BarsPlaceholder>
                   const SizedBox(width: 12),
                   SizedBox(
                     width: 34,
-                    child: Text('–',
-                        textAlign: TextAlign.right,
-                        style:
-                            TextStyle(fontSize: 12.5, color: colors.textMuted)),
+                    child: Text(
+                      '–',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 12.5, color: colors.textMuted),
+                    ),
                   ),
                 ],
               ),
@@ -199,25 +218,26 @@ class _GhostBarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final radius = size.height / 2;
-    final track =
-        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius));
+    final track = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(radius),
+    );
     canvas.drawRRect(track, Paint()..color = trackColor);
 
     final ghostWidth = size.width * fraction;
     if (ghostWidth <= 0) return;
     final ghostRect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, ghostWidth, size.height), Radius.circular(radius));
+      Rect.fromLTWH(0, 0, ghostWidth, size.height),
+      Radius.circular(radius),
+    );
     canvas.drawRRect(
-        ghostRect,
-        Paint()
-          ..shader = ui.Gradient.linear(
-            Offset.zero,
-            Offset(ghostWidth, 0),
-            [
-              goldColor.withValues(alpha: alpha * 0.75),
-              identityColor.withValues(alpha: alpha),
-            ],
-          ));
+      ghostRect,
+      Paint()
+        ..shader = ui.Gradient.linear(Offset.zero, Offset(ghostWidth, 0), [
+          goldColor.withValues(alpha: alpha * 0.75),
+          identityColor.withValues(alpha: alpha),
+        ]),
+    );
   }
 
   @override
@@ -282,12 +302,13 @@ class _RingsPlaceholderState extends State<_RingsPlaceholder>
   @override
   Widget build(BuildContext context) {
     final colors = widget.colors;
-    final rows = (widget.infos.length / _crossAxisCount).ceil();
+    final rowSizes = ringRowSizes(widget.infos.length, perRow: _crossAxisCount);
+    final rows = rowSizes.length;
+    final columns = rowSizes.fold(1, math.max);
     return LayoutBuilder(
       builder: (context, constraints) {
         final widthBased =
-            (constraints.maxWidth - _spacing * (_crossAxisCount - 1)) /
-                _crossAxisCount;
+            (constraints.maxWidth - _spacing * (columns - 1)) / columns;
         final heightBased =
             (constraints.maxHeight - _runSpacing * (rows - 1)) / rows;
         final diameter = math.min(widthBased, heightBased);
@@ -296,54 +317,73 @@ class _RingsPlaceholderState extends State<_RingsPlaceholder>
           builder: (context, _) {
             final glowT = Curves.easeInOut.transform(_pulse.value);
             final ghostAlpha = 0.22 + 0.14 * glowT;
-            return Wrap(
-              alignment: WrapAlignment.center,
-              spacing: _spacing,
-              runSpacing: _runSpacing,
-              children: widget.infos.asMap().entries.map((indexed) {
-                final i = indexed.key;
-                final m = indexed.value;
-                return SizedBox(
-                  width: diameter,
-                  height: diameter,
-                  child: Stack(
-                    alignment: Alignment.center,
+            Widget cell(int i) {
+              final m = widget.infos[i];
+              return SizedBox(
+                width: diameter,
+                height: diameter,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CustomPaint(
+                      size: Size(diameter, diameter),
+                      painter: _PlaceholderRingPainter(
+                        identityColor: m.identityColor,
+                        goldColor: colors.accent,
+                        ghostFraction: ghostFraction(i),
+                        ghostAlpha: ghostAlpha,
+                      ),
+                    ),
+                    SizedBox(
+                      width: diameter * 0.78,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '–',
+                            style: TextStyle(
+                              fontSize: diameter * 0.24,
+                              fontWeight: FontWeight.w600,
+                              height: 1,
+                              color: colors.textMuted,
+                            ),
+                          ),
+                          Text(
+                            m.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: diameter * 0.115,
+                              height: 1.2,
+                              color: colors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            var next = 0;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var r = 0; r < rows; r++) ...[
+                  if (r > 0) const SizedBox(height: _runSpacing),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      CustomPaint(
-                        size: Size(diameter, diameter),
-                        painter: _PlaceholderRingPainter(
-                          identityColor: m.identityColor,
-                          goldColor: colors.accent,
-                          ghostFraction: ghostFraction(i),
-                          ghostAlpha: ghostAlpha,
-                        ),
-                      ),
-                      SizedBox(
-                        width: diameter * 0.78,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('–',
-                                style: TextStyle(
-                                    fontSize: diameter * 0.24,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1,
-                                    color: colors.textMuted)),
-                            Text(m.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: diameter * 0.115,
-                                    height: 1.2,
-                                    color: colors.textMuted)),
-                          ],
-                        ),
-                      ),
+                      for (var c = 0; c < rowSizes[r]; c++) ...[
+                        if (c > 0) const SizedBox(width: _spacing),
+                        cell(next++),
+                      ],
                     ],
                   ),
-                );
-              }).toList(),
+                ],
+              ],
             );
           },
         );
@@ -387,9 +427,15 @@ class _PlaceholderRingPainter extends CustomPainter {
       ..strokeWidth = 1.3
       ..color = tipShade.withValues(alpha: 0.55);
     canvas.drawCircle(
-        center, ringRadius + strokeWidth / 2 + edgeGap, edgePaint);
+      center,
+      ringRadius + strokeWidth / 2 + edgeGap,
+      edgePaint,
+    );
     canvas.drawCircle(
-        center, ringRadius - strokeWidth / 2 - edgeGap, edgePaint);
+      center,
+      ringRadius - strokeWidth / 2 - edgeGap,
+      edgePaint,
+    );
 
     final sweep = 2 * math.pi * ghostFraction;
     final ghost = Paint()
@@ -523,16 +569,19 @@ class _PlaceholderPetalsPainter extends CustomPainter {
     // static — this is what's waiting for data, not what's absent.
     final glowAlpha = 0.10 + 0.12 * glowT;
     canvas.drawCircle(
-        center,
-        maxLen * 1.3,
-        Paint()
-          ..shader = ui.Gradient.radial(center, maxLen * 1.3, [
-            colors.accent.withValues(alpha: glowAlpha),
-            colors.accent.withValues(alpha: 0),
-          ]));
+      center,
+      maxLen * 1.3,
+      Paint()
+        ..shader = ui.Gradient.radial(center, maxLen * 1.3, [
+          colors.accent.withValues(alpha: glowAlpha),
+          colors.accent.withValues(alpha: 0),
+        ]),
+    );
 
     final textPainter = TextPainter(
-        textDirection: TextDirection.ltr, textAlign: TextAlign.center);
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
 
     for (var i = 0; i < n; i++) {
       final m = infos[i];
@@ -555,28 +604,31 @@ class _PlaceholderPetalsPainter extends CustomPainter {
       final gPath = Path()
         ..moveTo(center.dx, center.dy)
         ..cubicTo(
-            ghostOut(ghostAlong(0.22), 1.0).dx,
-            ghostOut(ghostAlong(0.22), 1.0).dy,
-            ghostOut(ghostAlong(0.75), 0.55).dx,
-            ghostOut(ghostAlong(0.75), 0.55).dy,
-            gTip.dx,
-            gTip.dy)
+          ghostOut(ghostAlong(0.22), 1.0).dx,
+          ghostOut(ghostAlong(0.22), 1.0).dy,
+          ghostOut(ghostAlong(0.75), 0.55).dx,
+          ghostOut(ghostAlong(0.75), 0.55).dy,
+          gTip.dx,
+          gTip.dy,
+        )
         ..cubicTo(
-            ghostOut(ghostAlong(0.75), -0.55).dx,
-            ghostOut(ghostAlong(0.75), -0.55).dy,
-            ghostOut(ghostAlong(0.22), -1.0).dx,
-            ghostOut(ghostAlong(0.22), -1.0).dy,
-            center.dx,
-            center.dy)
+          ghostOut(ghostAlong(0.75), -0.55).dx,
+          ghostOut(ghostAlong(0.75), -0.55).dy,
+          ghostOut(ghostAlong(0.22), -1.0).dx,
+          ghostOut(ghostAlong(0.22), -1.0).dy,
+          center.dx,
+          center.dy,
+        )
         ..close();
       canvas.drawPath(
-          gPath,
-          Paint()
-            ..style = PaintingStyle.fill
-            ..shader = ui.Gradient.linear(center, gTip, [
-              colors.accent.withValues(alpha: 0.22),
-              m.identityColor.withValues(alpha: 0.14),
-            ]));
+        gPath,
+        Paint()
+          ..style = PaintingStyle.fill
+          ..shader = ui.Gradient.linear(center, gTip, [
+            colors.accent.withValues(alpha: 0.22),
+            m.identityColor.withValues(alpha: 0.14),
+          ]),
+      );
 
       final tip = along(1.0);
       final c1 = out(along(0.22), 1.0);
@@ -591,28 +643,36 @@ class _PlaceholderPetalsPainter extends CustomPainter {
         ..close();
 
       canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5
-            ..color = outline);
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = outline,
+      );
 
       textPainter.text = TextSpan(
-          text: m.name,
-          style: TextStyle(fontSize: 9.5, color: colors.textMuted));
+        text: m.name,
+        style: TextStyle(fontSize: 9.5, color: colors.textMuted),
+      );
       textPainter.layout();
       // Same tip-relative, size-aware clearance as the real petal
       // painter — see its comment for why a fixed fraction of maxLen
       // isn't enough for a wide, near-horizontal label.
-      final reach = (textPainter.width / 2) * a.dx.abs() +
+      final reach =
+          (textPainter.width / 2) * a.dx.abs() +
           (textPainter.height / 2) * a.dy.abs();
       final labelPos = tip + a * (reach + 6);
-      textPainter.paint(canvas,
-          labelPos - Offset(textPainter.width / 2, textPainter.height / 2));
+      textPainter.paint(
+        canvas,
+        labelPos - Offset(textPainter.width / 2, textPainter.height / 2),
+      );
     }
 
     canvas.drawCircle(
-        center, 4, Paint()..color = colors.textMuted.withValues(alpha: 0.6));
+      center,
+      4,
+      Paint()..color = colors.textMuted.withValues(alpha: 0.6),
+    );
   }
 
   @override
