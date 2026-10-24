@@ -265,6 +265,9 @@ class BackupController {
           content: Text(
             app == null
                 ? 'That file is not a Véda backup.'
+                : app == 'veda-all'
+                ? 'That is the master backup of all your apps. Restore it from '
+                      'Véda: Profile, Your data, Restore all my apps.'
                 : 'That backup belongs to a different Véda app.',
           ),
         ),

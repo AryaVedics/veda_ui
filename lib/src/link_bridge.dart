@@ -20,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'restore_inbox.dart';
 import 'veda_link.dart';
 
 /// The apps of the family, with the id each publishes under.
@@ -328,6 +329,7 @@ class LinkRefresher extends StatefulWidget {
     required this.child,
     this.onResume,
     this.readings,
+    this.restoreInto,
   });
 
   final LinkBridge bridge;
@@ -340,6 +342,10 @@ class LinkRefresher extends StatefulWidget {
   /// Also run on open and resume, e.g. to republish a feed that depends on
   /// today's date.
   final VoidCallback? onResume;
+
+  /// A restore Véda left for this app is applied on open and resume.
+  /// Cycle never passes this: it is not part of the master backup.
+  final RestoreTarget? restoreInto;
 
   @override
   State<LinkRefresher> createState() => _LinkRefresherState();
@@ -373,6 +379,10 @@ class _LinkRefresherState extends State<LinkRefresher>
   }
 
   Future<void> _go() async {
+    // A restore Véda left comes first, so the feed published next carries the
+    // restored data.
+    final target = widget.restoreInto;
+    if (target != null) await RestoreInbox.applyIfWaiting(target);
     await widget.bridge.load();
     widget.onResume?.call();
     await widget.bridge.refresh();

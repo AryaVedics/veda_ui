@@ -8,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'app_colors.dart';
 import 'backup.dart';
 import 'common.dart';
+import 'restore_inbox.dart';
 import 'json_store.dart';
 
 /// Export and delete, for the app's own data file.
@@ -20,6 +21,7 @@ class DataSection extends StatelessWidget {
     required this.backupKey,
     required this.whatIsDeleted,
     this.alsoDelete,
+    this.restoreTarget,
   });
 
   final String appName;
@@ -34,6 +36,9 @@ class DataSection extends StatelessWidget {
 
   /// Anything else to clear with it (the Véda readings, preferences).
   final Future<void> Function()? alsoDelete;
+
+  /// Lets "Undo the last restore" appear after Véda has restored this app.
+  final RestoreTarget? restoreTarget;
 
   Future<void> _delete(BuildContext context) async {
     final ok = await showDialog<bool>(
@@ -75,6 +80,7 @@ class DataSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         BackupCard(controller: backup),
+        if (restoreTarget != null) UndoRestoreRow(target: restoreTarget!),
         const SizedBox(height: 12),
         CardBox(
           padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
