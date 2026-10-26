@@ -17,6 +17,7 @@ import 'link_bridge.dart';
 import 'metric_ghost.dart';
 import 'metric_views.dart';
 import 'open_veda.dart';
+import 'score_ring.dart';
 import 'theme.dart';
 import 'veda_link.dart';
 
@@ -240,41 +241,18 @@ class _Hero extends StatelessWidget {
         : 'Down ${-change!} on the week before';
     return Column(
       children: [
-        SizedBox(
-          width: 150,
-          height: 150,
-          child: CustomPaint(
-            painter: _RingPainter(
-              fraction: ((shown ?? 0) / 100).clamp(0.0, 1.0),
-              track: colors.accentDim,
-              fill: colors.accent,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    shown == null ? '–' : '${shown.round()}',
-                    style: TextStyle(
-                      fontSize: 46,
-                      fontFamily: kDisplayFont,
-                      height: 1,
-                      color: colors.accent,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'SKIN SCORE',
-                    style: TextStyle(
-                      fontSize: 10,
-                      letterSpacing: 1.2,
-                      color: colors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        // The same ring as Véda's own Today tab, so the score looks the same
+        // wherever it is shown.
+        ScoreRing(
+          value: shown ?? 0,
+          label: shown == null ? 'Waiting for\n1st Skin Score' : 'Skin Score',
+          trackColor: colors.accentDim,
+          fillColor: colors.accent,
+          edgeColor: colors.accentText,
+          valueColor: shown == null ? colors.textMuted : colors.textPrimary,
+          labelColor: colors.textMuted,
+          size: 148,
+          hasReading: shown != null,
         ),
         const SizedBox(height: 10),
         Text(
@@ -284,42 +262,6 @@ class _Hero extends StatelessWidget {
       ],
     );
   }
-}
-
-class _RingPainter extends CustomPainter {
-  _RingPainter({
-    required this.fraction,
-    required this.track,
-    required this.fill,
-  });
-
-  final double fraction;
-  final Color track;
-  final Color fill;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const stroke = 13.0;
-    final rect = (Offset.zero & size).deflate(stroke / 2);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, 0, 6.2831853, false, paint..color = track);
-    if (fraction > 0) {
-      canvas.drawArc(
-        rect,
-        -1.5707963,
-        6.2831853 * fraction,
-        false,
-        paint..color = fill,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter old) =>
-      old.fraction != fraction || old.track != track || old.fill != fill;
 }
 
 /// The latest reading's measurements, in the app's chosen chart style.

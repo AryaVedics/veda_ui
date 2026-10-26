@@ -77,7 +77,10 @@ void main() {
         ),
       );
       await t.pump();
+      // The ring counts up to the score, as it does on Véda's Today tab.
+      await t.pump(const Duration(seconds: 2));
       expect(find.text('84'), findsOneWidget);
+      expect(find.byType(ScoreRing), findsOneWidget);
       expect(find.text('Up 4 on the week before'), findsOneWidget);
       expect(find.text('an app card'), findsOneWidget);
       expect(find.text('Get Véda'), findsNothing);

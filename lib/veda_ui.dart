@@ -29,6 +29,7 @@ export 'src/metric_ghost.dart' show GhostMetricChart;
 export 'src/metric_views.dart';
 export 'src/profile_sections.dart';
 export 'src/restore_inbox.dart';
+export 'src/score_ring.dart';
 export 'src/skin_tab.dart';
 export 'src/support.dart';
 export 'src/theme.dart';
