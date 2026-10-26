@@ -832,8 +832,9 @@ class MetricPetalsView extends StatelessWidget {
                 final v = details.localPosition - center;
                 // Same -90° start as the painter, so the wedge under the
                 // finger matches the wedge that gets tapped.
-                var angle = math.atan2(v.dy, v.dx) * 180 / math.pi + 90;
-                if (angle < 0) angle += 360;
+                var angle = math.atan2(v.dy, v.dx) * 180 / math.pi + 90 -
+                    _petalOffsetDegrees(entries.length);
+                angle = ((angle % 360) + 360) % 360;
                 final i =
                     (angle / (360 / entries.length)).floor() % entries.length;
                 onTap(entries[i].key);
@@ -859,6 +860,18 @@ class MetricPetalsView extends StatelessWidget {
   }
 }
 
+/// Where the first petal sits, as a turn from the top. An even number of
+/// petals starts half a step round, so four petals form an X like Véda's
+/// seven, not a plus with one petal straight up and one straight down.
+double _petalOffsetDegrees(int count) => count.isEven ? 180 / count : 0;
+
+/// Petal thickness for [count] petals in a flower of radius [maxLen]. Seven
+/// petals is the reference; with fewer, each petal is thicker in proportion
+/// (four are 7/4 as thick) so the flower keeps its weight. More than seven
+/// stay at the reference width.
+double petalBaseWidth(double maxLen, int count) =>
+    maxLen * 0.16 * (count < 7 ? 7 / count : 1);
+
 class _MetricPetalsPainter extends CustomPainter {
   _MetricPetalsPainter({
     required this.entries,
@@ -883,7 +896,7 @@ class _MetricPetalsPainter extends CustomPainter {
     // grow independently of leaving room for the text.
     final maxLen = math.min(size.width, size.height) * 0.37;
     const minLen = 0.30;
-    final baseWidth = maxLen * 0.16;
+    final baseWidth = petalBaseWidth(maxLen, n);
 
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -910,7 +923,7 @@ class _MetricPetalsPainter extends CustomPainter {
       final identity = info?.identityColor ?? colors.textMuted;
       final fraction = (entry.value / 100).clamp(0.0, 1.0);
       final len = maxLen * (minLen + (1 - minLen) * fraction) * reveals[i];
-      final angle = (-90 + i * 360 / n) * math.pi / 180;
+      final angle = (-90 + _petalOffsetDegrees(n) + i * 360 / n) * math.pi / 180;
       final a = Offset(math.cos(angle), math.sin(angle));
       final p = Offset(-math.sin(angle), math.cos(angle));
 

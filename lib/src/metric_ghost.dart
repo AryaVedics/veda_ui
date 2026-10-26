@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'hud_bars.dart';
 import 'metric_info.dart';
-import 'metric_views.dart' show MetricStyle, ringRowSizes;
+import 'metric_views.dart' show MetricStyle, petalBaseWidth, ringRowSizes;
 
 /// A plausible-looking fraction for part [i]: not data, just enough variation
 /// that the ghost does not look like a flat line.
@@ -561,7 +561,7 @@ class _PlaceholderPetalsPainter extends CustomPainter {
     // grows into the exact same shape once there's real data.
     final maxLen = math.min(size.width, size.height) * 0.37;
     const minLen = 0.30;
-    final baseWidth = maxLen * 0.16;
+    final baseWidth = petalBaseWidth(maxLen, n);
     final outline = colors.textMuted.withValues(alpha: 0.45);
 
     // Same warm wash the real chart's flower sits in (_MetricPetalsPainter),
