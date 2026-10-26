@@ -12,6 +12,7 @@ class VedaBrand {
     required this.word,
     required this.markAsset,
     this.markBackdrop,
+    this.markFireflies = false,
   });
 
   /// "Véda Sun".
@@ -26,6 +27,9 @@ class VedaBrand {
   /// An optional disc behind the header mark, for an app whose look wants one
   /// (Routine's night teal). Null for the others: the mark sits bare.
   final Color? markBackdrop;
+
+  /// A few glowing fireflies round the header mark (Routine's night clearing).
+  final bool markFireflies;
 }
 
 class VedaBrandScope extends InheritedWidget {

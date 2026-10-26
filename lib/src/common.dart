@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 // Small pieces every Véda companion screen shares, drawn the way Véda draws
 // them: the title-and-medallion header, header icons, cards, section labels,
 // empty states, the gold button, profile rows and date wording.
@@ -30,20 +32,26 @@ class VedaLockup extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(4),
-              child: Container(
-                decoration: brand.markBackdrop == null
-                    ? null
-                    : BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          center: const Alignment(0, -0.3),
-                          colors: [brand.markBackdrop!, brand.markBackdrop!.withValues(alpha: 0.6)],
+              child: CustomPaint(
+                painter: brand.markFireflies ? const _HeaderFireflies() : null,
+                child: Container(
+                  decoration: brand.markBackdrop == null
+                      ? null
+                      : BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            center: const Alignment(0, -0.3),
+                            colors: [
+                              brand.markBackdrop!,
+                              brand.markBackdrop!.withValues(alpha: 0.6),
+                            ],
+                          ),
                         ),
-                      ),
-                child: Image.asset(
-                  brand.markAsset,
-                  width: kLockupMarkSize,
-                  height: kLockupMarkSize,
+                  child: Image.asset(
+                    brand.markAsset,
+                    width: kLockupMarkSize,
+                    height: kLockupMarkSize,
+                  ),
                 ),
               ),
             ),
@@ -432,4 +440,40 @@ String dayKey(DateTime d) =>
 DateTime parseDayKey(String k) {
   final p = k.split('-').map(int.parse).toList();
   return DateTime(p[0], p[1], p[2]);
+}
+
+/// A few glowing fireflies round the header mark, in the night clearing's gold.
+class _HeaderFireflies extends CustomPainter {
+  const _HeaderFireflies();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    const spots = [
+      (a: -2.2, d: 1.0, s: 1.6),
+      (a: -1.1, d: 1.08, s: 1.2),
+      (a: -0.2, d: 1.0, s: 1.8),
+      (a: 0.9, d: 1.1, s: 1.3),
+      (a: 2.0, d: 1.02, s: 1.5),
+      (a: 2.9, d: 1.12, s: 1.1),
+      (a: 3.7, d: 1.0, s: 1.4),
+    ];
+    for (final f in spots) {
+      final at =
+          c +
+          Offset(math.cos(f.a), math.sin(f.a)) *
+              (kLockupMarkSize / 2 * f.d + 6);
+      canvas.drawCircle(
+        at,
+        f.s * 2.6,
+        Paint()
+          ..color = const Color(0xFFD9F77A).withValues(alpha: 0.45)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, f.s * 2),
+      );
+      canvas.drawCircle(at, f.s, Paint()..color = const Color(0xFFF4FFB8));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_HeaderFireflies old) => false;
 }
