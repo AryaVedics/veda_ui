@@ -30,6 +30,8 @@ export 'src/metric_views.dart';
 export 'src/profile_sections.dart';
 export 'src/restore_inbox.dart';
 export 'src/score_ring.dart';
+export 'src/shelf_glyph.dart';
+export 'src/score_glow.dart';
 export 'src/skin_tab.dart';
 export 'src/support.dart';
 export 'src/theme.dart';

@@ -100,7 +100,7 @@ class GroupMetricsCard extends StatefulWidget {
     required this.groups,
     required this.caveat,
     this.empty,
-    this.hud = false,
+    this.hud = true,
     this.ghostKeys = kVedaMetrics,
   });
 

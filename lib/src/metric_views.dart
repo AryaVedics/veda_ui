@@ -212,11 +212,11 @@ class MetricBarsView extends StatelessWidget {
     required this.scores,
     required this.colors,
     required this.onTap,
-    this.hud = false,
+    this.hud = true,
   });
 
   /// The readout look (label and number above a thick bracketed track), as on
-  /// Véda's Lifestyle tab, instead of the slim one-line rows.
+  /// Véda's Lifestyle tab. Off only for the slim one-line rows.
   final bool hud;
 
   final Map<String, double> scores;

@@ -24,22 +24,51 @@ const kHudRowHeight = 37.0;
 double hudBarsHeight(int rows) =>
     rows * kHudRowHeight + (rows - 1) * hudRowGap(rows);
 
+/// How much room a row's parts take: the gap between rows, the gap under the
+/// label and the track's own height. The label's type never changes size.
+class _HudSpacing {
+  const _HudSpacing(this.gap, this.labelGap, this.track);
+
+  final double gap;
+  final double labelGap;
+  final double track;
+
+  double height(int rows) =>
+      rows * (kHudRowHeight - 7 - 14 + labelGap + track) + (rows - 1) * gap;
+}
+
+/// Roomy when there is space; tighter, a step at a time, when the chart's box
+/// is short, so the rows fit without the whole chart being scaled down.
+_HudSpacing _spacingFor(int rows, double? maxHeight) {
+  final roomy = _HudSpacing(hudRowGap(rows), 7, 14);
+  if (maxHeight == null || !maxHeight.isFinite) return roomy;
+  for (final s in [roomy, const _HudSpacing(7, 5, 13)]) {
+    if (s.height(rows) <= maxHeight) return s;
+  }
+  return const _HudSpacing(4, 3, 12);
+}
+
 class HudBarsView extends StatelessWidget {
   const HudBarsView({
     super.key,
     required this.scores,
     required this.colors,
     required this.onTap,
+    this.maxHeight,
   });
 
   final Map<String, double> scores;
   final AppColors colors;
   final void Function(String key) onTap;
 
+  /// The height the rows have to fit in, when it is limited: they tighten up
+  /// to fit it. Null means no limit.
+  final double? maxHeight;
+
   @override
   Widget build(BuildContext context) {
     final entries = scores.entries.toList();
-    final gap = hudRowGap(entries.length);
+    final sp = _spacingFor(entries.length, maxHeight);
     return DataReveal(
       builder: (context, tAt) => Column(
         mainAxisSize: MainAxisSize.min,
@@ -50,9 +79,9 @@ class HudBarsView extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: i == entries.length - 1 ? 0 : gap,
+                  bottom: i == entries.length - 1 ? 0 : sp.gap,
                 ),
-                child: _row(entries[i], tAt(i, entries.length)),
+                child: _row(entries[i], tAt(i, entries.length), sp),
               ),
             ),
         ],
@@ -60,7 +89,7 @@ class HudBarsView extends StatelessWidget {
     );
   }
 
-  Widget _row(MapEntry<String, double> e, double reveal) {
+  Widget _row(MapEntry<String, double> e, double reveal, _HudSpacing sp) {
     final info = metricInfoByKey[e.key];
     final identity = info?.identityColor ?? colors.textMuted;
     final shown = e.value * reveal;
@@ -91,12 +120,12 @@ class HudBarsView extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 7),
+        SizedBox(height: sp.labelGap),
         SizedBox(
-          height: 14,
+          height: sp.track,
           child: LayoutBuilder(
             builder: (context, constraints) => CustomPaint(
-              size: Size(constraints.maxWidth, 14),
+              size: Size(constraints.maxWidth, sp.track),
               painter: _HudBarPainter(
                 fraction: (shown / 100).clamp(0.0, 1.0),
                 trackColor: colors.cardSunken,
@@ -211,10 +240,18 @@ void _brackets(Canvas canvas, Size size, Color color) {
 
 /// The same rows before there is data: a breathing ghost fill and "–".
 class HudGhostBars extends StatefulWidget {
-  const HudGhostBars({super.key, required this.colors, required this.infos});
+  const HudGhostBars({
+    super.key,
+    required this.colors,
+    required this.infos,
+    this.maxHeight,
+  });
 
   final AppColors colors;
   final List<MetricInfo> infos;
+
+  /// As [HudBarsView.maxHeight].
+  final double? maxHeight;
 
   @override
   State<HudGhostBars> createState() => _HudGhostBarsState();
@@ -249,7 +286,7 @@ class _HudGhostBarsState extends State<HudGhostBars>
   @override
   Widget build(BuildContext context) {
     final colors = widget.colors;
-    final gap = hudRowGap(widget.infos.length);
+    final sp = _spacingFor(widget.infos.length, widget.maxHeight);
     return AnimatedBuilder(
       animation: _pulse,
       builder: (context, _) {
@@ -261,7 +298,7 @@ class _HudGhostBarsState extends State<HudGhostBars>
             for (var i = 0; i < widget.infos.length; i++)
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: i == widget.infos.length - 1 ? 0 : gap,
+                  bottom: i == widget.infos.length - 1 ? 0 : sp.gap,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,12 +326,12 @@ class _HudGhostBarsState extends State<HudGhostBars>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 7),
+                    SizedBox(height: sp.labelGap),
                     SizedBox(
-                      height: 14,
+                      height: sp.track,
                       child: LayoutBuilder(
                         builder: (context, constraints) => CustomPaint(
-                          size: Size(constraints.maxWidth, 14),
+                          size: Size(constraints.maxWidth, sp.track),
                           painter: _HudGhostPainter(
                             fraction: ghostFraction(i),
                             trackColor: colors.cardSunken,

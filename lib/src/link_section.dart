@@ -6,7 +6,9 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
 import 'common.dart';
+import 'heart_pulse_icon.dart';
 import 'link_bridge.dart';
+import 'shelf_glyph.dart';
 import 'theme.dart';
 import 'veda_link.dart';
 
@@ -44,13 +46,22 @@ class LinkSection extends StatefulWidget {
   /// Score next to your sleep and water."
   final String? why;
 
-  static const _icons = {
-    LinkApp.skin: PhosphorIconsThin.sparkle,
-    LinkApp.lifestyle: PhosphorIconsThin.heartbeat,
-    LinkApp.cycle: PhosphorIconsThin.flowerLotus,
-    LinkApp.sun: PhosphorIconsThin.sun,
-    LinkApp.routine: PhosphorIconsThin.listChecks,
-  };
+  /// Each app's own tab icon, so the list looks like the apps it names.
+  static Widget _iconFor(LinkApp app, Color color) => SizedBox.square(
+    dimension: 22,
+    child: FittedBox(
+      child: switch (app) {
+        LinkApp.lifestyle => HeartPulseIcon(selected: false, color: color),
+        LinkApp.routine => ShelfGlyph(color: color),
+        LinkApp.cycle => Icon(PhosphorIconsThin.flowerLotus, color: color),
+        LinkApp.sun => Icon(PhosphorIconsThin.sun, color: color),
+        LinkApp.skin => Image.asset(
+          'packages/veda_ui/assets/branding/veda_mark.png',
+          filterQuality: FilterQuality.medium,
+        ),
+      },
+    ),
+  );
 
   @override
   State<LinkSection> createState() => _LinkSectionState();
@@ -258,16 +269,18 @@ class _LinkSectionState extends State<LinkSection> {
                             child: CircleAvatar(
                               radius: 13,
                               backgroundColor: colors.cardSunken,
-                              child: Icon(
-                                LinkSection._icons[app] ??
-                                    PhosphorIconsThin.circle,
-                                size: 16,
-                                color:
+                              child: SizedBox.square(
+                                dimension: 16,
+                                child: FittedBox(
+                                  child: LinkSection._iconFor(
+                                    app,
                                     bridge.isLinked(app) &&
-                                        bridge.readOf(app).status ==
-                                            LinkStatus.connected
-                                    ? colors.accentText
-                                    : colors.textMuted,
+                                            bridge.readOf(app).status ==
+                                                LinkStatus.connected
+                                        ? colors.accentText
+                                        : colors.textMuted,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -297,7 +310,7 @@ class _LinkSectionState extends State<LinkSection> {
                 Divider(height: 8, color: colors.accentDim),
                 for (final app in others) ...[
                   ProfileRow(
-                    icon: LinkSection._icons[app] ?? PhosphorIconsThin.circle,
+                    iconWidget: LinkSection._iconFor(app, colors.accentText),
                     title: app.name,
                     subtitle:
                         '${app.gives}\n${_words(app, bridge.readOf(app))}',
