@@ -30,10 +30,21 @@ class VedaLockup extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(4),
-              child: Image.asset(
-                brand.markAsset,
-                width: kLockupMarkSize,
-                height: kLockupMarkSize,
+              child: Container(
+                decoration: brand.markBackdrop == null
+                    ? null
+                    : BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          center: const Alignment(0, -0.3),
+                          colors: [brand.markBackdrop!, brand.markBackdrop!.withValues(alpha: 0.6)],
+                        ),
+                      ),
+                child: Image.asset(
+                  brand.markAsset,
+                  width: kLockupMarkSize,
+                  height: kLockupMarkSize,
+                ),
               ),
             ),
             Transform.translate(

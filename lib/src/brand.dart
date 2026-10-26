@@ -11,6 +11,7 @@ class VedaBrand {
     required this.appName,
     required this.word,
     required this.markAsset,
+    this.markBackdrop,
   });
 
   /// "Véda Sun".
@@ -21,6 +22,10 @@ class VedaBrand {
 
   /// The app's own mark (its icon art on a transparent square).
   final String markAsset;
+
+  /// An optional disc behind the header mark, for an app whose look wants one
+  /// (Routine's night teal). Null for the others: the mark sits bare.
+  final Color? markBackdrop;
 }
 
 class VedaBrandScope extends InheritedWidget {
