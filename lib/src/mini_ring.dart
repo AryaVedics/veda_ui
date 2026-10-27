@@ -26,6 +26,7 @@ class MiniRing extends StatelessWidget {
     required this.gradient,
     required this.stops,
     this.size = kMiniRingSize,
+    this.trackColor,
   });
 
   /// How much of the ring is filled, 0 to 1.
@@ -44,6 +45,9 @@ class MiniRing extends StatelessWidget {
 
   final double size;
 
+  /// The unfilled band. Null means the app's own dim accent.
+  final Color? trackColor;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -57,6 +61,7 @@ class MiniRing extends StatelessWidget {
           gradient: gradient,
           stops: stops,
           colors: colors,
+          track: trackColor ?? colors.accentDim,
         ),
       ),
     );
@@ -71,8 +76,10 @@ class _MiniRingPainter extends CustomPainter {
     required this.gradient,
     required this.stops,
     required this.colors,
+    required this.track,
   });
 
+  final Color track;
   final double fraction;
   final String? centre;
   final String? caption;
@@ -104,7 +111,7 @@ class _MiniRingPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
-        ..color = colors.accentDim,
+        ..color = track,
     );
 
     const start = -math.pi / 2;
@@ -130,19 +137,43 @@ class _MiniRingPainter extends CustomPainter {
     }
 
     if (centre != null) {
-      _text(canvas, centre!, c + Offset(0, -size.shortestSide * 0.06),
-          size.shortestSide * 0.28, colors.textPrimary, display: true);
+      _text(
+        canvas,
+        centre!,
+        c + Offset(0, -size.shortestSide * 0.06),
+        size.shortestSide * 0.28,
+        colors.textPrimary,
+        display: true,
+      );
     }
     if (caption != null) {
-      _text(canvas, caption!, c + Offset(0, size.shortestSide * 0.17),
-          size.shortestSide * 0.1, colors.textMuted);
+      // a long caption shrinks to fit inside the ring rather than touch it
+      final capAt = size.shortestSide * 0.17;
+      final reach = r - stroke / 2 - edgeGap;
+      final drop = capAt + size.shortestSide * 0.05;
+      final room =
+          2 * math.sqrt(math.max(0.0, reach * reach - drop * drop)) * 0.94;
+      _text(
+        canvas,
+        caption!,
+        c + Offset(0, capAt),
+        size.shortestSide * 0.1,
+        colors.textMuted,
+        maxWidth: room,
+      );
     }
   }
 
   /// Véda's end cap: a straight line across the band where the arc stops, warm
   /// white, with a soft glow behind it, clipped to the band.
-  void _endLine(Canvas canvas, Offset c, double r, double stroke,
-      double endAngle, Color glow) {
+  void _endLine(
+    Canvas canvas,
+    Offset c,
+    double r,
+    double stroke,
+    double endAngle,
+    Color glow,
+  ) {
     final markerWidth = stroke * 0.4;
     final angle = endAngle - (markerWidth / 2) / r;
     final dir = Offset(math.cos(angle), math.sin(angle));
@@ -173,9 +204,16 @@ class _MiniRingPainter extends CustomPainter {
     canvas.restore();
   }
 
-  void _text(Canvas canvas, String text, Offset at, double size, Color color,
-      {bool display = false}) {
-    final tp = TextPainter(
+  void _text(
+    Canvas canvas,
+    String text,
+    Offset at,
+    double size,
+    Color color, {
+    bool display = false,
+    double? maxWidth,
+  }) {
+    var tp = TextPainter(
       text: TextSpan(
         text: text,
         style: TextStyle(
@@ -186,6 +224,15 @@ class _MiniRingPainter extends CustomPainter {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
+    if (maxWidth != null && tp.width > maxWidth) {
+      tp = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(fontSize: size * maxWidth / tp.width, color: color),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+    }
     tp.paint(canvas, at - Offset(tp.width / 2, tp.height / 2));
   }
 
@@ -196,5 +243,6 @@ class _MiniRingPainter extends CustomPainter {
       old.caption != caption ||
       old.gradient != gradient ||
       old.stops != stops ||
+      old.track != track ||
       old.colors != colors;
 }
