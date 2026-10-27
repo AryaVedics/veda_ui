@@ -25,6 +25,7 @@ export 'src/link_bridge.dart';
 export 'src/link_section.dart';
 export 'src/logo_menu.dart';
 export 'src/notice_carousel.dart';
+export 'src/mini_ring.dart';
 export 'src/open_veda.dart';
 export 'src/metric_info.dart' show MetricInfo, metricInfoByKey, metricInfoList;
 export 'src/metric_ghost.dart' show GhostMetricChart;

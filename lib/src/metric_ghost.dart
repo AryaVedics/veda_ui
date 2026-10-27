@@ -16,6 +16,11 @@ import 'metric_views.dart' show MetricStyle, petalBaseWidth, ringRowSizes;
 
 /// A plausible-looking fraction for part [i]: not data, just enough variation
 /// that the ghost does not look like a flat line.
+/// Where the first petal sits, as an angle in degrees from the top. An even
+/// number of petals starts half a step round, so they form an X, never a plus.
+/// Every petal chart, filled or empty, uses this rule (see UI_RULES.md).
+double petalOffsetDegrees(int count) => count.isEven ? 180 / count : 0;
+
 double ghostFraction(int i) =>
     (0.45 + 0.35 * math.sin(i * 2.1 + 0.6)).clamp(0.25, 0.95);
 
@@ -585,7 +590,7 @@ class _PlaceholderPetalsPainter extends CustomPainter {
 
     for (var i = 0; i < n; i++) {
       final m = infos[i];
-      final angle = (-90 + i * 360 / n) * math.pi / 180;
+      final angle = (-90 + petalOffsetDegrees(n) + i * 360 / n) * math.pi / 180;
       final a = Offset(math.cos(angle), math.sin(angle));
       final p = Offset(-math.sin(angle), math.cos(angle));
 

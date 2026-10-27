@@ -18,6 +18,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'app_colors.dart';
 import 'data_reveal.dart';
 import 'hud_bars.dart';
+import 'metric_ghost.dart' show petalOffsetDegrees;
 import 'metric_info.dart';
 
 enum MetricStyle { bars, rings, petals }
@@ -833,7 +834,7 @@ class MetricPetalsView extends StatelessWidget {
                 // Same -90° start as the painter, so the wedge under the
                 // finger matches the wedge that gets tapped.
                 var angle = math.atan2(v.dy, v.dx) * 180 / math.pi + 90 -
-                    _petalOffsetDegrees(entries.length);
+                    petalOffsetDegrees(entries.length);
                 angle = ((angle % 360) + 360) % 360;
                 final i =
                     (angle / (360 / entries.length)).floor() % entries.length;
@@ -863,7 +864,6 @@ class MetricPetalsView extends StatelessWidget {
 /// Where the first petal sits, as a turn from the top. An even number of
 /// petals starts half a step round, so four petals form an X like Véda's
 /// seven, not a plus with one petal straight up and one straight down.
-double _petalOffsetDegrees(int count) => count.isEven ? 180 / count : 0;
 
 /// Petal thickness for [count] petals in a flower of radius [maxLen]. Seven
 /// petals is the reference; with fewer, each petal is thicker in proportion
@@ -923,7 +923,7 @@ class _MetricPetalsPainter extends CustomPainter {
       final identity = info?.identityColor ?? colors.textMuted;
       final fraction = (entry.value / 100).clamp(0.0, 1.0);
       final len = maxLen * (minLen + (1 - minLen) * fraction) * reveals[i];
-      final angle = (-90 + _petalOffsetDegrees(n) + i * 360 / n) * math.pi / 180;
+      final angle = (-90 + petalOffsetDegrees(n) + i * 360 / n) * math.pi / 180;
       final a = Offset(math.cos(angle), math.sin(angle));
       final p = Offset(-math.sin(angle), math.cos(angle));
 

@@ -45,7 +45,7 @@ class VedaLockup extends StatelessWidget {
                   Text(
                     brand.word,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 11,
                       fontFamily: kDisplayFont,
                       height: 1,
                       letterSpacing: 2,
@@ -103,7 +103,7 @@ class PinnedHeaderList extends StatelessWidget {
     super.key,
     required this.header,
     required this.children,
-    this.padding = const EdgeInsets.fromLTRB(20, 12, 20, 24),
+    this.padding = const EdgeInsets.fromLTRB(20, 24, 20, 24),
     this.controller,
   });
 
@@ -131,7 +131,7 @@ class PinnedHeaderList extends StatelessWidget {
           controller: controller,
           padding: EdgeInsets.fromLTRB(
             padding.left,
-            8,
+            14,
             padding.right,
             padding.bottom,
           ),

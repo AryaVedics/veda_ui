@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
+import 'mini_ring.dart';
 
 /// How long a message stays after it is first shown.
 const kNoticeLifetime = Duration(days: 14);
@@ -59,15 +60,30 @@ Future<void> dismissNotice(
   await store.setBool('notice.$appKey.${m.id}.dismissed', true);
 }
 
-/// The carousel itself. Shows nothing until its messages are worked out, and
+/// The carousel itself.
+///
+/// Where it goes, in every Véda app (the rule, from Véda's own Today tab):
+/// - At the top of Today, directly under the header and the date, and above the
+///   centrepiece. Never at the bottom of the page and never in the scrolling
+///   cards. Véda draws it in the row beside its Skin Score ring.
+/// - Its size is Véda's: the app's mark on the left (about a third of the
+///   width), then a message box 112 high with a 3px track beneath it,
+///   no card behind it, an icon and a line of text, and a × to dismiss.
+/// - New user messages go into this carousel, never into a card of their own
+///   (see NOTICES.md). Shows nothing until its messages are worked out, and
 /// takes no room at all when none are left to show.
 class NoticeCarousel extends StatefulWidget {
   const NoticeCarousel({
     super.key,
     required this.appKey,
     required this.messages,
+    required this.leading,
     this.now,
   });
+
+  /// What sits at the left of the message box: the app's own ring, with its
+  /// number for today (see MiniRing).
+  final Widget leading;
 
   /// Which app these messages belong to, so their dismissals stay apart.
   final String appKey;
@@ -76,7 +92,8 @@ class NoticeCarousel extends StatefulWidget {
   /// The clock; tests pass a fixed one. Null means the real time.
   final DateTime? now;
 
-  static const _cardHeight = 40.0;
+  /// Véda's own size: the message box is 112 high, with a 3px track under it.
+  static const _cardHeight = 112.0;
   static const _trackHeight = 3.0;
 
   @override
@@ -141,28 +158,41 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     // nothing to show.
     if (shown == null || shown.isEmpty) return const SizedBox.shrink();
     final showTrack = shown.length > 1;
-    return Column(
+    // Véda's own layout: the ring at the left edge, a 20 gap, and the message
+    // box in the rest of the row, both centred on the same line.
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
-          height: NoticeCarousel._cardHeight,
-          child: PageView(
-            controller: _controller,
-            onPageChanged: (i) => setState(() => _page = i),
+        SizedBox.square(dimension: kMiniRingSize, child: widget.leading),
+        const SizedBox(width: 20),
+        Expanded(
+          child: Column(
             children: [
-              for (final m in shown) _card(colors, m),
+              SizedBox(
+                height: NoticeCarousel._cardHeight,
+                child: PageView(
+                  controller: _controller,
+                  onPageChanged: (i) => setState(() => _page = i),
+                  children: [
+                    for (final m in shown) _card(colors, m),
+                  ],
+                ),
+              ),
+              if (showTrack) ...[
+                const SizedBox(height: 8),
+                _track(colors, shown.length),
+              ],
             ],
           ),
         ),
-        if (showTrack) ...[
-          const SizedBox(height: 6),
-          _track(colors, shown.length),
-        ],
       ],
     );
   }
 
   Widget _card(AppColors colors, NoticeMessage m) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+    // no side inset: the icon lines up with the title and the date above it,
+    // and the × with the right edge
+    padding: const EdgeInsets.symmetric(vertical: 7),
     alignment: Alignment.centerLeft,
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
