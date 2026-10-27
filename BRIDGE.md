@@ -120,13 +120,15 @@ There is no manual import: the readings only arrive live over the link
 ## Véda Cycle is an island (decided 2026-10-27, supersedes the Cycle rows above)
 
 Period days and cycle phase are the most sensitive entries in the family, and the people who use Véda Cycle
-will, understandably, want every possible risk removed. So:
+will, understandably, want every possible risk removed, and even an optional link makes an app look less sealed. So:
 
 - **Véda Cycle publishes nothing.** No feed, no content provider, no App Group file, to any app, including ours.
   The old outward feed (`cycleLinkFeed`, the "Véda Cycle: Cycle phase" row in Véda's link list, Lifestyle's phase
   beside sleep and stress) is removed.
-- **Inward only, and optional.** Cycle may read Véda's skin scores for its "skin by phase" charts. The switch is
-  inside Cycle, off by default, never promoted by a notice. Skin scores flow in; nothing about periods flows out.
+- **No link at all, not even inward.** Cycle does not read Véda's skin readings either. Anyone who wants "skin
+  by phase" tracks in Véda, whose own Cycle tab has the flower chart and skin by phase. Cycle therefore has no Skin
+  tab (four tabs: Today, Calendar, Insights, Profile) and no Véda Link code, switch or provider. The two products
+  split cleanly: want skin by phase, track in Véda; want maximum privacy, use Véda Cycle, which never talks to anything.
 - **Véda's Cycle tab stands alone.** For people who track inside Véda it keeps working as today. It is not a window
   onto Véda Cycle and has no read-only mode.
 - **No release build of Cycle has any internet permission, ads or account.** The promise to say everywhere: "Véda
