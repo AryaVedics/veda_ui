@@ -146,3 +146,10 @@ will, understandably, want every possible risk removed, and even an optional lin
 3. Review the iPhone project settings once more (no file sharing, no network, Face ID text) and test on a real iPhone.
 4. Add an iPhone pipeline for Cycle (none exists; Codemagic builds Véda only).
 5. Wording in Cycle's privacy policy, the store listing and the "Your data" page must match; on the lawyer list.
+
+## The Patron flag (decided 2026-10-27)
+One Véda Patron membership covers Véda, Routine, Lifestyle and Sun (not Cycle, which is sealed and has its own plan).
+Store subscriptions belong to one app, so Véda publishes a small `patron` entry over the same local channel as the
+other feeds: only "active" and the date it runs to, nothing about the person. The companions read it (with the link
+switch on) to switch off their ads and turn on Patron extras. An app installed on its own can offer "Restore Patron".
+Never sent to a server; never published by Cycle or read by it.
