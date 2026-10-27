@@ -12,7 +12,7 @@ class VedaBrand {
     required this.word,
     required this.markAsset,
     required this.ringTrack,
-    this.watermarkAsset,
+    this.watermarkScale = 1,
   });
 
   /// "Véda Sun".
@@ -24,11 +24,11 @@ class VedaBrand {
   /// The app's own mark (its icon art on a transparent square).
   final String markAsset;
 
-  /// The art for the faint background medallion, when the app's mark has extra
-  /// glow, orbit or sparkle round the medallion that would make it sit smaller
-  /// than the others (Routine). It must be drawn like the rest: the medallion's
-  /// outer ring spanning the full width. Null means [markAsset].
-  final String? watermarkAsset;
+  /// How much bigger than the screen's width the mark is drawn as the faint
+  /// background medallion. 1 for a mark whose medallion ring fills its square,
+  /// like the other apps'. A mark with a night disc and fireflies round the
+  /// medallion (Routine) is drawn larger, so its disc spans the full width.
+  final double watermarkScale;
 
   /// The dark, unfilled band of the app's message ring: a deep shade from the
   /// app's own colour family, never Véda's gold-brown (see UI_RULES.md).
@@ -59,7 +59,8 @@ class BrandWatermark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brand = VedaBrandScope.of(context);
-    final asset = brand.watermarkAsset ?? brand.markAsset;
+    final asset = brand.markAsset;
+    final scale = brand.watermarkScale;
     return IgnorePointer(
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -68,12 +69,26 @@ class BrandWatermark extends StatelessWidget {
           child: Opacity(
             opacity: 0.05,
             child: LayoutBuilder(
-              builder: (context, constraints) => Image.asset(
-                asset,
-                width: constraints.maxWidth,
-                height: constraints.maxWidth,
-                filterQuality: FilterQuality.medium,
-              ),
+              builder: (context, constraints) {
+                final side = constraints.maxWidth;
+                return SizedBox(
+                  width: side,
+                  height: side,
+                  // a larger mark grows from the same centre, past the edges
+                  child: OverflowBox(
+                    minWidth: side * scale,
+                    maxWidth: side * scale,
+                    minHeight: side * scale,
+                    maxHeight: side * scale,
+                    child: Image.asset(
+                      asset,
+                      width: side * scale,
+                      height: side * scale,
+                      filterQuality: FilterQuality.medium,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

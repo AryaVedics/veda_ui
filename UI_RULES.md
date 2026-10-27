@@ -91,8 +91,8 @@ numbers; do not eyeball them.
   opacity, anchored to the bottom of the page, moved 22 down so a sliver hides
   under the tab bar, and as wide as the screen, so the medallion's outer ring
   spans the full width. `BrandWatermark` draws it; do not place it any other way.
-- An app whose header mark carries extra glow, fireflies or an orbit round the
-  medallion (Routine) would sit smaller in the same box. Such an app sets
-  `watermarkAsset` in its `VedaBrand` to plain art drawn like the others, with the
-  outer ring full width. Routine's is `routine_watermark.png` (orbit ring, sun and
-  moon, no glow or fireflies).
+- An app whose header mark carries a night disc and fireflies round the medallion
+  (Routine) would sit smaller in the same box. Such an app sets `watermarkScale`
+  in its `VedaBrand`, so the mark is drawn larger from the same centre and its disc
+  spans the full width. Routine's is 1.27, with the fireflies running past the
+  edges.
