@@ -116,3 +116,31 @@ identically (its own provider or App Group file, its own switch):
 ```
 There is no manual import: the readings only arrive live over the link
 (a hand-made import went stale with every new reading, so nobody would use it).
+
+## Véda Cycle is an island (decided 2026-10-27, supersedes the Cycle rows above)
+
+Period days and cycle phase are the most sensitive entries in the family, and the people who use Véda Cycle
+will, understandably, want every possible risk removed. So:
+
+- **Véda Cycle publishes nothing.** No feed, no content provider, no App Group file, to any app, including ours.
+  The old outward feed (`cycleLinkFeed`, the "Véda Cycle: Cycle phase" row in Véda's link list, Lifestyle's phase
+  beside sleep and stress) is removed.
+- **Inward only, and optional.** Cycle may read Véda's skin scores for its "skin by phase" charts. The switch is
+  inside Cycle, off by default, never promoted by a notice. Skin scores flow in; nothing about periods flows out.
+- **Véda's Cycle tab stands alone.** For people who track inside Véda it keeps working as today. It is not a window
+  onto Véda Cycle and has no read-only mode.
+- **No release build of Cycle has any internet permission, ads or account.** The promise to say everywhere: "Véda
+  Cycle never connects to anything."
+- **Its membership plan is separate** from the other Véda apps' Patron plan, so nothing ties a person's cycle app to
+  their account elsewhere.
+- Why not a "bulletin board" (Véda drawing cards that Cycle computes) or an inactive Véda tab fed one way: both were
+  weighed; the island is safest and simplest to promise. The bulletin-board idea may still suit Lifestyle.
+
+### Before Véda Cycle ships on iPhone
+1. Keep `cycle.json` (and Véda's cycle log) out of iCloud and computer backups (a file flagged
+   `isExcludedFromBackup`; Véda's photo folder already does this). Today both are in backed-up storage.
+2. Cover the screen when the app goes *inactive* (the iPhone's app-switcher snapshot is taken then), not only when
+   it is paused.
+3. Review the iPhone project settings once more (no file sharing, no network, Face ID text) and test on a real iPhone.
+4. Add an iPhone pipeline for Cycle (none exists; Codemagic builds Véda only).
+5. Wording in Cycle's privacy policy, the store listing and the "Your data" page must match; on the lawyer list.
