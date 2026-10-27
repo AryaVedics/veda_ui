@@ -66,7 +66,8 @@ numbers; do not eyeball them.
   period", "of 5", "wellness", "UV peak"). A long caption shrinks to fit inside
   the ring; it never touches the edge.
 - The glass look is for Véda's main Skin Score ring only, and only in Véda.
-  Nothing in the accessory apps uses it.
+  Nothing in the accessory apps uses it. It is soft on purpose: a gentle inner glow, a faint
+  gold halo just outside the ring, and a gloss along the band. Keep the inner light low so it never outshines the number.
 
 ## Pages
 
