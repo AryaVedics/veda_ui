@@ -175,21 +175,14 @@ class _TrendPainter extends CustomPainter {
         ..strokeWidth = 2.6
         ..strokeJoin = StrokeJoin.round
         ..strokeCap = StrokeCap.round;
-      final path = Path();
-      Offset? last;
-      var started = false;
+      final points = <Offset>[];
       for (var i = 0; i < n; i++) {
         final s = days[i].score;
         if (s == null) continue;
-        final p = Offset(i * w + w / 2, y(s));
-        if (!started) {
-          path.moveTo(p.dx, p.dy);
-          started = true;
-        } else {
-          path.lineTo(p.dx, p.dy);
-        }
-        last = p;
+        points.add(Offset(i * w + w / 2, y(s)));
       }
+      final last = points.isEmpty ? null : points.last;
+      final path = _smoothPath(points);
       canvas.drawPath(path, line);
       if (last != null)
         canvas.drawCircle(last, 5.5, Paint()..color = kMarkerWhite);
@@ -202,6 +195,36 @@ class _TrendPainter extends CustomPainter {
         canvas.drawCircle(Offset(i * w + w / 2, size.height - 6), 3, dot);
       }
     }
+  }
+
+  /// A gentle curve through the points rather than straight segments, drawn
+  /// exactly as Véda's own Trends chart draws it (mirrors Véda's
+  /// trend_chart.dart; change both together): each point is the control point
+  /// of a quadratic curve to the midpoint between it and the next one.
+  Path _smoothPath(List<Offset> points) {
+    final path = Path();
+    if (points.isEmpty) return path;
+    path.moveTo(points.first.dx, points.first.dy);
+    if (points.length == 1) return path;
+    if (points.length == 2) {
+      path.lineTo(points[1].dx, points[1].dy);
+      return path;
+    }
+    for (var i = 0; i < points.length - 1; i++) {
+      final p0 = points[i];
+      final p1 = points[i + 1];
+      final mid = Offset((p0.dx + p1.dx) / 2, (p0.dy + p1.dy) / 2);
+      path.quadraticBezierTo(p0.dx, p0.dy, mid.dx, mid.dy);
+    }
+    final lastPoint = points.last;
+    final secondLast = points[points.length - 2];
+    path.quadraticBezierTo(
+      secondLast.dx,
+      secondLast.dy,
+      lastPoint.dx,
+      lastPoint.dy,
+    );
+    return path;
   }
 
   @override
