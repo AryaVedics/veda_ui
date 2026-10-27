@@ -54,3 +54,44 @@ numbers; do not eyeball them.
   same line. `NoticeCarousel` + `MiniRing` draw this.
 - The ring has Véda's thin edge rings, flat arc ends and the straight glowing
   end line, in a gradient of the app's own colour.
+
+## Rings: colours, tracks and captions
+
+- Every accessory ring has its own colour and its own dark track, set once as
+  `ringTrack` in the app's `VedaBrand`. The track is a deep shade from the app's
+  own colour family (Lifestyle navy, Routine forest green, Cycle plum-rose, Sun
+  ember brown), never Véda's gold-brown, which turns muddy beside any other
+  colour. Do not pass a track colour at the call site; change the brand.
+- The caption under the number says what the number is in full words ("days to
+  period", "of 5", "wellness", "UV peak"). A long caption shrinks to fit inside
+  the ring; it never touches the edge.
+- The glass look is for Véda's main Skin Score ring only, and only in Véda.
+  Nothing in the accessory apps uses it.
+
+## Pages
+
+- No date line under a page header, on any tab. A date belongs in a card that
+  is about that day, never as a subtitle under the header.
+- A line chart is always drawn smooth, with a dot on each reading and a ringed
+  marker on the latest, exactly as Véda's Trends chart (the shared `TrendChart`).
+
+## Life in the centrepiece
+
+- A centrepiece that is a line (Lifestyle's Pulse) draws itself out like an ECG
+  whenever it first appears, either as the app opens on it or when the user
+  switches to it. Afterwards, every five to seven seconds, one small bright dash
+  runs along the line from end to end. With reduced motion it is drawn at once
+  and stays still.
+- Surprises stay rare and brief (see Routine's forest friends).
+
+## The background medallion
+
+- Every page of every Véda app has the app's medallion faintly behind it: 5%
+  opacity, anchored to the bottom of the page, moved 22 down so a sliver hides
+  under the tab bar, and as wide as the screen, so the medallion's outer ring
+  spans the full width. `BrandWatermark` draws it; do not place it any other way.
+- An app whose header mark carries extra glow, fireflies or an orbit round the
+  medallion (Routine) would sit smaller in the same box. Such an app sets
+  `watermarkAsset` in its `VedaBrand` to plain art drawn like the others, with the
+  outer ring full width. Routine's is `routine_watermark.png` (orbit ring, sun and
+  moon, no glow or fireflies).

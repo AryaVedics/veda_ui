@@ -9,6 +9,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'brand.dart';
 import 'theme.dart';
 
 /// Véda's own ring size beside its message box.
@@ -45,7 +46,7 @@ class MiniRing extends StatelessWidget {
 
   final double size;
 
-  /// The unfilled band. Null means the app's own dim accent.
+  /// The unfilled band. Null means the app's brand ring track (see VedaBrand).
   final Color? trackColor;
 
   @override
@@ -61,7 +62,10 @@ class MiniRing extends StatelessWidget {
           gradient: gradient,
           stops: stops,
           colors: colors,
-          track: trackColor ?? colors.accentDim,
+          track:
+              trackColor ??
+              VedaBrandScope.maybeOf(context)?.ringTrack ??
+              colors.accentDim,
         ),
       ),
     );

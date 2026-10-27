@@ -833,7 +833,9 @@ class MetricPetalsView extends StatelessWidget {
                 final v = details.localPosition - center;
                 // Same -90° start as the painter, so the wedge under the
                 // finger matches the wedge that gets tapped.
-                var angle = math.atan2(v.dy, v.dx) * 180 / math.pi + 90 -
+                var angle =
+                    math.atan2(v.dy, v.dx) * 180 / math.pi +
+                    90 -
                     petalOffsetDegrees(entries.length);
                 angle = ((angle % 360) + 360) % 360;
                 final i =

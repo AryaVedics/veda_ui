@@ -22,7 +22,10 @@ void paintScoreGlow(
     r,
     Paint()
       ..shader = RadialGradient(
-        colors: [tone.withValues(alpha: alpha), tone.withValues(alpha: 0)],
+        colors: [
+          tone.withValues(alpha: alpha),
+          tone.withValues(alpha: 0),
+        ],
       ).createShader(Rect.fromCircle(center: c, radius: r)),
   );
 }

@@ -76,13 +76,14 @@ class ScoreRingPainter extends CustomPainter {
       // with — this ring is the single most-seen number in the app, so it
       // earns the same "waiting for data" glow rather than sitting flat.
       canvas.drawCircle(
-          center,
-          radius * 1.35,
-          Paint()
-            ..shader = ui.Gradient.radial(center, radius * 1.35, [
-              fillColor.withValues(alpha: 0.14 + 0.12 * t),
-              fillColor.withValues(alpha: 0),
-            ]));
+        center,
+        radius * 1.35,
+        Paint()
+          ..shader = ui.Gradient.radial(center, radius * 1.35, [
+            fillColor.withValues(alpha: 0.14 + 0.12 * t),
+            fillColor.withValues(alpha: 0),
+          ]),
+      );
     }
 
     // A thin gold frame just outside and just inside the band — the same
@@ -108,13 +109,14 @@ class ScoreRingPainter extends CustomPainter {
     // not another fullness indicator competing with the arc itself.
     if (ghostT == null) {
       canvas.drawCircle(
-          center,
-          innerEdge,
-          Paint()
-            ..shader = ui.Gradient.radial(center, innerEdge, [
-              fillColor.withValues(alpha: 0.20),
-              fillColor.withValues(alpha: 0.0),
-            ]));
+        center,
+        innerEdge,
+        Paint()
+          ..shader = ui.Gradient.radial(center, innerEdge, [
+            fillColor.withValues(alpha: 0.20),
+            fillColor.withValues(alpha: 0.0),
+          ]),
+      );
     }
 
     final track = Paint()
@@ -135,18 +137,24 @@ class ScoreRingPainter extends CustomPainter {
     if (ghostT case final t?) {
       const sweep = 2 * math.pi * _ghostFraction;
       canvas.drawArc(
-          rect,
-          start,
-          sweep,
-          false,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = strokeWidth
-            ..strokeCap = StrokeCap.butt
-            ..color = fillColor.withValues(alpha: 0.20 + 0.14 * t));
+        rect,
+        start,
+        sweep,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.butt
+          ..color = fillColor.withValues(alpha: 0.20 + 0.14 * t),
+      );
       // A faint hint of the real marker, at the ghost arc's own end.
-      _drawIndex(canvas, center, radius, start + sweep,
-          coreColor: _markerColor.withValues(alpha: 0.35 + 0.3 * t));
+      _drawIndex(
+        canvas,
+        center,
+        radius,
+        start + sweep,
+        coreColor: _markerColor.withValues(alpha: 0.35 + 0.3 * t),
+      );
       return;
     }
 
@@ -161,44 +169,63 @@ class ScoreRingPainter extends CustomPainter {
       ..color = fillColor;
     canvas.drawArc(rect, start, sweep, false, fill);
 
-    _drawIndex(canvas, center, radius, start + sweep,
-        coreColor: _markerColor,
-        glowColor: edgeColor.withValues(alpha: 0.4 + 0.55 * glint),
-        glowWidth: strokeWidth * (0.9 + 0.5 * glint));
+    _drawIndex(
+      canvas,
+      center,
+      radius,
+      start + sweep,
+      coreColor: _markerColor,
+      glowColor: edgeColor.withValues(alpha: 0.4 + 0.55 * glint),
+      glowWidth: strokeWidth * (0.9 + 0.5 * glint),
+    );
   }
 
   /// The white index line at the fill's flat end: straight across the band,
   /// 40% of the band's width (the small rings' own proportion), its leading
   /// edge flush with where the gold stops. Clipped to the band, glow
   /// included, so nothing ever draws past the band's edges.
-  void _drawIndex(Canvas canvas, Offset center, double radius, double endAngle,
-      {required Color coreColor, Color? glowColor, double? glowWidth}) {
+  void _drawIndex(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double endAngle, {
+    required Color coreColor,
+    Color? glowColor,
+    double? glowWidth,
+  }) {
     final markerWidth = strokeWidth * 0.4;
     final angle = endAngle - (markerWidth / 2) / radius;
     final dir = Offset(math.cos(angle), math.sin(angle));
     final inner = center + dir * (radius - strokeWidth / 2);
     final outer = center + dir * (radius + strokeWidth / 2);
     canvas.save();
-    canvas.clipPath(Path()
-      ..fillType = PathFillType.evenOdd
-      ..addOval(Rect.fromCircle(center: center, radius: radius + strokeWidth / 2))
-      ..addOval(
-          Rect.fromCircle(center: center, radius: radius - strokeWidth / 2)));
+    canvas.clipPath(
+      Path()
+        ..fillType = PathFillType.evenOdd
+        ..addOval(
+          Rect.fromCircle(center: center, radius: radius + strokeWidth / 2),
+        )
+        ..addOval(
+          Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        ),
+    );
     if (glowColor != null) {
       canvas.drawLine(
-          inner,
-          outer,
-          Paint()
-            ..strokeWidth = glowWidth ?? strokeWidth * 0.9
-            ..color = glowColor
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 0.22));
-    }
-    canvas.drawLine(
         inner,
         outer,
         Paint()
-          ..strokeWidth = markerWidth
-          ..color = coreColor);
+          ..strokeWidth = glowWidth ?? strokeWidth * 0.9
+          ..color = glowColor
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 0.22),
+      );
+    }
+    canvas.drawLine(
+      inner,
+      outer,
+      Paint()
+        ..strokeWidth = markerWidth
+        ..color = coreColor,
+    );
     canvas.restore();
   }
 
@@ -319,10 +346,15 @@ class _ScoreRingState extends State<ScoreRing>
               padding: EdgeInsets.all(size * 0.2),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(widget.label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 12, height: 1.3, color: widget.labelColor)),
+                child: Text(
+                  widget.label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.3,
+                    color: widget.labelColor,
+                  ),
+                ),
               ),
             ),
           ],

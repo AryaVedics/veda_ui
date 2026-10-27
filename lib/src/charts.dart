@@ -172,7 +172,7 @@ class _TrendPainter extends CustomPainter {
       final line = Paint()
         ..color = colors.accent
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.6
+        ..strokeWidth = 2.5
         ..strokeJoin = StrokeJoin.round
         ..strokeCap = StrokeCap.round;
       final points = <Offset>[];
@@ -184,8 +184,23 @@ class _TrendPainter extends CustomPainter {
       final last = points.isEmpty ? null : points.last;
       final path = _smoothPath(points);
       canvas.drawPath(path, line);
-      if (last != null)
-        canvas.drawCircle(last, 5.5, Paint()..color = kMarkerWhite);
+      // a dot on every reading and a ringed marker on the latest, as Véda's
+      // own Trends chart draws them
+      final dots = Paint()..color = colors.accent;
+      for (final p in points.take(points.length - 1)) {
+        canvas.drawCircle(p, 4, dots);
+      }
+      if (last != null) {
+        canvas.drawCircle(last, 5, Paint()..color = kMarkerWhite);
+        canvas.drawCircle(
+          last,
+          7.5,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.3
+            ..color = kMarkerWhite.withValues(alpha: 0.7),
+        );
+      }
     }
 
     // Dots under the days that are marked.

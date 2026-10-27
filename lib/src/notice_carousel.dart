@@ -173,9 +173,7 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
                 child: PageView(
                   controller: _controller,
                   onPageChanged: (i) => setState(() => _page = i),
-                  children: [
-                    for (final m in shown) _card(colors, m),
-                  ],
+                  children: [for (final m in shown) _card(colors, m)],
                 ),
               ),
               if (showTrack) ...[
@@ -212,11 +210,7 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
         const SizedBox(width: 5),
         GestureDetector(
           onTap: () => _dismiss(m),
-          child: Icon(
-            PhosphorIconsThin.x,
-            size: 14,
-            color: colors.textMuted,
-          ),
+          child: Icon(PhosphorIconsThin.x, size: 14, color: colors.textMuted),
         ),
       ],
     ),
@@ -246,7 +240,9 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
               height: NoticeCarousel._trackHeight,
               decoration: BoxDecoration(
                 color: colors.accent,
-                borderRadius: BorderRadius.circular(NoticeCarousel._trackHeight),
+                borderRadius: BorderRadius.circular(
+                  NoticeCarousel._trackHeight,
+                ),
               ),
             ),
           ),

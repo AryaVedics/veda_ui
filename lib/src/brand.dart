@@ -11,6 +11,8 @@ class VedaBrand {
     required this.appName,
     required this.word,
     required this.markAsset,
+    required this.ringTrack,
+    this.watermarkAsset,
   });
 
   /// "Véda Sun".
@@ -21,6 +23,16 @@ class VedaBrand {
 
   /// The app's own mark (its icon art on a transparent square).
   final String markAsset;
+
+  /// The art for the faint background medallion, when the app's mark has extra
+  /// glow, orbit or sparkle round the medallion that would make it sit smaller
+  /// than the others (Routine). It must be drawn like the rest: the medallion's
+  /// outer ring spanning the full width. Null means [markAsset].
+  final String? watermarkAsset;
+
+  /// The dark, unfilled band of the app's message ring: a deep shade from the
+  /// app's own colour family, never Véda's gold-brown (see UI_RULES.md).
+  final Color ringTrack;
 }
 
 class VedaBrandScope extends InheritedWidget {
@@ -30,6 +42,9 @@ class VedaBrandScope extends InheritedWidget {
 
   static VedaBrand of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<VedaBrandScope>()!.brand;
+
+  static VedaBrand? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<VedaBrandScope>()?.brand;
 
   @override
   bool updateShouldNotify(VedaBrandScope old) => old.brand != brand;
@@ -43,7 +58,8 @@ class BrandWatermark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final asset = VedaBrandScope.of(context).markAsset;
+    final brand = VedaBrandScope.of(context);
+    final asset = brand.watermarkAsset ?? brand.markAsset;
     return IgnorePointer(
       child: Align(
         alignment: Alignment.bottomCenter,

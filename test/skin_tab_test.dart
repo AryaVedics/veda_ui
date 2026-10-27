@@ -7,6 +7,7 @@ const _brand = VedaBrand(
   appName: 'Véda Lifestyle',
   word: 'LIFESTYLE',
   markAsset: 'assets/branding/lifestyle_mark.png',
+  ringTrack: Color(0xFF2B3B6B),
 );
 
 Widget _app(Widget child) => MaterialApp(

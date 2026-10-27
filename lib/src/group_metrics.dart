@@ -177,7 +177,10 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                 const SizedBox(height: 10),
                 SizedBox(
                   height: widget.hud
-                      ? math.max(250.0, hudBarsHeight(widget.ghostKeys.length) + 8)
+                      ? math.max(
+                          250.0,
+                          hudBarsHeight(widget.ghostKeys.length) + 8,
+                        )
                       : 250,
                   child: SwipeableChartPager<MetricStyle>(
                     value: _style,

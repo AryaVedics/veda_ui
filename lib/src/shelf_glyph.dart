@@ -11,10 +11,10 @@ class ShelfGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 24,
-        height: 24,
-        child: CustomPaint(painter: _ShelfGlyphPainter(color, filled)),
-      );
+    width: 24,
+    height: 24,
+    child: CustomPaint(painter: _ShelfGlyphPainter(color, filled)),
+  );
 }
 
 class _ShelfGlyphPainter extends CustomPainter {
@@ -68,7 +68,12 @@ class _ShelfGlyphPainter extends CustomPainter {
       // the cap
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTRB(left + 0.7 * k, b.top * k, right - 0.7 * k, (b.top + 2.5) * k),
+          Rect.fromLTRB(
+            left + 0.7 * k,
+            b.top * k,
+            right - 0.7 * k,
+            (b.top + 2.5) * k,
+          ),
           Radius.circular(0.8 * k),
         ),
         cap,

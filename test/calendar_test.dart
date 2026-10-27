@@ -11,7 +11,10 @@ void main() {
 
   test('regional holidays fall on the right weekday', () {
     // US Mother's Day: second Sunday in May, 2026 is May 10.
-    expect(holidayOn(DateTime(2026, 5, 10), countryCode: 'US'), Holiday.mothersDay);
+    expect(
+      holidayOn(DateTime(2026, 5, 10), countryCode: 'US'),
+      Holiday.mothersDay,
+    );
     expect(holidayOn(DateTime(2026, 5, 10), countryCode: 'IN'), isNull);
     // Thanksgiving: fourth Thursday in November, 2026 is November 26.
     expect(holidayOn(DateTime(2026, 11, 26)), Holiday.thanksgiving);
@@ -32,7 +35,13 @@ void main() {
   });
 
   test('seasons flip in the southern hemisphere', () {
-    expect(seasonOf(DateTime(2026, 1, 15), southern: false).season, Season.winter);
-    expect(seasonOf(DateTime(2026, 1, 15), southern: true).season, Season.summer);
+    expect(
+      seasonOf(DateTime(2026, 1, 15), southern: false).season,
+      Season.winter,
+    );
+    expect(
+      seasonOf(DateTime(2026, 1, 15), southern: true).season,
+      Season.summer,
+    );
   });
 }

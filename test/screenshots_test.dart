@@ -134,16 +134,19 @@ void main() {
     appName: 'Véda Sun',
     word: 'SUN',
     markAsset: 'assets/branding/sun_mark.png',
+    ringTrack: Color(0xFF4A2E22),
   );
   const lifeBrand = VedaBrand(
     appName: 'Véda Lifestyle',
     word: 'LIFESTYLE',
     markAsset: 'assets/branding/lifestyle_mark.png',
+    ringTrack: Color(0xFF2B3B6B),
   );
   const cycleBrand = VedaBrand(
     appName: 'Véda Cycle',
     word: 'CYCLE',
     markAsset: 'assets/branding/cycle_mark.png',
+    ringTrack: Color(0xFF5A2A45),
   );
 
   // Sample entries for each app: which group each day falls in.
@@ -159,28 +162,35 @@ void main() {
 
   for (final style in MetricStyle.values) {
     testWidgets('lifestyle ${style.name}', (t) async {
-      await shoot(t, 'lifestyle_${style.name}', AppColors.nightfall, lifeBrand, [
-        const Text(
-          'Days',
-          style: TextStyle(
-            fontSize: 23,
-            fontFamily: kDisplayFont,
-            color: Colors.white,
+      await shoot(
+        t,
+        'lifestyle_${style.name}',
+        AppColors.nightfall,
+        lifeBrand,
+        [
+          const Text(
+            'Days',
+            style: TextStyle(
+              fontSize: 23,
+              fontFamily: kDisplayFont,
+              color: Colors.white,
+            ),
           ),
-        ),
-        const SizedBox(height: 14),
-        GroupMetricsCard(
-          hud: true,
-          title: 'Your skin by sleep',
-          subtitle: 'Your Véda measurements on days you slept...',
-          caveat: 'Days with both a Véda reading and a check-in.',
-          groups: groupMetrics(
-            readings: _readings(),
-            groups: kSleepSample,
-            groupOf: sleepOf,
+          const SizedBox(height: 14),
+          GroupMetricsCard(
+            hud: true,
+            title: 'Your skin by sleep',
+            subtitle: 'Your Véda measurements on days you slept...',
+            caveat: 'Days with both a Véda reading and a check-in.',
+            groups: groupMetrics(
+              readings: _readings(),
+              groups: kSleepSample,
+              groupOf: sleepOf,
+            ),
           ),
-        ),
-      ], style);
+        ],
+        style,
+      );
     });
 
     testWidgets('cycle ${style.name}', (t) async {
