@@ -96,3 +96,19 @@ numbers; do not eyeball them.
   in its `VedaBrand`, so the mark is drawn larger from the same centre and its disc
   spans the full width. Routine's is 1.27, with the fireflies running past the
   edges.
+
+## Calendars
+
+- Tapping the month and year in a calendar's header opens a drop-down just
+  below it: a year to choose from a list, and the twelve months to pick from.
+  It is never a separate page or a row of arrows only. The arrows beside the
+  title still step one month at a time.
+- Use `MonthYearTitle` (and `kCalendarEarliestMonth` for the range). Do
+  not write another.
+- Every calendar in every app starts at January 2023 (`kCalendarEarliestMonth`)
+  and always will. The start is fixed, never "a few years back from today", so
+  nothing a person logged ever drops out of reach, and someone backfilling old
+  days always has somewhere to go. It never goes forward past the current month.
+- A day that was missed can always be filled in afterwards: a calendar is also
+  the way back to it. A day with nothing on it is left blank, never marked as
+  missed.
