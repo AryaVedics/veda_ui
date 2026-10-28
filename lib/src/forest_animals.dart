@@ -862,6 +862,13 @@ class ForestPeeker extends StatefulWidget {
   @visibleForTesting
   static math.Random Function() random = math.Random.new;
 
+  /// Whether Bao and Mei may come out together. An app can hold the pair back
+  /// (Routine does, for a person's first visits); by default it is allowed.
+  static bool Function() pairAllowed = () => true;
+
+  /// Told each time a visit starts, so an app can count them.
+  static void Function() onVisit = () {};
+
   /// Zen mode: a friend peeks out sooner and more often.
   final bool eager;
 
@@ -1022,9 +1029,13 @@ class _ForestPeekerState extends State<ForestPeeker>
       _schedule(10);
       return;
     }
+    ForestPeeker.onVisit();
     // very rarely (about 1 visit in 80 on Today, 1 in 100 in Nature Mode, and
-    // never twice running) Bao and Mei peek out side by side, Mei a moment later
-    if (!_lastWasPair && _rnd.nextInt(widget.eager ? 100 : 80) == 0) {
+    // never twice running, and only once the app allows it) Bao and Mei peek
+    // out side by side, Mei a moment later
+    if (!_lastWasPair &&
+        ForestPeeker.pairAllowed() &&
+        _rnd.nextInt(widget.eager ? 100 : 80) == 0) {
       _lastWasPair = true;
       _angle = _spot(_together);
       final meiLeft = _rnd.nextBool();
