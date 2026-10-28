@@ -5,6 +5,9 @@
 //
 //  * written to a side file and moved over the old one, so a crash mid-write
 //    never leaves half a file;
+//  * saves are queued, one at a time and in order, and only the newest state is
+//    ever written, so two saves close together can never leave the older one
+//    on disk over the newer (which lost a whole day after a restart);
 //  * a file that could not be read is never overwritten (loadFailed), so
 //    someone's data is never silently replaced by an empty one.
 
@@ -25,6 +28,8 @@ abstract class JsonFile {
 class DocumentsJsonFile implements JsonFile {
   DocumentsJsonFile(this.name);
 
+  static var _writeSeq = 0;
+
   /// The file name in the app's documents folder, e.g. "sun.json".
   final String name;
 
@@ -42,7 +47,8 @@ class DocumentsJsonFile implements JsonFile {
   @override
   Future<void> write(String text) async {
     final f = await _file;
-    final tmp = File('${f.path}.tmp');
+    // its own side file for each write, so two writes never share one
+    final tmp = File('${f.path}.${_writeSeq++}.tmp');
     await tmp.writeAsString(text, flush: true);
     await tmp.rename(f.path);
   }
@@ -113,8 +119,39 @@ abstract class JsonStore<T> extends ChangeNotifier {
     _data = next;
     notifyListeners();
     if (loadFailed) return;
-    await _file.write(jsonEncode(toJson(next)));
+    await _save();
   }
+
+  var _saveGen = 0;
+  Future<void> _saving = Future.value();
+
+  /// Writes the data to the file: after any save already running, and only if
+  /// no newer save has been asked for since (that one writes the newest state,
+  /// which includes this one's changes).
+  Future<void> _save() {
+    final gen = ++_saveGen;
+    return _saving = _saving.then((_) async {
+      if (gen != _saveGen || loadFailed) return;
+      // a write that fails is tried again; it never stops the saves behind it
+      for (var attempt = 0; attempt < 3; attempt++) {
+        try {
+          await _file.write(jsonEncode(toJson(_data)));
+          saveFailed = false;
+          return;
+        } catch (e) {
+          debugPrint('Saving failed (try ${attempt + 1}): $e');
+          await Future<void>.delayed(
+            Duration(milliseconds: 150 * (attempt + 1)),
+          );
+          if (gen != _saveGen) return; // a newer save will write instead
+        }
+      }
+      saveFailed = true;
+    });
+  }
+
+  /// Set when the last save could not be written even after trying again.
+  bool saveFailed = false;
 
   String exportJson() =>
       const JsonEncoder.withIndent('  ').convert(toJson(_data));
@@ -130,6 +167,8 @@ abstract class JsonStore<T> extends ChangeNotifier {
   Future<void> deleteEverything() async {
     _data = empty;
     loadFailed = false;
+    _saveGen++; // anything queued is dropped
+    await _saving;
     await _file.delete();
     notifyListeners();
   }

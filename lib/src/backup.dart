@@ -26,6 +26,10 @@ import 'app_colors.dart';
 import 'common.dart';
 
 const _format = 'veda-backup/1';
+
+/// A backup made without a passphrase: the same data, in the clear, marked so
+/// it is never mistaken for a sealed one. Optional, and the person is told so.
+const _plainFormat = 'veda-backup-plain/1';
 const kBackupIterations = 150000;
 
 /// Something the person should be told, in plain words.
@@ -76,12 +80,34 @@ Future<String> sealBackup(
   });
 }
 
+/// The JSON of a backup made without a passphrase for [appKey], as the text of
+/// a backup file. Nothing is sealed, so nothing can be recovered from it, and
+/// nothing needs to be.
+String plainBackup(String appKey, String json, {DateTime? now}) => jsonEncode({
+  'format': _plainFormat,
+  'app': appKey,
+  'created': (now ?? DateTime.now()).toUtc().toIso8601String(),
+  'data': json,
+});
+
+/// Whether a backup file was made without a passphrase.
+bool isPlainBackup(String text) {
+  try {
+    final m = jsonDecode(text);
+    return m is Map && m['format'] == _plainFormat;
+  } catch (_) {
+    return false;
+  }
+}
+
 /// Which app a backup file belongs to, without opening it; null if it is not
 /// a Véda backup at all.
 String? backupAppOf(String text) {
   try {
     final m = jsonDecode(text);
-    if (m is Map && m['format'] == _format && m['app'] is String) {
+    if (m is Map &&
+        (m['format'] == _format || m['format'] == _plainFormat) &&
+        m['app'] is String) {
       return m['app'] as String;
     }
   } catch (_) {}
@@ -90,7 +116,11 @@ String? backupAppOf(String text) {
 
 /// The JSON inside a backup file. Throws [BackupException] if it is not a
 /// backup for [appKey] or the passphrase is wrong.
-Future<String> openBackup(String appKey, String text, String passphrase) async {
+Future<String> openBackup(
+  String appKey,
+  String text,
+  String? passphrase,
+) async {
   final app = backupAppOf(text);
   if (app == null) {
     throw BackupException('That file is not a Véda backup.');
@@ -99,6 +129,13 @@ Future<String> openBackup(String appKey, String text, String passphrase) async {
     throw BackupException('That backup belongs to a different Véda app.');
   }
   final m = jsonDecode(text) as Map;
+  if (m['format'] == _plainFormat) {
+    // nothing to open: the data is there as it was saved
+    return m['data'] as String;
+  }
+  if (passphrase == null) {
+    throw BackupException('This backup needs its passphrase.');
+  }
   try {
     final salt = base64Decode(m['salt'] as String);
     final key = await _key(passphrase, salt, (m['iterations'] as num).toInt());
@@ -212,23 +249,28 @@ class BackupController {
 
   /// Asks for a passphrase twice, seals the data and opens the share sheet.
   Future<bool> backUp(BuildContext context) async {
+    // null: no passphrase (the person chose that); '': cancelled
     final pass = await _askNewPassphrase(context, appName);
-    if (pass == null || !context.mounted) return false;
+    if (pass == '' || !context.mounted) return false;
     final messenger = ScaffoldMessenger.of(context);
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _Working('Sealing your backup…'),
+      builder: (_) => _Working(
+        pass == null ? 'Making your backup…' : 'Sealing your backup…',
+      ),
     );
     String sealed;
     try {
-      sealed = await sealBackup(
-        appKey,
-        exportJson(),
-        pass,
-        iterations: iterations,
-        now: clock(),
-      );
+      sealed = pass == null
+          ? plainBackup(appKey, exportJson(), now: clock())
+          : await sealBackup(
+              appKey,
+              exportJson(),
+              pass,
+              iterations: iterations,
+              now: clock(),
+            );
     } finally {
       if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
     }
@@ -241,10 +283,12 @@ class BackupController {
     if (result.status == ShareResultStatus.dismissed) return false;
     await _markDone();
     messenger.showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          'Backup made. Keep the file somewhere safe, and remember your '
-          'passphrase.',
+          pass == null
+              ? 'Backup made. It is not sealed, so keep the file somewhere safe.'
+              : 'Backup made. Keep the file somewhere safe, and remember your '
+                    'passphrase.',
         ),
       ),
     );
@@ -274,8 +318,11 @@ class BackupController {
       );
       return false;
     }
-    final pass = await _askPassphrase(context);
-    if (pass == null || !context.mounted) return false;
+    String? pass;
+    if (!isPlainBackup(text)) {
+      pass = await _askPassphrase(context);
+      if (pass == null || !context.mounted) return false;
+    }
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -388,9 +435,11 @@ Future<String?> _askNewPassphrase(BuildContext context, String appName) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Your $appName backup is sealed with it. Nobody can open the '
-                'file without it, including us, and there is no way to recover '
-                'a forgotten one. At least 8 characters.',
+                'Your $appName backup can be sealed with a passphrase. Nobody '
+                'can open a sealed file without it, including us, and there is '
+                'no way to recover a forgotten one. At least 8 characters. Or '
+                'leave the passphrase out: the file is then not sealed, so keep '
+                'it somewhere safe.',
                 style: const TextStyle(fontSize: 13, height: 1.4),
               ),
               const SizedBox(height: 12),
@@ -420,8 +469,13 @@ Future<String?> _askNewPassphrase(BuildContext context, String appName) {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(d),
+            onPressed: () => Navigator.pop(d, ''),
             child: const Text('Cancel'),
+          ),
+          TextButton(
+            key: const Key('backupWithoutPassphrase'),
+            onPressed: () => Navigator.pop(d),
+            child: const Text('No passphrase'),
           ),
           TextButton(
             onPressed: () {

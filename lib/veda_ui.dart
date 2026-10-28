@@ -18,6 +18,8 @@ export 'src/breathing.dart';
 export 'src/chart_style.dart';
 export 'src/charts.dart';
 export 'src/common.dart';
+export 'src/forest_animals.dart';
+export 'src/forest_friends.dart';
 export 'src/group_metrics.dart';
 export 'src/heart_pulse_icon.dart';
 export 'src/json_store.dart';

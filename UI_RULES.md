@@ -108,7 +108,33 @@ numbers; do not eyeball them.
 - Every calendar in every app starts at January 2023 (`kCalendarEarliestMonth`)
   and always will. The start is fixed, never "a few years back from today", so
   nothing a person logged ever drops out of reach, and someone backfilling old
-  days always has somewhere to go. It never goes forward past the current month.
+  days always has somewhere to go. It never goes forward past the current month,
+  except a calendar that shows what is expected (the cycle calendars), which
+  reaches ahead as far as its predictions do.
+- Véda keeps its own copy of the drop-down (`lib/widgets/month_year_title.dart`),
+  as it does of the rest of the shared code. A change to one is made to both.
 - A day that was missed can always be filled in afterwards: a calendar is also
   the way back to it. A day with nothing on it is left blank, never marked as
   missed.
+
+## Titles
+
+- A title (a name that stands alone, such as a soundscape, a screen's choice or
+  a card heading) is written in Title Case: every word starts with a capital,
+  except the small words "a", "an", "and", "at", "in", "of", "on", "or", "the"
+  and "to", which stay lowercase unless they begin the title.
+  "Wind in the Pines", "Canal at Midnight", "Calories and Macros".
+- Sentences, captions and button labels are not titles: they stay in sentence
+  case ("Add a part", "Check off today's products").
+
+## The forest friends
+
+- The sixteen forest friends are in the shared library: their drawings and
+  peek-out (`forest_animals.dart`: `paintAnimalHead`, `ForestPeeker`), and their
+  names, stories and round faces (`forest_friends.dart`: `kForestFriends`,
+  `forestFriendFor`, `ForestHeadIcon`). Draw them with these, never a copy.
+- They belong in Routine and Kitchen. They have no place in Véda (the flagship,
+  work-of-art feel) or Cycle (private and serious). Lifestyle may offer them,
+  off by default and light. Sun only if it truly fits.
+- They are company, not a judge: they never comment on numbers, a missed day or
+  a streak.

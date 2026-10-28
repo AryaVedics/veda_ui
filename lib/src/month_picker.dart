@@ -86,12 +86,16 @@ class MonthYearTitle extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '${_monthNames[month.month - 1]} ${month.year}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: kDisplayFont,
-                    color: colors.textPrimary,
+                Flexible(
+                  child: Text(
+                    '${_monthNames[month.month - 1]} ${month.year}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: kDisplayFont,
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -131,13 +135,13 @@ Future<DateTime?> showMonthYearDropdown(
     barrierLabel: 'Close',
     barrierColor: Colors.black.withValues(alpha: 0.25),
     transitionDuration: const Duration(milliseconds: 160),
-    pageBuilder: (context, _, _) => _Dropdown(
+    pageBuilder: (context, animation, secondary) => _Dropdown(
       target: target,
       initial: initial,
       earliest: earliest,
       latest: latest,
     ),
-    transitionBuilder: (_, a, _, child) => FadeTransition(
+    transitionBuilder: (context, a, secondary, child) => FadeTransition(
       opacity: CurvedAnimation(parent: a, curve: Curves.easeOut),
       child: child,
     ),
