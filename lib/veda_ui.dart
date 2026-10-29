@@ -18,6 +18,7 @@ export 'src/breathing.dart';
 export 'src/chart_style.dart';
 export 'src/charts.dart';
 export 'src/common.dart';
+export 'src/data_reveal.dart';
 export 'src/forest_animals.dart';
 export 'src/forest_friends.dart';
 export 'src/group_metrics.dart';
