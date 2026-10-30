@@ -78,13 +78,13 @@ const kForestFriends = [
   ),
   ForestFriend(
     ForestAnimal.lion,
-    'Leo',
+    'Shumba',
     'The gentle roarer',
-    'Leo practises his big roar every single morning. It always comes out as '
-        'a yawn, which makes everyone smile, Leo most of all. His mane is full of '
+    'Shumba practises his big roar every single morning. It always comes out as '
+        'a yawn, which makes everyone smile, Shumba most of all. His mane is full of '
         'leaves he has stopped bothering to pick out, and he says they make him '
         'look wise.',
-    means: 'Leo means "lion" in Latin.',
+    means: 'Shumba means "lion" in Shona.',
   ),
   ForestFriend(
     ForestAnimal.bear,
