@@ -90,11 +90,10 @@ const kForestFriends = [
     ForestAnimal.bear,
     'Bela',
     'The professional napper',
-    'Dancing is Bela’s way of having fun: when the music starts, she is up and '
-        'swaying. The rest of the time she is only ever "resting her eyes". '
-        'She has the slowest routine in the forest and she does not apologise '
-        'for it: a long stretch, a little honey, a nap in the sun, and a good '
-        'think about nothing at all. The others secretly envy her.',
+    'Bela is only ever "resting her eyes". She has the slowest routine in the '
+        'forest and she does not apologise for it: a long stretch, a little '
+        'honey, a nap in the sun, and a good think about nothing at all. The '
+        'others secretly envy her.',
   ),
   ForestFriend(
     ForestAnimal.monkey,
