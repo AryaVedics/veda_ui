@@ -148,6 +148,7 @@ class _HudBarPainter extends CustomPainter {
     required this.bracketColor,
     required this.fillColor,
     required this.veinColor,
+    this.endAlpha = 0.75,
   });
 
   final double fraction;
@@ -155,6 +156,10 @@ class _HudBarPainter extends CustomPainter {
   final Color bracketColor;
   final Color fillColor;
   final Color veinColor;
+
+  /// How strong the far end of the fill is: 0.75 for Véda's gold-into-colour
+  /// wash, 1 for a bar that simply fades up to its own colour.
+  final double endAlpha;
 
   static const _trackHeight = 6.0;
 
@@ -181,7 +186,7 @@ class _HudBarPainter extends CustomPainter {
       Paint()
         ..shader = ui.Gradient.linear(Offset.zero, Offset(fillWidth, 0), [
           fillColor,
-          veinColor.withValues(alpha: 0.75),
+          veinColor.withValues(alpha: endAlpha),
         ]),
     );
 
@@ -408,4 +413,80 @@ class _HudGhostPainter extends CustomPainter {
       old.alpha != alpha ||
       old.identityColor != identityColor ||
       old.trackColor != trackColor;
+}
+
+/// One HUD readout bar on its own: the label and its number on one line, and
+/// the thick track beneath with the same brackets and glowing tip as Véda's
+/// bars. [color] is the bar's own colour (for a food, its macro's colour), so
+/// the bars never take on the app's gold unless they are the Skin Score.
+class HudBar extends StatelessWidget {
+  const HudBar({
+    super.key,
+    required this.colors,
+    required this.label,
+    required this.valueText,
+    required this.fraction,
+    required this.color,
+  });
+
+  final AppColors colors;
+  final String label;
+
+  /// The number at the right of the label line, as the caller words it.
+  final String valueText;
+
+  /// How full the bar is, 0 to 1.
+  final double fraction;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final sp = _spacingFor(1, null);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ),
+            Text(
+              valueText,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: sp.labelGap),
+        SizedBox(
+          height: sp.track,
+          child: LayoutBuilder(
+            builder: (context, constraints) => CustomPaint(
+              size: Size(constraints.maxWidth, sp.track),
+              painter: _HudBarPainter(
+                fraction: fraction.clamp(0.0, 1.0).toDouble(),
+                trackColor: colors.cardSunken,
+                bracketColor: colors.textMuted.withValues(alpha: 0.5),
+                fillColor: color.withValues(alpha: 0.35),
+                veinColor: color,
+                endAlpha: 1,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

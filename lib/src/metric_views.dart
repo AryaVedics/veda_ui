@@ -555,12 +555,18 @@ class ValueRingsGrid extends StatelessWidget {
     super.key,
     required this.items,
     required this.edgeColor,
+    this.colorOf,
   });
 
   /// [fraction] is how full the ring draws (0-1); [value] is the number
   /// printed in it, null for nothing yet.
   final List<({String label, double? value, double fraction})> items;
   final Color edgeColor;
+
+  /// A colour of its own for ring [i]: its arc then fades from a faint version
+  /// of it to the full colour at the tip. Without it, every ring is the app's
+  /// gold fading into [edgeColor].
+  final Color Function(int i)? colorOf;
 
   static const _spacing = 18.0;
 
@@ -604,7 +610,8 @@ class ValueRingsGrid extends StatelessWidget {
                             colors,
                             items[next],
                             diameter,
-                            tAt(next++, items.length),
+                            tAt(next, items.length),
+                            next++,
                           ),
                         ],
                       ],
@@ -623,8 +630,10 @@ class ValueRingsGrid extends StatelessWidget {
     ({String label, double? value, double fraction}) item,
     double diameter,
     double t,
+    int index,
   ) {
     final value = item.value;
+    final own = colorOf?.call(index);
     return SizedBox(
       width: diameter,
       height: diameter,
@@ -635,9 +644,11 @@ class ValueRingsGrid extends StatelessWidget {
             size: Size(diameter, diameter),
             painter: _MetricRingPainter(
               value: value == null ? 0 : item.fraction * 100 * t,
-              trackColor: colors.accentDim,
-              fillColor: colors.accent,
-              edgeColor: edgeColor,
+              trackColor: own == null ? colors.accentDim : colors.cardSunken,
+              fillColor: own == null
+                  ? colors.accent
+                  : own.withValues(alpha: 0.35),
+              edgeColor: own ?? edgeColor,
             ),
           ),
           SizedBox(

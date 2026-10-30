@@ -93,8 +93,12 @@ class NoticeCarousel extends StatefulWidget {
   final DateTime? now;
 
   /// Véda's own size: the message box is 112 high, with a 3px track under it.
+  /// On a short screen (under 700 high) the box is smaller, with smaller text,
+  /// so the page keeps its room for the things that matter on it.
   static const _cardHeight = 112.0;
+  static const _compactCardHeight = 84.0;
   static const _trackHeight = 3.0;
+  static const _shortScreen = 700.0;
 
   @override
   State<NoticeCarousel> createState() => _NoticeCarouselState();
@@ -158,6 +162,8 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     // nothing to show.
     if (shown == null || shown.isEmpty) return const SizedBox.shrink();
     final showTrack = shown.length > 1;
+    final compact =
+        MediaQuery.sizeOf(context).height < NoticeCarousel._shortScreen;
     // Véda's own layout: the ring at the left edge, a 20 gap, and the message
     // box in the rest of the row, both centred on the same line.
     return Row(
@@ -169,11 +175,13 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
           child: Column(
             children: [
               SizedBox(
-                height: NoticeCarousel._cardHeight,
+                height: compact
+                    ? NoticeCarousel._compactCardHeight
+                    : NoticeCarousel._cardHeight,
                 child: PageView(
                   controller: _controller,
                   onPageChanged: (i) => setState(() => _page = i),
-                  children: [for (final m in shown) _card(colors, m)],
+                  children: [for (final m in shown) _card(colors, m, compact)],
                 ),
               ),
               if (showTrack) ...[
@@ -187,10 +195,10 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     );
   }
 
-  Widget _card(AppColors colors, NoticeMessage m) => Container(
+  Widget _card(AppColors colors, NoticeMessage m, bool compact) => Container(
     // no side inset: the icon lines up with the title and the date above it,
     // and the × with the right edge
-    padding: const EdgeInsets.symmetric(vertical: 7),
+    padding: EdgeInsets.symmetric(vertical: compact ? 4 : 7),
     alignment: Alignment.centerLeft,
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,9 +209,9 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
           child: Text(
             m.text,
             style: TextStyle(
-              fontSize: 11.5,
+              fontSize: compact ? 10.5 : 11.5,
               color: colors.textSecondary,
-              height: 1.4,
+              height: compact ? 1.3 : 1.4,
             ),
           ),
         ),

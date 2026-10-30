@@ -11,12 +11,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'chart_carousel.dart';
 import 'chart_style.dart';
 import 'hud_bars.dart';
 import 'charts.dart';
 import 'common.dart';
 import 'metric_ghost.dart';
 import 'metric_views.dart';
+import 'quiet_tab.dart';
+import 'scaled_box.dart';
 import 'theme.dart';
 import 'veda_link.dart';
 
@@ -175,14 +178,16 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
               children: [
                 MetricStyleToggle(value: _style, onChanged: _setStyle),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: widget.hud
+                ScaledBox(
+                  designWidth: 350,
+                  designHeight: widget.hud
                       ? math.max(
                           250.0,
                           hudBarsHeight(widget.ghostKeys.length) + 8,
                         )
                       : 250,
                   child: SwipeableChartPager<MetricStyle>(
+                    swipeable: !ChartCarouselScope.of(context),
                     value: _style,
                     values: const [
                       MetricStyle.rings,
@@ -214,29 +219,27 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final g in widget.groups)
-                      ChoiceChip(
-                        label: Text(
-                          g.isEmpty ? g.label : '${g.label} · ${g.days}d',
+                // The groups as quiet tabs, not pills: the name, its days
+                // beneath, and a short gold line under the one showing.
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 22,
+                    runSpacing: 12,
+                    children: [
+                      for (final g in widget.groups)
+                        QuietTab(
+                          label: g.label,
+                          sub: g.isEmpty
+                              ? 'no days'
+                              : '${g.days} ${g.days == 1 ? 'day' : 'days'}',
+                          empty: g.isEmpty,
+                          selected: g.label == current.label,
+                          onTap: () => setState(() => _picked = g.label),
                         ),
-                        selected: g.label == current.label,
-                        labelStyle: TextStyle(
-                          fontSize: 13,
-                          color: g.label == current.label
-                              ? colors.accentText
-                              : g.isEmpty
-                              ? colors.textMuted
-                              : colors.textSecondary,
-                        ),
-                        onSelected: g.isEmpty
-                            ? null
-                            : (_) => setState(() => _picked = g.label),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 14),
                 if (current.skinScore != null)
@@ -269,14 +272,16 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                 const SizedBox(height: 12),
                 MetricStyleToggle(value: _style, onChanged: _setStyle),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: widget.hud
+                ScaledBox(
+                  designWidth: 350,
+                  designHeight: widget.hud
                       ? math.max(
                           285.0,
                           hudBarsHeight(current.scores.length) + 8,
                         )
                       : 285,
                   child: SwipeableChartPager<MetricStyle>(
+                    swipeable: !ChartCarouselScope.of(context),
                     value: _style,
                     values: const [
                       MetricStyle.rings,

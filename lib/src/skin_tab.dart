@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
 import 'charts.dart';
+import 'chart_carousel.dart';
+import 'scaled_box.dart';
 import 'chart_style.dart';
 import 'common.dart';
 import 'link_bridge.dart';
@@ -299,9 +301,11 @@ class _Latest extends StatelessWidget {
               onChanged: ChartStylePref.instance.set,
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              height: 285,
+            ScaledBox(
+              designWidth: 350,
+              designHeight: 285,
               child: SwipeableChartPager<MetricStyle>(
+                swipeable: !ChartCarouselScope.of(context),
                 value: style,
                 values: const [
                   MetricStyle.rings,

@@ -11,6 +11,8 @@ import 'app_colors.dart';
 import 'brand.dart';
 import 'common.dart';
 import 'theme.dart';
+import 'scaled_box.dart';
+import 'chart_gradient.dart';
 
 /// "A difference, not proof of a cause."
 class ChartCaveat extends StatelessWidget {
@@ -78,9 +80,9 @@ class TrendChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 170,
-          width: double.infinity,
+        ScaledBox(
+          designWidth: 350,
+          designHeight: 170,
           child: CustomPaint(painter: _TrendPainter(days, colors)),
         ),
         const SizedBox(height: 8),
@@ -135,6 +137,16 @@ class _TrendPainter extends CustomPainter {
     final n = days.length;
     final w = size.width / n;
     final plotH = size.height - 22; // room for the dots underneath
+
+    // Faint guides at 0, 50 and 100, as Véda's own Trends chart has.
+    final grid = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = colors.divider;
+    for (final v in const [0.0, 50.0, 100.0]) {
+      final gy = _scoreY(v, plotH);
+      canvas.drawLine(Offset(0, gy), Offset(size.width, gy), grid);
+    }
     final maxBar = days
         .map((d) => d.bar ?? 0)
         .fold<double>(0, (a, b) => a > b ? a : b);
@@ -154,21 +166,14 @@ class _TrendPainter extends CustomPainter {
       );
     }
 
-    // The score line: scaled to the range actually seen, with a little air.
+    // The score line, on the same fixed 0-100 range as Véda's own chart, so a
+    // few points either way read as the small change they are.
     final scores = [
       for (final d in days)
         if (d.score != null) d.score!,
     ];
     if (scores.isNotEmpty) {
-      var lo = scores.reduce((a, b) => a < b ? a : b);
-      var hi = scores.reduce((a, b) => a > b ? a : b);
-      if (hi - lo < 12) {
-        final mid = (hi + lo) / 2;
-        lo = mid - 6;
-        hi = mid + 6;
-      }
-      double y(double s) =>
-          plotH - ((s - lo) / (hi - lo)) * plotH * 0.9 - plotH * 0.05;
+      double y(double s) => _scoreY(s, plotH);
       final line = Paint()
         ..color = colors.accent
         ..style = PaintingStyle.stroke
@@ -182,13 +187,36 @@ class _TrendPainter extends CustomPainter {
         points.add(Offset(i * w + w / 2, y(s)));
       }
       final last = points.isEmpty ? null : points.last;
+      if (points.isNotEmpty && points.first.dx > w) {
+        _drawDashedLine(
+          canvas,
+          Offset(0, points.first.dy),
+          Offset(points.first.dx, points.first.dy),
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2
+            ..color = colors.accent.withValues(alpha: 0.4),
+        );
+      }
       final path = _smoothPath(points);
+      // The line fades from faint at the oldest reading to full at the latest.
+      final x0 = points.isEmpty ? 0.0 : points.first.dx;
+      final x1 = points.isEmpty ? 1.0 : points.last.dx;
+      if (x1 - x0 > 1) {
+        line.shader = fadeAcross(colors.accent)
+            .createShader(Rect.fromLTRB(x0, 0, x1, size.height));
+      }
       canvas.drawPath(path, line);
       // a dot on every reading and a ringed marker on the latest, as Véda's
-      // own Trends chart draws them
-      final dots = Paint()..color = colors.accent;
+      // own Trends chart draws them, each as strong as the line beside it
       for (final p in points.take(points.length - 1)) {
-        canvas.drawCircle(p, 4, dots);
+        final t = x1 - x0 > 1 ? ((p.dx - x0) / (x1 - x0)).clamp(0.0, 1.0) : 1.0;
+        canvas.drawCircle(
+          p,
+          4,
+          Paint()
+            ..color = Color.lerp(fadeStart(colors.accent), colors.accent, t)!,
+        );
       }
       if (last != null) {
         canvas.drawCircle(last, 5, Paint()..color = kMarkerWhite);
@@ -209,6 +237,25 @@ class _TrendPainter extends CustomPainter {
       if (days[i].marked) {
         canvas.drawCircle(Offset(i * w + w / 2, size.height - 6), 3, dot);
       }
+    }
+  }
+
+  /// Where a score sits: 0 at the bottom and 100 at the top of the plot, with
+  /// a little room above and below (as Véda's Trends chart).
+  static double _scoreY(double score, double plotH) =>
+      12 + (plotH - 24) * (1 - (score / 100).clamp(0.0, 1.0));
+
+  /// A dashed line, for the stretch before the first reading.
+  void _drawDashedLine(Canvas canvas, Offset from, Offset to, Paint paint) {
+    const dash = 5.0, gap = 4.0;
+    final total = (to - from).distance;
+    if (total <= 0) return;
+    final dir = (to - from) / total;
+    var covered = 0.0;
+    while (covered < total) {
+      final end = covered + dash < total ? covered + dash : total;
+      canvas.drawLine(from + dir * covered, from + dir * end, paint);
+      covered = end + gap;
     }
   }
 
