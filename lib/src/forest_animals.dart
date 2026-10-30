@@ -862,6 +862,10 @@ class ForestPeeker extends StatefulWidget {
   @visibleForTesting
   static math.Random Function() random = math.Random.new;
 
+  /// The forests that are alive right now. Opening Nature Mode from Today puts
+  /// a second one on screen; it takes over a visit already in progress.
+  static final _running = <_ForestPeekerState>{};
+
   /// Whether Bao and Mei may come out together. An app can hold the pair back
   /// (Routine does, for a person's first visits); by default it is allowed.
   static bool Function() pairAllowed = () => true;
@@ -947,6 +951,37 @@ class _ForestPeekerState extends State<ForestPeeker>
         _elapsed = e;
         n.value = _expectancy();
       })..start();
+    }
+    ForestPeeker._running.add(this);
+    _adoptRunningVisit();
+  }
+
+  /// A friend who is already out in another forest (Today, when Nature Mode
+  /// opens) stays out here, in the same place and at the same point of the
+  /// visit, instead of the forest starting again.
+  void _adoptRunningVisit() {
+    for (final other in ForestPeeker._running) {
+      if (identical(other, this) || !other._visiting || other._peeks.isEmpty) {
+        continue;
+      }
+      _peeks = [...other._peeks];
+      _visit = other._visit;
+      _angle = other._angle;
+      _last = other._last;
+      _lastWasPair = other._lastWasPair;
+      _visiting = true;
+      _timer?.cancel();
+      _c.duration = _visit;
+      _c.forward(from: other._c.value).whenComplete(_end);
+      // told once the first frame is built: the screen is still being built
+      // now, and its listeners may not be changed in the middle of that
+      final name = _peeks.length > 1
+          ? 'Bao and Mei'
+          : friendNameOf(_peeks.first.animal, special: _peeks.first.special);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _visiting) widget.friend?.value = name;
+      });
+      return;
     }
   }
 
@@ -1069,6 +1104,7 @@ class _ForestPeekerState extends State<ForestPeeker>
 
   @override
   void dispose() {
+    ForestPeeker._running.remove(this);
     _timer?.cancel();
     _tick?.dispose();
     widget.hold?.removeListener(_holdChanged);
