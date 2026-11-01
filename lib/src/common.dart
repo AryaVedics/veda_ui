@@ -233,10 +233,20 @@ class EmptyNote extends StatelessWidget {
 
 /// The gold primary action, same as Véda's Save buttons.
 class GoldButton extends StatelessWidget {
-  const GoldButton({super.key, required this.label, required this.onPressed});
+  const GoldButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.quiet = true,
+  });
 
   final String label;
   final VoidCallback? onPressed;
+
+  /// The app's standard button: a dark fill, a thin gold edge and a soft glow
+  /// on the label, so it reads as a button without taking the eye from the
+  /// artwork. Pass false only for the one bright action a screen exists for.
+  final bool quiet;
 
   @override
   Widget build(BuildContext context) {
@@ -246,19 +256,91 @@ class GoldButton extends StatelessWidget {
       height: 50,
       child: FilledButton(
         style: FilledButton.styleFrom(
-          backgroundColor: colors.accent,
-          foregroundColor: colors.onAccent,
-          disabledBackgroundColor: colors.accentDim,
+          backgroundColor: quiet ? colors.card : colors.accent,
+          foregroundColor: quiet ? colors.accentText : colors.onAccent,
+          disabledBackgroundColor: quiet ? colors.card : colors.accentDim,
+          disabledForegroundColor: quiet ? colors.textMuted : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
+            side: quiet
+                ? BorderSide(color: colors.accent.withValues(alpha: 0.6))
+                : BorderSide.none,
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-        ),
+        child: quiet
+            ? _BreathingLabel(label: label, color: colors.accent)
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
+    );
+  }
+}
+
+/// The label of a quiet [GoldButton]: its glow breathes slowly, about every
+/// four seconds, and stays still for anyone who has animations turned off.
+class _BreathingLabel extends StatefulWidget {
+  const _BreathingLabel({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  State<_BreathingLabel> createState() => _BreathingLabelState();
+}
+
+class _BreathingLabelState extends State<_BreathingLabel>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _c.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    if (still) {
+      _c.stop();
+    } else if (!_c.isAnimating) {
+      _c.repeat(reverse: true);
+    }
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final alpha = still
+            ? 0.5
+            : 0.35 + 0.25 * Curves.easeInOut.transform(_c.value);
+        return Text(
+          widget.label,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            shadows: [
+              Shadow(
+                color: widget.color.withValues(alpha: alpha),
+                blurRadius: 12,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

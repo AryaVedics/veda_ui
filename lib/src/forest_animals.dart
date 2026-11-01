@@ -866,6 +866,17 @@ class ForestPeeker extends StatefulWidget {
   /// a second one on screen; it takes over a visit already in progress.
   static final _running = <_ForestPeekerState>{};
 
+  /// Whether friends visit at all. Off, nobody comes out, on Today or in Nature
+  /// Mode, and the forest is only trees.
+  static final visitsOn = ValueNotifier<bool>(true);
+
+  /// Quiet mode: visits are rarer and slower, with no pairs, no floating heart
+  /// and no firefly landing on Nuru.
+  static bool calm = false;
+
+  /// How long a friend takes to rise, and the same to sink.
+  static double get edgeSeconds => calm ? kCalmEdgeSeconds : kEdgeSeconds;
+
   /// Whether Bao and Mei may come out together. An app can hold the pair back
   /// (Routine does, for a person's first visits); by default it is allowed.
   static bool Function() pairAllowed = () => true;
@@ -879,6 +890,13 @@ class ForestPeeker extends StatefulWidget {
   @override
   State<ForestPeeker> createState() => _ForestPeekerState();
 }
+
+/// How long, in seconds, a friend takes to rise into view, and the same to sink
+/// back: slow enough to watch, so they glide rather than pop.
+const double kEdgeSeconds = 2.4;
+
+/// The same, for quiet mode: a little slower still.
+const double kCalmEdgeSeconds = 3.2;
 
 /// One animal on its way up and down: which one, where on the rim, and how far
 /// into the visit it waits before it starts (0 to 1 of the visit).
@@ -895,7 +913,7 @@ class _ForestPeekerState extends State<ForestPeeker>
     with TickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 5200),
+    duration: const Duration(milliseconds: 7500),
   );
   final _rnd = ForestPeeker.random();
   Timer? _timer;
@@ -909,11 +927,15 @@ class _ForestPeekerState extends State<ForestPeeker>
     inner: widget.inner,
   );
 
-  double get _rise => (1.3 / (_visit.inMilliseconds / 1000)).clamp(0.05, 0.3);
+  double get _rise =>
+      (ForestPeeker.edgeSeconds / (_visit.inMilliseconds / 1000)).clamp(
+        0.05,
+        0.45,
+      );
 
   /// How long this visit lasts. The rare ones stay longer, so there is time to
   /// enjoy them, and to take a screenshot.
-  var _visit = const Duration(milliseconds: 5200);
+  var _visit = const Duration(milliseconds: 7500);
   ForestAnimal? _last;
   double _angle = 0;
 
@@ -945,6 +967,7 @@ class _ForestPeekerState extends State<ForestPeeker>
     _schedule(widget.eager ? 4 + _rnd.nextInt(4) : 8 + _rnd.nextInt(8));
     _c.addListener(_waitIfHeld);
     widget.hold?.addListener(_holdChanged);
+    ForestPeeker.visitsOn.addListener(_visitsChanged);
     final n = widget.expectancy;
     if (n != null) {
       _tick = createTicker((e) {
@@ -959,30 +982,50 @@ class _ForestPeekerState extends State<ForestPeeker>
   /// A friend who is already out in another forest (Today, when Nature Mode
   /// opens) stays out here, in the same place and at the same point of the
   /// visit, instead of the forest starting again.
-  void _adoptRunningVisit() {
+  void _adoptRunningVisit() => _resumeFromOther();
+
+  /// Whether this forest is on screen: a forest covered by Nature Mode is not.
+  var _wasShown = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final shown = TickerMode.valuesOf(context).enabled;
+    if (shown && !_wasShown) _resumeFromOther();
+    _wasShown = shown;
+  }
+
+  /// Shown again (on entering, or coming back from Nature Mode): the visit the
+  /// other forest is playing carries on here, at the point it has reached, so
+  /// the animals are exactly where the person left them.
+  void _resumeFromOther() {
     for (final other in ForestPeeker._running) {
       if (identical(other, this) || !other._visiting || other._peeks.isEmpty) {
         continue;
       }
-      _peeks = [...other._peeks];
-      _visit = other._visit;
-      _angle = other._angle;
-      _last = other._last;
-      _lastWasPair = other._lastWasPair;
-      _visiting = true;
-      _timer?.cancel();
-      _c.duration = _visit;
-      _c.forward(from: other._c.value).whenComplete(_end);
-      // told once the first frame is built: the screen is still being built
-      // now, and its listeners may not be changed in the middle of that
-      final name = _peeks.length > 1
-          ? 'Bao and Mei'
-          : friendNameOf(_peeks.first.animal, special: _peeks.first.special);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _visiting) widget.friend?.value = name;
-      });
+      _takeOverFrom(other);
       return;
     }
+  }
+
+  void _takeOverFrom(_ForestPeekerState other) {
+    _peeks = [...other._peeks];
+    _visit = other._visit;
+    _angle = other._angle;
+    _last = other._last;
+    _lastWasPair = other._lastWasPair;
+    _visiting = true;
+    _timer?.cancel();
+    _c.duration = _visit;
+    _c.forward(from: other._c.value).whenComplete(_end);
+    // told once the first frame is built: the screen is still being built
+    // now, and its listeners may not be changed in the middle of that
+    final name = _peeks.length > 1
+        ? 'Bao and Mei'
+        : friendNameOf(_peeks.first.animal, special: _peeks.first.special);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _visiting) widget.friend?.value = name;
+    });
   }
 
   static double _smooth(double x) {
@@ -1021,12 +1064,24 @@ class _ForestPeekerState extends State<ForestPeeker>
     }
   }
 
+  /// Turned on or off from the Friends card: off stops the next visit, on starts
+  /// the wait for one again.
+  void _visitsChanged() {
+    if (!mounted) return;
+    if (!ForestPeeker.visitsOn.value) {
+      _timer?.cancel();
+    } else if (!_visiting && !(_timer?.isActive ?? false)) {
+      _schedule(8 + _rnd.nextInt(8));
+    }
+  }
+
   void _end() {
     widget.friend?.value = null;
     _visiting = false;
     if (mounted) {
+      final gap = widget.eager ? 20 + _rnd.nextInt(11) : 20 + _rnd.nextInt(26);
       _schedule(
-        widget.eager ? 12 + _rnd.nextInt(11) : 20 + _rnd.nextInt(26),
+        ForestPeeker.calm ? (gap * 1.5).round() : gap,
         afterVisit: true,
       );
     }
@@ -1034,6 +1089,7 @@ class _ForestPeekerState extends State<ForestPeeker>
 
   void _schedule(int seconds, {bool afterVisit = false}) {
     _timer?.cancel();
+    if (!ForestPeeker.visitsOn.value) return;
     _gapStart = _elapsed;
     _gapEnd = _elapsed + Duration(seconds: seconds);
     _fromPeak = afterVisit;
@@ -1069,6 +1125,7 @@ class _ForestPeekerState extends State<ForestPeeker>
     // never twice running, and only once the app allows it) Bao and Mei peek
     // out side by side, Mei a moment later
     if (!_lastWasPair &&
+        !ForestPeeker.calm &&
         ForestPeeker.pairAllowed() &&
         _rnd.nextInt(widget.eager ? 100 : 80) == 0) {
       _lastWasPair = true;
@@ -1095,7 +1152,7 @@ class _ForestPeekerState extends State<ForestPeeker>
       final mei = animal == ForestAnimal.panda && _rnd.nextInt(8) == 0;
       _peeks = [_Peek(animal, mei, _angle)];
       widget.friend?.value = friendNameOf(animal, special: mei);
-      _visit = Duration(milliseconds: mei ? 15000 : 5200);
+      _visit = Duration(milliseconds: mei ? 15000 : 7500);
     }
     _visiting = true;
     _c.duration = _visit;
@@ -1108,6 +1165,7 @@ class _ForestPeekerState extends State<ForestPeeker>
     _timer?.cancel();
     _tick?.dispose();
     widget.hold?.removeListener(_holdChanged);
+    ForestPeeker.visitsOn.removeListener(_visitsChanged);
     _c.dispose();
     super.dispose();
   }
@@ -1180,19 +1238,20 @@ class _PeekPainter extends CustomPainter {
     final total = visitSeconds();
     // rising and sinking always take the same time; only the pause between
     // them grows in the longer visits
-    final rise = (1.3 / total).clamp(0.05, 0.3);
+    final rise = (ForestPeeker.edgeSeconds / total).clamp(0.05, 0.45);
     canvas.save();
     canvas.clipPath(Path()..addOval(Rect.fromCircle(center: c, radius: sky)));
     final heads = <Offset>[];
     for (final peek in list) {
       final p = ((visit - peek.delay) / (1 - peek.delay)).clamp(0.0, 1.0);
       if (p <= 0 || p >= 1) continue;
-      // up (with a little overshoot), a pause with a small sway, then down
+      // up, a pause with a small sway, then down: both ends glide with the same
+      // soft curve, so nothing pops in or out
       final e = p < rise
-          ? Curves.easeOutBack.transform(p / rise)
+          ? Curves.easeInOutCubic.transform(p / rise)
           : p < 1 - rise
           ? 1.0
-          : 1 - Curves.easeInCubic.transform((p - (1 - rise)) / rise);
+          : 1 - Curves.easeInOutCubic.transform((p - (1 - rise)) / rise);
       final a = peek.angle;
       final dir = Offset(math.cos(a), math.sin(a));
       final dist = sky + r * 1.2 - e * (sky * 0.40 + r * 1.2);
@@ -1226,7 +1285,9 @@ class _PeekPainter extends CustomPainter {
         special: peek.special,
       );
       canvas.restore();
-      if (peek.animal == ForestAnimal.elephant) _firefly(canvas, r, p);
+      if (peek.animal == ForestAnimal.elephant && !ForestPeeker.calm) {
+        _firefly(canvas, r, p);
+      }
       canvas.restore();
       // the dense foliage at the rim swallows the base of the head
       canvas.save();
@@ -1251,7 +1312,8 @@ class _PeekPainter extends CustomPainter {
     // together, they share a small heart that floats up between them
     // (a new one every few seconds while they stay)
     final secs = visit * total;
-    if (list.length == 2 &&
+    if (!ForestPeeker.calm &&
+        list.length == 2 &&
         heads.length == 2 &&
         secs > 1.8 &&
         secs < total - 1.4) {
