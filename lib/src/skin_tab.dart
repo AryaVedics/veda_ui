@@ -124,8 +124,9 @@ class SkinTabScreen extends StatelessWidget {
   final VedaLinkStore link;
   final LinkBridge bridge;
 
-  /// The app's own skin cards, after the trend ("Your skin by sleep",
-  /// "Your skin by phase").
+  /// The app's own skin cards, straight after the score ring and before the
+  /// metric rings and the 30-day trend ("Your skin by sleep", "Your skin by
+  /// phase").
   final List<Widget> cards;
 
   /// Bars in the readout look (Lifestyle).
@@ -169,7 +170,15 @@ class SkinTabScreen extends StatelessWidget {
         ..add(
           _Hero(score: latest.skinScore, change: change, on: latest.takenAt),
         )
-        ..add(const SizedBox(height: 16))
+        ..add(const SizedBox(height: 16));
+      // The app's own charts come straight after the score ring, so the first
+      // chart a person sees is one of theirs.
+      for (final c in cards) {
+        children
+          ..add(c)
+          ..add(const SizedBox(height: 14));
+      }
+      children
         ..add(_Latest(scores: latest.scores, hud: hud))
         ..add(const SizedBox(height: 14))
         ..add(
@@ -197,11 +206,6 @@ class SkinTabScreen extends StatelessWidget {
             ),
           ),
         );
-      for (final c in cards) {
-        children
-          ..add(const SizedBox(height: 14))
-          ..add(c);
-      }
       children
         ..add(const SizedBox(height: 18))
         ..add(

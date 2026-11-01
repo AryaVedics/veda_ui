@@ -79,6 +79,7 @@ class NoticeCarousel extends StatefulWidget {
     required this.messages,
     required this.leading,
     this.now,
+    this.greeting,
   });
 
   /// What sits at the left of the message box: the app's own ring, with its
@@ -91,6 +92,11 @@ class NoticeCarousel extends StatefulWidget {
 
   /// The clock; tests pass a fixed one. Null means the real time.
   final DateTime? now;
+
+  /// The greeting that stays when every message has been dismissed, by the
+  /// time of day. It has no ×, so it never goes away: the box is never left
+  /// empty, as on Véda's own Today. Null leaves just the ring.
+  final String Function(DateTime now)? greeting;
 
   /// Véda's own size: the message box is 112 high, with a 3px track under it.
   /// On a short screen (under 700 high) the box is smaller, with smaller text,
@@ -158,10 +164,28 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final shown = _shown;
-    // Nothing until the first answer, and nothing taking up room when there is
-    // nothing to show.
-    if (shown == null || shown.isEmpty) return const SizedBox.shrink();
-    final showTrack = shown.length > 1;
+    // Nothing until the first answer. Once every message is closed the ring
+    // stays, on its own: it is the app's number for today, not part of a
+    // message.
+    if (shown == null) return const SizedBox.shrink();
+    final greet = widget.greeting;
+    if (shown.isEmpty && greet == null) {
+      return Center(
+        child: SizedBox.square(dimension: kMiniRingSize, child: widget.leading),
+      );
+    }
+    // With nothing left to show, the greeting is the one message.
+    final isGreeting = shown.isEmpty;
+    final msgs = isGreeting
+        ? [
+            NoticeMessage(
+              'greeting',
+              PhosphorIconsThin.sparkle,
+              greet!(widget.now ?? DateTime.now()),
+            ),
+          ]
+        : shown;
+    final showTrack = msgs.length > 1;
     final compact =
         MediaQuery.sizeOf(context).height < NoticeCarousel._shortScreen;
     // Véda's own layout: the ring at the left edge, a 20 gap, and the message
@@ -181,12 +205,15 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
                 child: PageView(
                   controller: _controller,
                   onPageChanged: (i) => setState(() => _page = i),
-                  children: [for (final m in shown) _card(colors, m, compact)],
+                  children: [
+                    for (final m in msgs)
+                      _card(colors, m, compact, dismissible: !isGreeting),
+                  ],
                 ),
               ),
               if (showTrack) ...[
                 const SizedBox(height: 8),
-                _track(colors, shown.length),
+                _track(colors, msgs.length),
               ],
             ],
           ),
@@ -195,7 +222,12 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     );
   }
 
-  Widget _card(AppColors colors, NoticeMessage m, bool compact) => Container(
+  Widget _card(
+    AppColors colors,
+    NoticeMessage m,
+    bool compact, {
+    bool dismissible = true,
+  }) => Container(
     // no side inset: the icon lines up with the title and the date above it,
     // and the × with the right edge
     padding: EdgeInsets.symmetric(vertical: compact ? 4 : 7),
@@ -215,11 +247,13 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
             ),
           ),
         ),
-        const SizedBox(width: 5),
-        GestureDetector(
-          onTap: () => _dismiss(m),
-          child: Icon(PhosphorIconsThin.x, size: 14, color: colors.textMuted),
-        ),
+        if (dismissible) ...[
+          const SizedBox(width: 5),
+          GestureDetector(
+            onTap: () => _dismiss(m),
+            child: Icon(PhosphorIconsThin.x, size: 14, color: colors.textMuted),
+          ),
+        ],
       ],
     ),
   );

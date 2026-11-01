@@ -3,71 +3,45 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:veda_ui/veda_ui.dart';
 
-const _a = NoticeMessage('a', Icons.star, 'First');
-const _b = NoticeMessage('b', Icons.star, 'Second');
+Widget _app({String Function(DateTime)? greeting}) => MaterialApp(
+  theme: vedaTheme(AppColors.nightfall),
+  home: Scaffold(
+    body: NoticeCarousel(
+      appKey: 'test',
+      messages: const [
+        NoticeMessage('a', PhosphorIconsThin.drop, 'First message'),
+      ],
+      leading: const Text('RING'),
+      now: DateTime(2026, 10, 31, 9),
+      greeting: greeting,
+    ),
+  ),
+);
 
 void main() {
-  final start = DateTime(2026, 10, 1, 9);
-
-  test(
-    'a new message shows, and its fourteen days start at the first showing',
-    () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final shown = await visibleNotices(
-        'lifestyle',
-        [_a, _b],
-        now: start,
-        prefs: prefs,
-      );
-      expect(shown.map((m) => m.id), ['a', 'b']);
-      expect(
-        prefs.getInt('notice.lifestyle.a.shownAt'),
-        start.millisecondsSinceEpoch,
-      );
-    },
-  );
-
-  test('a message is gone fourteen days after it first showed', () async {
+  testWidgets('closing the last message leaves the ring and a greeting', (
+    t,
+  ) async {
     SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    await visibleNotices('lifestyle', [_a], now: start, prefs: prefs);
-    final day13 = await visibleNotices(
-      'lifestyle',
-      [_a],
-      now: start.add(const Duration(days: 13)),
-      prefs: prefs,
-    );
-    expect(day13.length, 1);
-    final day14 = await visibleNotices(
-      'lifestyle',
-      [_a],
-      now: start.add(const Duration(days: 14)),
-      prefs: prefs,
-    );
-    expect(day14, isEmpty);
+    await t.pumpWidget(_app(greeting: (n) => 'Good morning at ${n.hour}'));
+    await t.pumpAndSettle();
+    expect(find.text('First message'), findsOneWidget);
+
+    await t.tap(find.byIcon(PhosphorIconsThin.x));
+    await t.pumpAndSettle();
+    expect(find.text('First message'), findsNothing);
+    // the box is never empty: the greeting stays, with no x, beside the ring
+    expect(find.text('RING'), findsOneWidget);
+    expect(find.text('Good morning at 9'), findsOneWidget);
+    expect(find.byIcon(PhosphorIconsThin.x), findsNothing);
   });
 
-  test(
-    'a dismissed message never comes back, and apps keep their own',
-    () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      await dismissNotice('lifestyle', _a, prefs: prefs);
-      final lifestyle = await visibleNotices(
-        'lifestyle',
-        [_a, _b],
-        now: start,
-        prefs: prefs,
-      );
-      expect(lifestyle.map((m) => m.id), ['b']);
-      final routine = await visibleNotices(
-        'routine',
-        [_a],
-        now: start,
-        prefs: prefs,
-      );
-      expect(routine.map((m) => m.id), ['a']);
-    },
-  );
+  testWidgets('without a greeting the ring still stays', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    await t.pumpWidget(_app());
+    await t.pumpAndSettle();
+    await t.tap(find.byIcon(PhosphorIconsThin.x));
+    await t.pumpAndSettle();
+    expect(find.text('RING'), findsOneWidget);
+  });
 }

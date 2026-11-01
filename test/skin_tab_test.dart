@@ -85,6 +85,12 @@ void main() {
       expect(find.text('Up 4 on the week before'), findsOneWidget);
       expect(find.text('an app card'), findsOneWidget);
       expect(find.text('Get Véda'), findsNothing);
+      // The app's own charts sit straight under the score ring, above the
+      // metric rings and the 30-day trend.
+      expect(
+        t.getTopLeft(find.text('an app card')).dy,
+        lessThan(t.getTopLeft(find.text('Skin Score, last 30 days')).dy),
+      );
     },
   );
 

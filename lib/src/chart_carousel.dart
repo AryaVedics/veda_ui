@@ -12,22 +12,49 @@
 // a second chart later makes it a carousel without any other change.
 
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
+import 'charts.dart';
+import 'group_metrics.dart';
+import 'theme.dart';
 
 /// Tells the charts inside a carousel card that the carousel owns the swipe:
 /// a horizontal drag moves between cards, and the chart's own Rings, Petals
 /// and Bars change by tapping the buttons above it instead.
 class ChartCarouselScope extends InheritedWidget {
-  const ChartCarouselScope({super.key, required super.child});
+  const ChartCarouselScope({
+    super.key,
+    required this.titleInHeader,
+    required super.child,
+  });
+
+  /// True when the carousel shows this card's title in its own dropdown, so the
+  /// card leaves its title out.
+  final bool titleInHeader;
 
   /// Whether the chart at [context] sits inside a carousel.
   static bool of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<ChartCarouselScope>() != null;
 
+  /// Whether the card at [context] has its title shown by the carousel above it.
+  static bool titleInHeaderOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<ChartCarouselScope>()
+          ?.titleInHeader ??
+      false;
+
   @override
-  bool updateShouldNotify(ChartCarouselScope old) => false;
+  bool updateShouldNotify(ChartCarouselScope old) =>
+      old.titleInHeader != titleInHeader;
 }
+
+/// The title of a chart card, if it is one of ours (its own [title]).
+String? _titleOf(Widget w) => switch (w) {
+  GroupMetricsCard() => w.title,
+  ChartCard() => w.title,
+  _ => null,
+};
 
 class ChartCarousel extends StatefulWidget {
   const ChartCarousel({super.key, required this.children});
@@ -60,9 +87,21 @@ class _ChartCarouselState extends State<ChartCarousel> {
     if (children.length == 1) return children.first;
     final colors = context.colors;
     final page = _shown;
+    // With every card's title known, the title becomes the carousel's own
+    // dropdown: tap it to pick a chart by name.
+    final titles = [for (final c in children) _titleOf(c)];
+    final showHeader = titles.every((t) => t != null);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (showHeader) ...[
+          _TitleMenu(
+            titles: [for (final t in titles) t!],
+            page: page,
+            onPick: _go,
+          ),
+          const SizedBox(height: 6),
+        ],
         GestureDetector(
           onHorizontalDragStart: (_) => _drag = 0,
           onHorizontalDragUpdate: (d) => _drag += d.delta.dx,
@@ -92,7 +131,10 @@ class _ChartCarouselState extends State<ChartCarousel> {
                       // swiped away from freezes half-faded on top of the next.
                       child: TickerMode(
                         enabled: i == page,
-                        child: ChartCarouselScope(child: children[i]),
+                        child: ChartCarouselScope(
+                          titleInHeader: showHeader,
+                          child: children[i],
+                        ),
                       ),
                     ),
                   ),
@@ -125,6 +167,67 @@ class _ChartCarouselState extends State<ChartCarousel> {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// The chart's name, as a dropdown: the current chart's title with a caret.
+/// Tap it to choose any chart in the carousel by name.
+class _TitleMenu extends StatelessWidget {
+  const _TitleMenu({
+    required this.titles,
+    required this.page,
+    required this.onPick,
+  });
+
+  final List<String> titles;
+  final int page;
+  final ValueChanged<int> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PopupMenuButton<int>(
+      key: const Key('carouselTitleMenu'),
+      initialValue: page,
+      onSelected: onPick,
+      color: colors.card,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: colors.accentDim),
+      ),
+      position: PopupMenuPosition.under,
+      itemBuilder: (_) => [
+        for (var i = 0; i < titles.length; i++)
+          PopupMenuItem<int>(
+            value: i,
+            child: Text(
+              titles[i],
+              style: TextStyle(
+                fontSize: 14,
+                color: i == page ? colors.accentText : colors.textPrimary,
+              ),
+            ),
+          ),
+      ],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              titles[page],
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: kDisplayFont,
+                color: colors.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Icon(PhosphorIconsThin.caretDown, size: 14, color: colors.textMuted),
+        ],
+      ),
     );
   }
 }

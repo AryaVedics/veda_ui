@@ -12,6 +12,7 @@ Widget _app(List<Widget> children) => MaterialApp(
 );
 
 GroupMetricsCard _card(String title) => GroupMetricsCard(
+  key: ValueKey(title),
   title: title,
   subtitle: 'sub',
   ghostKeys: const ['sleep', 'movement'],
@@ -24,7 +25,10 @@ GroupMetricsCard _card(String title) => GroupMetricsCard(
 double _opacityOf(WidgetTester t, String title) {
   final fade = t.widget<FadeTransition>(
     find
-        .ancestor(of: find.text(title), matching: find.byType(FadeTransition))
+        .ancestor(
+          of: find.byKey(ValueKey(title)),
+          matching: find.byType(FadeTransition),
+        )
         .first,
   );
   return fade.opacity.value;
@@ -57,9 +61,7 @@ void main() {
   });
 
   testWidgets('swiping back and forth keeps the right card showing', (t) async {
-    await t.pumpWidget(
-      _app([_card('first'), _card('second'), _card('third')]),
-    );
+    await t.pumpWidget(_app([_card('first'), _card('second'), _card('third')]));
     await t.pumpAndSettle();
     const titles = ['first', 'second', 'third'];
     var page = 0;

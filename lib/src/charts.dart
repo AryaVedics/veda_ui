@@ -13,6 +13,7 @@ import 'common.dart';
 import 'theme.dart';
 import 'scaled_box.dart';
 import 'chart_gradient.dart';
+import 'chart_carousel.dart';
 
 /// "A difference, not proof of a cause."
 class ChartCaveat extends StatelessWidget {
@@ -315,20 +316,24 @@ class ChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    // In a carousel the carousel shows the title as its dropdown instead.
+    final titleHere = !ChartCarouselScope.titleInHeaderOf(context);
     return CardBox(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontFamily: kDisplayFont,
-              color: colors.textPrimary,
+          if (titleHere) ...[
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: kDisplayFont,
+                color: colors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 3),
+            const SizedBox(height: 3),
+          ],
           Text(
             subtitle,
             style: TextStyle(fontSize: 12.5, color: colors.textMuted),

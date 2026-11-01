@@ -162,3 +162,22 @@ class _VedaTabBarState extends State<VedaTabBar> {
     );
   }
 }
+
+/// The Skin tab's icon in the accessory apps: Véda's own medallion, the same
+/// mark Véda shows for itself. Dimmed when idle, full when selected.
+class SkinMedalIcon extends StatelessWidget {
+  const SkinMedalIcon({super.key, required this.selected});
+
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) => Opacity(
+    opacity: selected ? 1 : 0.6,
+    child: Image.asset(
+      'packages/veda_ui/assets/branding/skin_medal.png',
+      width: 26,
+      height: 26,
+      filterQuality: FilterQuality.medium,
+    ),
+  );
+}
