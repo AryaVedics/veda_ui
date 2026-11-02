@@ -27,7 +27,13 @@ class ScoreRingPainter extends CustomPainter {
     this.glint = 0,
     this.ghostT,
     this.strokeWidth = 10,
+    this.glass = false,
   });
+
+  /// The glass look, for the main Skin Score only (see ScoreRing.glass): a
+  /// faint translucent disc and track, and a bright highlight along the top-left
+  /// rim. No sheen, so the fill stays one solid gold. Reversible: set it off.
+  final bool glass;
 
   /// 0-100.
   final double value;
@@ -99,6 +105,26 @@ class ScoreRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5
       ..color = edgeColor;
+    if (glass && ghostT == null) {
+      // A soft halo just outside the ring, fading to nothing: the ring reads
+      // as lit glass rather than a flat line. A trial (see ScoreRing.glass).
+      final reach = outerEdge + 16;
+      canvas.drawCircle(
+        center,
+        reach,
+        Paint()
+          ..shader = ui.Gradient.radial(
+            center,
+            reach,
+            [
+              fillColor.withValues(alpha: 0),
+              fillColor.withValues(alpha: 0.17),
+              fillColor.withValues(alpha: 0),
+            ],
+            [(outerEdge - 3) / reach, (outerEdge + 2) / reach, 1.0],
+          ),
+      );
+    }
     canvas.drawCircle(center, outerEdge, edgePaint);
     canvas.drawCircle(center, innerEdge, edgePaint);
 
@@ -113,9 +139,57 @@ class ScoreRingPainter extends CustomPainter {
         innerEdge,
         Paint()
           ..shader = ui.Gradient.radial(center, innerEdge, [
-            fillColor.withValues(alpha: 0.20),
+            // softer under the glass look, where the lens adds its own light
+            fillColor.withValues(alpha: glass ? 0.11 : 0.20),
             fillColor.withValues(alpha: 0.0),
           ]),
+      );
+    }
+
+    // The glass look: the inner disc is a lens, brighter toward the top-left
+    // and fading to clear at the far side, with a faint rim.
+    if (glass && ghostT == null) {
+      final lens = Rect.fromCircle(center: center, radius: innerEdge);
+      canvas.drawCircle(
+        center,
+        innerEdge,
+        Paint()
+          ..shader = ui.Gradient.radial(
+            center + Offset(-innerEdge * 0.45, -innerEdge * 0.5),
+            innerEdge * 1.5,
+            [
+              Colors.white.withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.03),
+            ],
+          ),
+      );
+      // a soft reflection in the upper left of the lens
+      canvas.save();
+      canvas.translate(
+        center.dx - innerEdge * 0.38,
+        center.dy - innerEdge * 0.5,
+      );
+      canvas.rotate(-0.6);
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: innerEdge * 0.9,
+          height: innerEdge * 0.42,
+        ),
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.10)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+      );
+      canvas.restore();
+      canvas.drawArc(
+        lens.deflate(1),
+        -math.pi * 0.95,
+        math.pi * 0.5,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.4
+          ..color = Colors.white.withValues(alpha: 0.3),
       );
     }
 
@@ -123,8 +197,23 @@ class ScoreRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..color = trackColor;
+      // The dim gold stays under the glass look too: it echoes the logo's
+      // bronze, and the ring must stay consistent with it.
+      ..color = glass ? trackColor.withValues(alpha: 0.6) : trackColor;
     canvas.drawArc(rect, 0, 2 * math.pi, false, track);
+    if (glass && ghostT == null) {
+      // frosted band: a light wash over the whole track
+      canvas.drawArc(
+        rect,
+        0,
+        2 * math.pi,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..color = Colors.white.withValues(alpha: 0.16),
+      );
+    }
 
     // Starts at 12 o'clock, same convention as the capture screen's
     // countdown ring, so "progress" always reads the same way in this app.
@@ -178,6 +267,38 @@ class ScoreRingPainter extends CustomPainter {
       glowColor: edgeColor.withValues(alpha: 0.4 + 0.55 * glint),
       glowWidth: strokeWidth * (0.9 + 0.5 * glint),
     );
+
+    if (glass) {
+      // The gloss: a thin highlight along the outer edge of the whole band,
+      // brightest at the upper left and again, fainter, at the lower right,
+      // the way light catches a glass tube. Flat, inside the band.
+      final gloss = Rect.fromCircle(
+        center: center,
+        radius: radius + strokeWidth * 0.26,
+      );
+      Color lobe(double a) => Colors.white.withValues(alpha: a);
+      canvas.drawArc(
+        gloss,
+        0,
+        2 * math.pi,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth * 0.3
+          ..strokeCap = StrokeCap.butt
+          ..shader = SweepGradient(
+            colors: [
+              lobe(0.10),
+              lobe(0.30),
+              lobe(0),
+              lobe(0.45),
+              lobe(0),
+              lobe(0.10),
+            ],
+            stops: const [0.0, 0.125, 0.375, 0.625, 0.875, 1.0],
+          ).createShader(gloss),
+      );
+    }
   }
 
   /// The white index line at the fill's flat end: straight across the band,
@@ -257,7 +378,11 @@ class ScoreRing extends StatefulWidget {
     required this.labelColor,
     this.size = 148,
     this.hasReading = true,
+    this.glass = false,
   });
+
+  /// The glass look (see ScoreRingPainter.glass). Only the main Skin Score uses it.
+  final bool glass;
 
   final double value;
   final String label;
@@ -381,6 +506,7 @@ class _ScoreRingState extends State<ScoreRing>
                   fillColor: widget.fillColor,
                   edgeColor: widget.edgeColor,
                   glint: glint,
+                  glass: widget.glass,
                 ),
               ),
               Column(

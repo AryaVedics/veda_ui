@@ -94,6 +94,47 @@ void main() {
     },
   );
 
+  testWidgets(
+    'an app can leave out the 30-day chart and add cards after the latest ones',
+    (t) async {
+      await still(t);
+      SharedPreferences.setMockInitialValues({});
+      final now = DateTime.now();
+      DateTime ago(int d) => DateTime(now.year, now.month, now.day - d, 9);
+      final link = VedaLinkStore(file: MemoryJsonFile());
+      await link.load();
+      await link.takeLive({
+        'readings': [
+          for (var i = 0; i < 10; i++)
+            VedaReading(
+              takenAt: ago(i),
+              skinScore: 80,
+              scores: const {'redness': 80, 'texture': 82},
+            ).toJson(),
+        ],
+      });
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.lifestyle),
+            showTrend: false,
+            cards: const [Text('before the latest')],
+            more: const [Text('after the latest')],
+          ),
+        ),
+      );
+      await t.pump();
+      await t.pump(const Duration(seconds: 2));
+      expect(find.text('Skin Score, last 30 days'), findsNothing);
+      final before = t.getTopLeft(find.text('before the latest')).dy;
+      final latest = t.getTopLeft(find.text('Your latest measurements')).dy;
+      final after = t.getTopLeft(find.text('after the latest')).dy;
+      expect(before, lessThan(latest));
+      expect(latest, lessThan(after));
+    },
+  );
+
   testWidgets('turning the tab off asks once, and Keep it keeps it', (t) async {
     await still(t);
     SharedPreferences.setMockInitialValues({});

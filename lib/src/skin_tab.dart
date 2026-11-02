@@ -118,6 +118,9 @@ class SkinTabScreen extends StatelessWidget {
     required this.link,
     required this.bridge,
     this.cards = const [],
+    this.more = const [],
+    this.showTrend = true,
+    this.ringSize = 148,
     this.hud = false,
   });
 
@@ -128,6 +131,18 @@ class SkinTabScreen extends StatelessWidget {
   /// metric rings and the 30-day trend ("Your skin by sleep", "Your skin by
   /// phase").
   final List<Widget> cards;
+
+  /// More of the app's own cards, after the latest measurements (and the
+  /// 30-day trend, when it is shown), before "Open Véda".
+  final List<Widget> more;
+
+  /// Whether the standard 30-day Skin Score chart is shown. An app whose own
+  /// cards already chart the Skin Score over time can turn it off.
+  final bool showTrend;
+
+  /// How big the Skin Score ring is. An app with a busier tab can make it a
+  /// little smaller so more of its own cards show without scrolling.
+  final double ringSize;
 
   /// Bars in the readout look (Lifestyle).
   final bool hud;
@@ -168,7 +183,12 @@ class SkinTabScreen extends StatelessWidget {
           : (w.now! - w.before!).round();
       children
         ..add(
-          _Hero(score: latest.skinScore, change: change, on: latest.takenAt),
+          _Hero(
+            score: latest.skinScore,
+            change: change,
+            on: latest.takenAt,
+            size: ringSize,
+          ),
         )
         ..add(const SizedBox(height: 16));
       // The app's own charts come straight after the score ring, so the first
@@ -178,34 +198,41 @@ class SkinTabScreen extends StatelessWidget {
           ..add(c)
           ..add(const SizedBox(height: 14));
       }
-      children
-        ..add(_Latest(scores: latest.scores, hud: hud))
-        ..add(const SizedBox(height: 14))
-        ..add(
-          ChartCard(
-            title: 'Skin Score, last 30 days',
-            subtitle: 'From your Véda readings',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TrendChart(
-                  days: [
-                    for (var i = 29; i >= 0; i--)
-                      () {
-                        final d = DateTime(
-                          today.year,
-                          today.month,
-                          today.day - i,
-                        );
-                        return TrendDay(d, score: link.data.skinScoreOn(d));
-                      }(),
-                  ],
-                ),
-                const ChartCaveat('A reading, not a diagnosis.'),
-              ],
+      children.add(_Latest(scores: latest.scores, hud: hud));
+      if (showTrend) {
+        children
+          ..add(const SizedBox(height: 14))
+          ..add(
+            ChartCard(
+              title: 'Skin Score, last 30 days',
+              subtitle: 'From your Véda readings',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TrendChart(
+                    days: [
+                      for (var i = 29; i >= 0; i--)
+                        () {
+                          final d = DateTime(
+                            today.year,
+                            today.month,
+                            today.day - i,
+                          );
+                          return TrendDay(d, score: link.data.skinScoreOn(d));
+                        }(),
+                    ],
+                  ),
+                  const ChartCaveat('A reading, not a diagnosis.'),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+      }
+      for (final c in more) {
+        children
+          ..add(const SizedBox(height: 14))
+          ..add(c);
+      }
       children
         ..add(const SizedBox(height: 18))
         ..add(
@@ -228,11 +255,17 @@ class SkinTabScreen extends StatelessWidget {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.score, required this.change, required this.on});
+  const _Hero({
+    required this.score,
+    required this.change,
+    required this.on,
+    required this.size,
+  });
 
   final double? score;
   final int? change;
   final DateTime on;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -257,8 +290,10 @@ class _Hero extends StatelessWidget {
           edgeColor: colors.accentText,
           valueColor: shown == null ? colors.textMuted : colors.textPrimary,
           labelColor: colors.textMuted,
-          size: 148,
+          size: size,
           hasReading: shown != null,
+          // the same glass look as Véda's own Skin Score ring
+          glass: true,
         ),
         const SizedBox(height: 10),
         Text(

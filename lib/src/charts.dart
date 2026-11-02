@@ -59,9 +59,13 @@ class TrendChart extends StatelessWidget {
     required this.days,
     this.barLabel,
     this.markLabel,
+    this.scoreLabel = 'Skin Score',
   });
 
   final List<TrendDay> days;
+
+  /// What the line is called in the key: the Skin Score, or one measurement.
+  final String scoreLabel;
 
   /// What the bars are, and what the dots are; null leaves that out of the key.
   final String? barLabel;
@@ -93,7 +97,7 @@ class TrendChart extends StatelessWidget {
           children: [
             key(
               Container(width: 20, height: 3, color: colors.accent),
-              'Skin Score',
+              scoreLabel,
             ),
             if (barLabel != null)
               key(
@@ -125,6 +129,14 @@ class TrendChart extends StatelessWidget {
     );
   }
 }
+
+// The dots on a trend line, kept small so the line is what the eye follows:
+// one for every reading, and a slightly larger ringed one for the latest.
+// Véda's own Trends chart (flutter_app/lib/widgets/trend_chart.dart) draws the
+// same sizes; change both together.
+const double _readingDot = 2.5;
+const double _latestDot = 4;
+const double _latestRing = 6.5;
 
 class _TrendPainter extends CustomPainter {
   _TrendPainter(this.days, this.colors);
@@ -214,16 +226,16 @@ class _TrendPainter extends CustomPainter {
         final t = x1 - x0 > 1 ? ((p.dx - x0) / (x1 - x0)).clamp(0.0, 1.0) : 1.0;
         canvas.drawCircle(
           p,
-          4,
+          _readingDot,
           Paint()
             ..color = Color.lerp(fadeStart(colors.accent), colors.accent, t)!,
         );
       }
       if (last != null) {
-        canvas.drawCircle(last, 5, Paint()..color = kMarkerWhite);
+        canvas.drawCircle(last, _latestDot, Paint()..color = kMarkerWhite);
         canvas.drawCircle(
           last,
-          7.5,
+          _latestRing,
           Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.3
