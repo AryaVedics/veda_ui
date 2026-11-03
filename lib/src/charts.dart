@@ -37,8 +37,24 @@ class ChartCaveat extends StatelessWidget {
 }
 
 /// One day on the trend chart.
+/// A coloured mark under a day: a dot, or a diamond for something of a
+/// different kind. An app uses one colour for each thing it marks, so the marks
+/// can be told apart.
+class TrendMark {
+  const TrendMark(this.color, {this.diamond = false});
+
+  final Color color;
+  final bool diamond;
+}
+
 class TrendDay {
-  const TrendDay(this.day, {this.score, this.bar, this.marked = false});
+  const TrendDay(
+    this.day, {
+    this.score,
+    this.bar,
+    this.marked = false,
+    this.marks = const [],
+  });
 
   final DateTime day;
 
@@ -50,6 +66,10 @@ class TrendDay {
 
   /// A dot under the day (sunscreen on).
   final bool marked;
+
+  /// Coloured marks under the day, side by side (up to three are drawn). They
+  /// take the place of the plain dot.
+  final List<TrendMark> marks;
 }
 
 /// The Skin Score as a gold line over bars and dots from the app's own data.
@@ -244,11 +264,36 @@ class _TrendPainter extends CustomPainter {
       }
     }
 
-    // Dots under the days that are marked.
+    // Marks under the days that have one: coloured ones where an app gave them,
+    // else the plain dot.
     final dot = Paint()..color = colors.accentText;
     for (var i = 0; i < n; i++) {
-      if (days[i].marked) {
-        canvas.drawCircle(Offset(i * w + w / 2, size.height - 6), 3, dot);
+      final marks = days[i].marks.take(3).toList();
+      final cx = i * w + w / 2;
+      final cy = size.height - 6;
+      if (marks.isNotEmpty) {
+        const gap = 8.0;
+        final start = cx - gap * (marks.length - 1) / 2;
+        for (var k = 0; k < marks.length; k++) {
+          final m = marks[k];
+          final c = Offset(start + k * gap, cy);
+          final paint = Paint()..color = m.color;
+          if (m.diamond) {
+            canvas.drawPath(
+              Path()
+                ..moveTo(c.dx, c.dy - 4.2)
+                ..lineTo(c.dx + 4.2, c.dy)
+                ..lineTo(c.dx, c.dy + 4.2)
+                ..lineTo(c.dx - 4.2, c.dy)
+                ..close(),
+              paint,
+            );
+          } else {
+            canvas.drawCircle(c, 3.4, paint);
+          }
+        }
+      } else if (days[i].marked) {
+        canvas.drawCircle(Offset(cx, cy), 3, dot);
       }
     }
   }
