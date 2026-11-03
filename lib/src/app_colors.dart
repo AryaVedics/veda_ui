@@ -164,12 +164,32 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayLight: _overlayLight,
   );
 
+  /// Véda Kitchen: chilli, a spice red. Clearly red (hue about 5°), so it is
+  /// never mistaken for Cycle's wine (about 330°) or Sun's umber (about 28°).
+  static const chilli = AppColors(
+    canvas: Color(0xFF5A1A14),
+    canvasDeep: Color(0xFF4C140F),
+    card: Color(0xFF78281F),
+    cardSunken: Color(0xFF69211A),
+    accent: _accent,
+    accentDim: _accentDim,
+    accentText: _accentText,
+    onAccent: _onAccent,
+    textPrimary: Color(0xFFFDEEEA),
+    textSecondary: Color(0xFFF3CABF),
+    textMuted: Color(0xFFE6A99B),
+    divider: Color(0xFF8E3528),
+    overlay: _overlay,
+    overlayLight: _overlayLight,
+  );
+
   static const all = {
     'midnight': midnight,
     'peacock': peacock,
     'nightfall': nightfall,
     'wine': wine,
     'umber': umber,
+    'chilli': chilli,
   };
 
   @override
