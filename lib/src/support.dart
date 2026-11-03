@@ -4,6 +4,8 @@
 // doesn't) from their own email app. No photos, readings, or entries are ever
 // included, only what helps us fix a problem.
 
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -15,6 +17,35 @@ import 'common.dart';
 const String kSupportEmail = 'support@aryavedics.com';
 
 const _channel = MethodChannel('com.aryavedics.veda_ui/link');
+
+/// The app's version on a platform whose native side cannot report it (an
+/// iPhone): the build passes it in with --dart-define=APP_VERSION=...
+const String _builtAppVersion = String.fromEnvironment('APP_VERSION');
+
+/// The app and phone lines of a support email. On Android the native side
+/// reports the version, build and phone model in [info]. On an iPhone it
+/// reports nothing, so the version the build was given and the system version
+/// are used instead, and the email never says "Android" for an iPhone.
+@visibleForTesting
+List<String> supportAppLines(
+  String appName,
+  Map<String, String> info, {
+  bool ios = false,
+  String osVersion = '',
+  String appVersion = '',
+}) {
+  if (ios) {
+    return [
+      'App: $appName $appVersion'.trim(),
+      'Phone: iPhone, $osVersion'.trim().replaceAll(RegExp(r',$'), ''),
+    ];
+  }
+  return [
+    'App: $appName ${info['version'] ?? ''} (build ${info['build'] ?? '?'})'
+        .trim(),
+    'Phone: ${info['model'] ?? 'unknown'}, Android ${info['android'] ?? '?'}',
+  ];
+}
 
 /// What a support email carries: the app, the version, the phone, and
 /// anything the caller adds (what failed, which apps are linked).
@@ -31,9 +62,13 @@ Future<String> supportDiagnostics(
     // Not Android, or the call failed: the email still goes out without it.
   }
   final lines = <String>[
-    'App: $appName ${info['version'] ?? ''} (build ${info['build'] ?? '?'})'
-        .trim(),
-    'Phone: ${info['model'] ?? 'unknown'}, Android ${info['android'] ?? '?'}',
+    ...supportAppLines(
+      appName,
+      info,
+      ios: Platform.isIOS,
+      osVersion: Platform.isIOS ? Platform.operatingSystemVersion : '',
+      appVersion: _builtAppVersion,
+    ),
     'Time: ${DateTime.now().toIso8601String()}',
     if (problem != null && problem.isNotEmpty) 'Problem: $problem',
     for (final e in extra.entries) '${e.key}: ${e.value}',

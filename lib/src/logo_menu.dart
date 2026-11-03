@@ -27,8 +27,19 @@ class LogoMenuScope extends InheritedWidget {
     super.key,
     required this.items,
     this.onLink,
+    this.showOpenVeda = true,
     required super.child,
   });
+
+  /// Whether the menu offers "Open Véda". It opens the Véda app through
+  /// Android, so an app on a platform without that (an iPhone) turns it off.
+  final bool showOpenVeda;
+
+  static bool openVedaOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<LogoMenuScope>()
+          ?.showOpenVeda ??
+      true;
 
   /// Opens the Connect card, for the "Link my Véda apps" shortcut. Null hides
   /// the shortcut (Véda's store builds, until Véda Link ships).
@@ -54,6 +65,7 @@ void _openUrl(String url) =>
 Future<void> showLogoMenu(BuildContext context) async {
   final items = LogoMenuScope.maybeOf(context) ?? const [];
   final onLink = LogoMenuScope.linkOf(context);
+  final showOpenVeda = LogoMenuScope.openVedaOf(context);
   final box = context.findRenderObject() as RenderBox?;
   final origin = box == null ? Offset.zero : box.localToGlobal(Offset.zero);
   final size = box?.size ?? Size.zero;
@@ -88,7 +100,11 @@ Future<void> showLogoMenu(BuildContext context) async {
                   maxHeight: (box.maxHeight - top - 8).clamp(0.0, 600.0),
                 ),
                 child: SingleChildScrollView(
-                  child: _MenuCard(items: items, onLink: onLink),
+                  child: _MenuCard(
+                    items: items,
+                    onLink: onLink,
+                    showOpenVeda: showOpenVeda,
+                  ),
                 ),
               ),
             ),
@@ -101,9 +117,10 @@ Future<void> showLogoMenu(BuildContext context) async {
 }
 
 class _MenuCard extends StatelessWidget {
-  const _MenuCard({required this.items, this.onLink});
+  const _MenuCard({required this.items, this.onLink, this.showOpenVeda = true});
 
   final VoidCallback? onLink;
+  final bool showOpenVeda;
 
   static const double width = 244;
 
@@ -186,11 +203,12 @@ class _MenuCard extends StatelessWidget {
                   'Link my Véda apps',
                   () => pick(c, onLink!),
                 ),
-              item(
-                PhosphorIconsThin.arrowSquareOut,
-                'Open Véda',
-                () => pick(c, openVeda),
-              ),
+              if (showOpenVeda)
+                item(
+                  PhosphorIconsThin.arrowSquareOut,
+                  'Open Véda',
+                  () => pick(c, openVeda),
+                ),
               item(
                 PhosphorIconsThin.globe,
                 'Our website',
