@@ -33,7 +33,7 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.tiger => 'Tara',
   ForestAnimal.elephant => 'Nuru',
   ForestAnimal.panda => special ? 'Mei' : 'Bao',
-  ForestAnimal.lion => 'Leo',
+  ForestAnimal.lion => 'Shumba',
   ForestAnimal.bear => 'Bela',
   ForestAnimal.monkey => 'Milo',
   ForestAnimal.peacock => 'Nazm',
