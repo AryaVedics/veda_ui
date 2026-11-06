@@ -39,6 +39,7 @@ export 'src/notice_carousel.dart';
 export 'src/mini_ring.dart';
 export 'src/month_picker.dart';
 export 'src/open_veda.dart';
+export 'src/today_tab_icon.dart';
 export 'src/metric_info.dart' show MetricInfo, metricInfoByKey, metricInfoList;
 export 'src/metric_ghost.dart' show GhostMetricChart;
 export 'src/metric_views.dart';
