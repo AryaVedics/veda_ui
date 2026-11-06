@@ -199,6 +199,50 @@ const kForestFriends = [
         'Jarrah is named for a eucalyptus tree, from the Noongar language of '
         'western Australia.',
   ),
+  // Season 2: drafts for the owner to approve, with names to be checked by
+  // someone who speaks each language
+  ForestFriend(
+    ForestAnimal.orangutan,
+    'Rimba',
+    'The tree-top builder',
+    'Rimba lives in the very top branches, where the sun arrives first. Every '
+        'evening he builds a new leafy nest, never the same twice, and is quietly '
+        'proud of each one. He is slow and thoughtful, and he says the best view '
+        'in the forest belongs to anyone willing to climb a little.',
+    means:
+        'Rimba means "forest" in Malay and Indonesian, where "orang utan" '
+        'means "person of the forest".',
+  ),
+  ForestFriend(
+    ForestAnimal.horse,
+    'Tulpar',
+    'The wind runner',
+    'Tulpar comes from the wide grasslands far to the east, where the sky is '
+        'very big and the wind has room to run. In the old stories a horse like '
+        'her can fly, and when she is happy she trots a little above the ground, '
+        'just to be sure. She never rushes, but she always arrives.',
+    means: 'Tulpar is the winged horse of the old stories of Central Asia.',
+  ),
+  ForestFriend(
+    ForestAnimal.gorilla,
+    'Mugisha',
+    'The gentle giant',
+    'Mugisha is the biggest of the friends and the most careful. He walks as '
+        'if the ground might be asleep, beats his chest only as a joke, and '
+        'shares his leaves with anyone who sits beside him. He says being strong '
+        'is mostly a matter of being gentle on purpose.',
+    means: 'Mugisha means "luck" or "fortune" in Kinyarwanda.',
+  ),
+  ForestFriend(
+    ForestAnimal.dolphin,
+    'Thalassa',
+    'The one who brings the sea',
+    'Thalassa arrives from the sea in the west, leaping most of the way. She '
+        'loves company and a good splash, and hums a song that only the water '
+        'can answer. She tells the others the sea is just a very big lake that '
+        'never stopped being curious.',
+    means: 'Thalassa means "sea" in Greek.',
+  ),
 ];
 
 /// The friend for an animal that peeks out; Mei is the panda with her bamboo.

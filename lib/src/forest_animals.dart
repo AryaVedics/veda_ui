@@ -26,6 +26,11 @@ enum ForestAnimal {
   llama,
   crane,
   koala,
+  // Season 2
+  orangutan,
+  horse,
+  gorilla,
+  dolphin,
 }
 
 /// The friend's name, for the share caption. Mei is the panda with her bamboo.
@@ -45,6 +50,10 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.llama => 'Illari',
   ForestAnimal.crane => 'Sora',
   ForestAnimal.koala => 'Jarrah',
+  ForestAnimal.orangutan => 'Rimba',
+  ForestAnimal.horse => 'Tulpar',
+  ForestAnimal.gorilla => 'Mugisha',
+  ForestAnimal.dolphin => 'Thalassa',
 };
 
 const _ink = Color(0xFF2A211C);
@@ -90,6 +99,14 @@ void paintAnimalHead(
       _crane(canvas);
     case ForestAnimal.koala:
       _koala(canvas);
+    case ForestAnimal.orangutan:
+      _orangutan(canvas);
+    case ForestAnimal.horse:
+      _horse(canvas);
+    case ForestAnimal.gorilla:
+      _gorilla(canvas);
+    case ForestAnimal.dolphin:
+      _dolphin(canvas);
   }
   canvas.restore();
 }
@@ -817,6 +834,285 @@ void _monkey(Canvas canvas) {
   }
   _smile(canvas, 0.42, w: 0.22);
   _cheeks(canvas, x: 0.5, y: 0.26);
+}
+
+// ---- Season 2
+
+void _orangutan(Canvas canvas) {
+  const fur = Color(0xFFC9682D);
+  const furDark = Color(0xFFA94F1E);
+  const furLight = Color(0xFFE08A45);
+  const skin = Color(0xFFE6B488);
+  const pad = Color(0xFFD59A68);
+  const muzzle = Color(0xFFF3D3AF);
+  // a shaggy ring of tufts round the head, in two tones
+  for (var i = 0; i < 18; i++) {
+    final a = i * 2 * math.pi / 18;
+    _oval(
+      canvas,
+      Offset(math.cos(a) * 0.84, math.sin(a) * 0.78 - 0.04),
+      0.5,
+      0.3,
+      i.isEven ? fur : furDark,
+      tilt: a + math.pi / 2,
+    );
+  }
+  _oval(canvas, const Offset(0, -0.04), 1.78, 1.62, fur);
+  // a taller topknot
+  for (final dx in [-0.3, 0.0, 0.3]) {
+    _oval(
+      canvas,
+      Offset(dx, -0.84 - (dx == 0 ? 0.06 : 0)),
+      0.42,
+      0.5,
+      furLight,
+      tilt: dx * 0.8,
+    );
+  }
+  // soft cheek pads, as an orangutan has
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.6, 0.12), 0.46, 0.66, pad);
+  }
+  // the pale face
+  _oval(canvas, const Offset(0, 0.06), 1.1, 1.12, skin);
+  _oval(canvas, const Offset(0, 0.36), 0.74, 0.56, muzzle);
+  // a small brow over each eye
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.25, -0.26),
+      0.3,
+      0.1,
+      pad.withValues(alpha: 0.9),
+      tilt: sd * -0.18,
+    );
+  }
+  _eyes(canvas, gap: 0.5, y: -0.1, r: 0.088);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.07, 0.28), 0.07, 0.05, const Color(0xFF8A5A3B));
+  }
+  _smile(canvas, 0.48, w: 0.2);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.46, 0.3), 0.18, 0.11, _blush);
+  }
+}
+
+void _horse(Canvas canvas) {
+  const coat = Color(0xFFE2B462);
+  const mane = Color(0xFFFFF0D2);
+  const maneShade = Color(0xFFF0D8A6);
+  const muzzle = Color(0xFFF2D5A8);
+  const pink = Color(0xFFF0B9A8);
+  // small, soft wings, a fan of feathers at each side: Tulpar is a flying horse
+  // in the old stories, and only just remembers how
+  for (final sd in [-1.0, 1.0]) {
+    for (var k = 0; k < 3; k++) {
+      final angle = sd * (0.55 + 0.42 * k);
+      final reach = 0.62 - 0.06 * k;
+      final base = Offset(sd * 0.74, -0.02 + 0.08 * k);
+      canvas.save();
+      canvas.translate(base.dx, base.dy);
+      canvas.rotate(angle);
+      _oval(
+        canvas,
+        Offset(0, -reach / 2),
+        0.25,
+        reach,
+        k == 1 ? const Color(0xFFFFFFFF) : const Color(0xFFEAF3F8),
+      );
+      canvas.restore();
+    }
+  }
+  // a long, soft mane falling on each side behind the head
+  for (final sd in [-1.0, 1.0]) {
+    for (var j = 0; j < 4; j++) {
+      _oval(
+        canvas,
+        Offset(sd * (0.68 + 0.05 * j), -0.5 + 0.34 * j),
+        0.36,
+        0.62,
+        j.isEven ? mane : maneShade,
+        tilt: sd * 0.35,
+      );
+    }
+  }
+  // upright ears
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.26, -0.66),
+        Offset(sd * 0.46, -1.3),
+        Offset(sd * 0.74, -0.66),
+        Offset(sd * 0.5, -0.46),
+      ]),
+      _fill(coat),
+    );
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.36, -0.72),
+        Offset(sd * 0.47, -1.08),
+        Offset(sd * 0.62, -0.72),
+        Offset(sd * 0.48, -0.6),
+      ]),
+      _fill(pink),
+    );
+  }
+  // the long head, wide at the brow and narrowing to the nose
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.9),
+      Offset(0.6, -0.66),
+      Offset(0.72, -0.02),
+      Offset(0.6, 0.58),
+      Offset(0.4, 0.98),
+      Offset(0, 1.04),
+      Offset(-0.4, 0.98),
+      Offset(-0.6, 0.58),
+      Offset(-0.72, -0.02),
+      Offset(-0.6, -0.66),
+    ]),
+    _fill(coat),
+  );
+  // a pale blaze down the face
+  _oval(canvas, const Offset(0, -0.2), 0.2, 1.0, const Color(0xFFFFF6E4));
+  // the forelock between the ears
+  for (final dx in [-0.18, 0.0, 0.18]) {
+    _oval(
+      canvas,
+      Offset(dx, -0.8),
+      0.26,
+      0.5,
+      dx == 0 ? mane : maneShade,
+      tilt: dx * 0.7,
+    );
+  }
+  // the muzzle, with its nostrils
+  _oval(canvas, const Offset(0, 0.74), 0.84, 0.52, muzzle);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.2, 0.66),
+      0.1,
+      0.15,
+      const Color(0xFF7A5238),
+      tilt: sd * 0.4,
+    );
+    _oval(canvas, Offset(sd * 0.52, 0.3), 0.2, 0.12, _blush);
+  }
+  _eyes(canvas, gap: 0.92, y: -0.1, r: 0.09);
+  _smile(canvas, 0.92, w: 0.12);
+}
+
+void _gorilla(Canvas canvas) {
+  const fur = Color(0xFF3F3F49);
+  const silver = Color(0xFFA6ACBB);
+  const face = Color(0xFF6B6672);
+  const muzzle = Color(0xFF8C848E);
+  // small round ears
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.9, 0.04), 0.17, fur);
+    _disc(canvas, Offset(sd * 0.9, 0.04), 0.09, face);
+  }
+  // the broad head, with a high domed crown
+  _oval(canvas, const Offset(0, -0.04), 1.8, 1.66, fur);
+  _oval(canvas, const Offset(0, -0.62), 1.14, 0.84, fur);
+  // the silver of a silverback, across the top
+  _oval(
+    canvas,
+    const Offset(0, -0.74),
+    0.66,
+    0.3,
+    silver.withValues(alpha: 0.6),
+  );
+  // the lighter, wide face under a heavy brow
+  _oval(canvas, const Offset(0, 0.12), 1.2, 1.1, face);
+  _oval(canvas, const Offset(0, -0.2), 1.1, 0.3, fur);
+  // the eyes: dark, under the brow, so they get a larger highlight
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.23, -0.06), 0.09, _ink);
+    _disc(canvas, Offset(sd * 0.23 - 0.03, -0.09), 0.04, Colors.white);
+  }
+  // a big muzzle and wide nostrils
+  _oval(canvas, const Offset(0, 0.4), 0.8, 0.62, muzzle);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.15, 0.3), 0.16, 0.09, _ink, tilt: sd * 0.3);
+    _oval(canvas, Offset(sd * 0.56, 0.3), 0.2, 0.12, _blush);
+  }
+  _smile(canvas, 0.55, w: 0.2);
+}
+
+void _dolphin(Canvas canvas) {
+  // drawn in profile, facing right, and moved and shrunk to sit in the same
+  // square as the rest
+  canvas.save();
+  canvas.translate(-0.1, 0.1);
+  canvas.scale(0.94);
+  const blue = Color(0xFF6FA2C8);
+  const deep = Color(0xFF5887AF);
+  const belly = Color(0xFFEAF3F8);
+  const spray = Color(0xFFCFE6F3);
+  // a few drops of spray above
+  for (final d in const [
+    (Offset(0.04, -1.08), 0.07),
+    (Offset(0.3, -1.2), 0.055),
+    (Offset(-0.22, -1.18), 0.05),
+  ]) {
+    _disc(canvas, d.$1, d.$2, spray);
+  }
+  // the dorsal fin, behind
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(-0.5, -0.55),
+      Offset(-0.8, -1.0),
+      Offset(-1.0, -0.4),
+      Offset(-0.7, -0.35),
+    ]),
+    _fill(deep),
+  );
+  // the pectoral fin, low at the side
+  _oval(canvas, const Offset(-0.48, 0.66), 0.34, 0.74, deep, tilt: 0.7);
+  // the round head and the body behind it
+  _oval(canvas, const Offset(-0.2, -0.02), 1.7, 1.5, blue);
+  // the pale underside and lower jaw
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(-0.6, 0.55),
+      Offset(0.1, 0.42),
+      Offset(0.95, 0.3),
+      Offset(0.7, 0.55),
+      Offset(0.1, 0.78),
+      Offset(-0.5, 0.8),
+    ]),
+    _fill(belly),
+  );
+  // the beak, rounded and a little lighter than the head
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0.5, -0.12),
+      Offset(1.12, 0.0),
+      Offset(1.26, 0.2),
+      Offset(1.05, 0.34),
+      Offset(0.5, 0.34),
+    ]),
+    _fill(const Color(0xFF84B3D4)),
+  );
+  // the broad, curved smile
+  canvas.drawPath(
+    Path()
+      ..moveTo(1.2, 0.24)
+      ..quadraticBezierTo(0.8, 0.4, 0.4, 0.2),
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.04
+      ..strokeCap = StrokeCap.round
+      ..color = _ink,
+  );
+  // the eye, big and bright
+  _bigEye(canvas, const Offset(0.28, -0.14), 0.115);
+  _oval(canvas, const Offset(0.1, 0.2), 0.2, 0.12, _blush);
+  // the blowhole on top
+  _oval(canvas, const Offset(-0.08, -0.74), 0.12, 0.05, deep);
+  canvas.restore();
 }
 
 /// Every so often one animal peeks out from the dense foliage round the rim of
