@@ -17,6 +17,7 @@ class ForestFriend {
     this.name,
     this.line,
     this.story, {
+    required this.kind,
     this.means,
     this.special = false,
   });
@@ -25,6 +26,10 @@ class ForestFriend {
   final String name;
   final String line;
   final String story;
+
+  /// What kind of animal this is, in a few words, for the ones whose shape is
+  /// not obvious at a glance (a stork, a monal, an onager).
+  final String kind;
   final String? means;
 
   /// Draws the panda with her bamboo.
@@ -37,11 +42,12 @@ const kForestFriends = [
     ForestAnimal.tiger,
     'Tara',
     'The stargazer',
-    'Every evening Tara climbs the tallest rock in the forest to wait for the '
-        'first star. She is quite sure the stars are watching her back, so she '
+    'Every evening Tara climbs up to Starlight Hill to wait for the first star, '
+        'right beside Danphe, who dances up there after dark. She is quite sure the stars are watching her back, so she '
         'always sits up very straight. She is the bravest of the friends and the '
         'first to peek out when the sky turns dark.',
     means: 'Tara means "star" in Hindi.',
+    kind: 'Tiger',
   ),
   ForestFriend(
     ForestAnimal.elephant,
@@ -53,6 +59,7 @@ const kForestFriends = [
         'a kindness either, and when the day starts winding down she gives one '
         'very quiet trumpet, so the whole forest knows it is time to ease up.',
     means: 'Nuru means "light" in Swahili.',
+    kind: 'Elephant',
   ),
   ForestFriend(
     ForestAnimal.panda,
@@ -64,6 +71,7 @@ const kForestFriends = [
         'today and you will hear about something you would have walked right '
         'past.',
     means: 'Bao can mean "treasure" in Mandarin.',
+    kind: 'Giant panda',
   ),
   ForestFriend(
     ForestAnimal.panda,
@@ -75,6 +83,7 @@ const kForestFriends = [
         'a good day.',
     means: 'Mei can mean "beautiful" in Mandarin.',
     special: true,
+    kind: 'Giant panda',
   ),
   ForestFriend(
     ForestAnimal.lion,
@@ -85,6 +94,7 @@ const kForestFriends = [
         'leaves he has stopped bothering to pick out, and he says they make him '
         'look wise.',
     means: 'Shumba means "lion" in Shona.',
+    kind: 'Lion',
   ),
   ForestFriend(
     ForestAnimal.bear,
@@ -94,6 +104,7 @@ const kForestFriends = [
         'forest and she does not apologise for it: a long stretch, a little '
         'honey, a nap in the sun, and a good think about nothing at all. The '
         'others secretly envy her.',
+    kind: 'Brown bear',
   ),
   ForestFriend(
     ForestAnimal.peacock,
@@ -105,6 +116,7 @@ const kForestFriends = [
         'understand. He is the vainest of the friends and the kindest: his fan '
         'is always big enough to share a little shade.',
     means: 'Nazm is Urdu for a poem, a verse. It also means order and harmony.',
+    kind: 'Peacock',
   ),
   ForestFriend(
     ForestAnimal.hippo,
@@ -116,6 +128,7 @@ const kForestFriends = [
         'notice everything. When the others hurry, he simply waits, and '
         'somehow nothing ever rushes him.',
     means: 'Hadi means "calm" in Arabic.',
+    kind: 'Hippopotamus',
   ),
   ForestFriend(
     ForestAnimal.owl,
@@ -126,6 +139,7 @@ const kForestFriends = [
         'everyone, and hoots only when something is lovely. She loves the night '
         'best, because the moon always seems to be listening.',
     means: 'Luna means "moon" in Spanish.',
+    kind: 'Owl',
   ),
   ForestFriend(
     ForestAnimal.fox,
@@ -136,6 +150,7 @@ const kForestFriends = [
         'on a pillow of moss. He grins whenever someone finds one, and always '
         'pretends it was the wind.',
     means: 'Renard means "fox" in French.',
+    kind: 'Red fox',
   ),
   ForestFriend(
     ForestAnimal.redPanda,
@@ -146,6 +161,7 @@ const kForestFriends = [
         'bamboo leaf, watching a single raindrop, wrapping her tail round '
         'herself like a warm scarf. Her friends say her calm is catching.',
     means: 'Pema means "lotus" in Tibetan.',
+    kind: 'Red panda',
   ),
   ForestFriend(
     ForestAnimal.polarBear,
@@ -156,6 +172,7 @@ const kForestFriends = [
         'the northern lights, the only place he has ever seen the sky dance. '
         'He is always happy to sit in a warm patch of sun with everyone.',
     means: 'Nanuq means "polar bear" in Inuktitut.',
+    kind: 'Polar bear',
   ),
   ForestFriend(
     ForestAnimal.llama,
@@ -166,6 +183,7 @@ const kForestFriends = [
         'hums as she walks. Wherever she goes, the day seems to begin a little '
         'more gently.',
     means: 'Illari carries the sense of dawn light in Quechua.',
+    kind: 'Llama',
   ),
   ForestFriend(
     ForestAnimal.crane,
@@ -177,6 +195,7 @@ const kForestFriends = [
         'about to happen. She folds paper cranes from fallen leaves for anyone '
         'who needs a wish.',
     means: 'Sora means "sky" in Japanese.',
+    kind: 'Crane, a tall wading bird',
   ),
   ForestFriend(
     ForestAnimal.koala,
@@ -189,6 +208,7 @@ const kForestFriends = [
     means:
         'Jarrah is named for a eucalyptus tree, from the Noongar language of '
         'western Australia.',
+    kind: 'Koala',
   ),
   // Season 2: drafts for the owner to approve, with names to be checked by
   // someone who speaks each language
@@ -203,6 +223,7 @@ const kForestFriends = [
     means:
         'Rimba means "forest" in Malay and Indonesian, where "orang utan" '
         'means "person of the forest".',
+    kind: 'Orangutan, a great ape of the rainforest',
   ),
   ForestFriend(
     ForestAnimal.horse,
@@ -213,6 +234,7 @@ const kForestFriends = [
         'her can fly, and when she is happy she trots a little above the ground, '
         'just to be sure. She never rushes, but she always arrives.',
     means: 'Tulpar is the winged horse of the old stories of Central Asia.',
+    kind: 'Horse, from the old winged-horse stories',
   ),
   ForestFriend(
     ForestAnimal.gorilla,
@@ -223,6 +245,7 @@ const kForestFriends = [
         'shares his leaves with anyone who sits beside him. He says being strong '
         'is mostly a matter of being gentle on purpose.',
     means: 'Mugisha means "luck" or "fortune" in Kinyarwanda.',
+    kind: 'Mountain gorilla',
   ),
   ForestFriend(
     ForestAnimal.dolphin,
@@ -233,6 +256,7 @@ const kForestFriends = [
         'can answer. She tells the others the sea is just a very big lake that '
         'never stopped being curious.',
     means: 'Thalassa means "sea" in Greek.',
+    kind: 'Dolphin',
   ),
   // the next round: drafts for the owner to approve, names to be checked by
   // someone who speaks each language
@@ -246,6 +270,7 @@ const kForestFriends = [
         'rather than sight. She is shy until she knows you, and then she '
         'follows you everywhere, one step behind.',
     means: 'Aroha means "love" in Māori.',
+    kind: 'Kiwi, a small flightless bird of New Zealand',
   ),
   ForestFriend(
     ForestAnimal.stork,
@@ -257,6 +282,7 @@ const kForestFriends = [
         'over everything below. When she is back, everyone knows the days are '
         'about to get longer.',
     means: 'Vesna means "spring" in several Slavic languages.',
+    kind: 'White stork, a tall bird with long red legs',
   ),
   ForestFriend(
     ForestAnimal.capybara,
@@ -267,17 +293,19 @@ const kForestFriends = [
         'floats through the day as if nothing could ever be urgent. He is the '
         'friend you go to when you simply want to sit beside someone.',
     means: 'Dengo is Brazilian Portuguese for tender, cuddly affection.',
+    kind: 'Capybara, the largest rodent in the world',
   ),
   ForestFriend(
     ForestAnimal.camel,
-    'Karvan',
+    'Bayar',
     'The steady traveller',
-    'Karvan is a Bactrian camel, the shaggy, two-humped kind from the steppe '
-        'and the cold deserts. He has walked more miles than anyone can count, '
+    'Bayar is a Bactrian camel, the shaggy, two-humped kind from the steppe '
+        'and the cold Gobi desert. He has walked more miles than anyone can count, '
         'one slow, even step at a time. His two humps are his pantry, he says, '
         'and his thick winter coat is the best coat there is. He never hurries, '
         'because he knows how far it is, and never stops.',
-    means: 'Karvan means "caravan" in Persian.',
+    means: 'Bayar means "joy" in Mongolian.',
+    kind: 'Bactrian camel, the two-humped kind',
   ),
   ForestFriend(
     ForestAnimal.penguin,
@@ -289,6 +317,7 @@ const kForestFriends = [
         'deal of joy. She thinks the forest is wonderfully warm, and says so, '
         'often.',
     means: 'Eira means "snow" in Welsh.',
+    kind: 'Penguin',
   ),
   ForestFriend(
     ForestAnimal.falcon,
@@ -301,13 +330,14 @@ const kForestFriends = [
         'and a falconer are old and proud partners, and he says the best '
         'flights begin with waiting.',
     means: 'Saqr means "falcon" in Arabic.',
+    kind: 'Falcon, a bird of prey',
   ),
   ForestFriend(
     ForestAnimal.monal,
     'Danphe',
     'The dance master',
     'Danphe is the dance master of the forest. He came down from the mountains '
-        'of Nepal wearing every colour he could find, and by day he is quiet and '
+        'of the high mountains far to the south, wearing every colour he could find, and by day he is quiet and '
         'a little shy about them. But when night falls he climbs to Starlight '
         'Hill and dances under the stars, his crest bobbing and his feathers '
         'catching every bit of light. Tara sits close by and gazes on, never '
@@ -317,6 +347,35 @@ const kForestFriends = [
     means:
         'Danphe is the Nepali name for the Himalayan monal, the national bird '
         'of Nepal.',
+    kind: 'Himalayan monal, a mountain pheasant',
+  ),
+  ForestFriend(
+    ForestAnimal.onager,
+    'Gur',
+    'The one who listens first',
+    'Gur comes from the high, dry plains far to the west, a wild relative of the horse '
+        'who is faster than almost anyone and never in a hurry to prove it. His '
+        'big ears catch every sound for miles, and he always stops to listen '
+        'before he runs. In the old poems of Persia his family is the swiftest '
+        'thing on the plain, and he says the best way to go far is to hear the '
+        'road first.',
+    means:
+        'Gur is the Persian word for the onager, the wild animal of the Iranian '
+        'plateau.',
+    kind: 'Persian onager, a wild relative of the horse',
+  ),
+  ForestFriend(
+    ForestAnimal.jaguar,
+    'Balam',
+    'The quiet guardian',
+    'Balam comes from the warm green forests far to the south, where the '
+        'Maya told stories of the jaguar who walks between the day and the '
+        'night. He is a quiet walker and a strong swimmer, and he likes to rest '
+        'on a wide branch through the afternoon, watching the light move. He is '
+        'gentle with every friend, and says the strongest thing in the forest '
+        'is a calm heart.',
+    means: 'Balam means "jaguar" in Maya.',
+    kind: 'Jaguar, the great cat of the Americas',
   ),
 ];
 
@@ -331,6 +390,7 @@ const kRestingFriends = [
         'butterfly. He is hopeless at hide and seek, because he cannot stop '
         'giggling the moment anyone gets close. He peeks in at the clearing more '
         'than anyone, just to check that everything is lovely.',
+    kind: 'Monkey',
   ),
 ];
 

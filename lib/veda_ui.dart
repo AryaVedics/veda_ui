@@ -25,6 +25,7 @@ export 'src/common.dart';
 export 'src/data_reveal.dart';
 export 'src/forest_animals.dart';
 export 'src/forest_friends.dart';
+export 'src/forest_friends_page.dart';
 export 'src/group_metrics.dart';
 export 'src/hud_bars.dart' show HudBar;
 export 'src/heart_pulse_icon.dart';

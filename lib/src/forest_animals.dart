@@ -39,6 +39,8 @@ enum ForestAnimal {
   penguin,
   falcon,
   monal,
+  onager,
+  jaguar,
 }
 
 /// The animals that come out to visit. A friend who is resting keeps a drawing
@@ -76,6 +78,8 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.penguin => 'Eira',
   ForestAnimal.falcon => 'Saqr',
   ForestAnimal.monal => 'Danphe',
+  ForestAnimal.onager => 'Gur',
+  ForestAnimal.jaguar => 'Balam',
 };
 
 const _ink = Color(0xFF2A211C);
@@ -143,6 +147,10 @@ void paintAnimalHead(
       _falcon(canvas);
     case ForestAnimal.monal:
       _monal(canvas);
+    case ForestAnimal.onager:
+      _onager(canvas);
+    case ForestAnimal.jaguar:
+      _jaguar(canvas);
   }
   canvas.restore();
 }
@@ -1037,6 +1045,131 @@ void _horse(Canvas canvas) {
   }
   _eyes(canvas, gap: 0.92, y: -0.1, r: 0.09);
   _smile(canvas, 0.92, w: 0.12);
+}
+
+void _onager(Canvas canvas) {
+  // a Persian onager, the swift wild equid of the Iranian plateau: a sandy coat,
+  // big upright ears, a short standing mane and a pale muzzle
+  const coat = Color(0xFFCFA070);
+  const coatDark = Color(0xFFA67B4E);
+  const pale = Color(0xFFF6EAD3);
+  const mane = Color(0xFF6E4E34);
+  const pink = Color(0xFFEFB9A8);
+  // big ears with dark tips
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.2, -0.62),
+        Offset(sd * 0.4, -1.42),
+        Offset(sd * 0.78, -0.7),
+        Offset(sd * 0.5, -0.44),
+      ]),
+      _fill(coat),
+    );
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.3, -0.7),
+        Offset(sd * 0.42, -1.12),
+        Offset(sd * 0.64, -0.72),
+        Offset(sd * 0.47, -0.58),
+      ]),
+      _fill(pink),
+    );
+    _oval(canvas, Offset(sd * 0.42, -1.3), 0.2, 0.22, mane, tilt: sd * 0.3);
+  }
+  // the short, standing mane between the ears
+  for (var j = -2; j <= 2; j++) {
+    _oval(
+      canvas,
+      Offset(j * 0.13, -0.86 + j.abs() * 0.05),
+      0.2,
+      0.46,
+      mane,
+      tilt: j * 0.18,
+    );
+  }
+  // the head: broad at the brow, tapering to a pale muzzle
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.84),
+      Offset(0.62, -0.62),
+      Offset(0.7, -0.02),
+      Offset(0.56, 0.56),
+      Offset(0.38, 0.96),
+      Offset(0, 1.02),
+      Offset(-0.38, 0.96),
+      Offset(-0.56, 0.56),
+      Offset(-0.7, -0.02),
+      Offset(-0.62, -0.62),
+    ]),
+    _fill(coat),
+  );
+  // the darker line of the brow and a pale ring round the eyes
+  _oval(canvas, const Offset(0, -0.52), 0.5, 0.2, coatDark);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.3, -0.12), 0.3, 0.22, pale, tilt: sd * -0.2);
+  }
+  // the pale muzzle, with its nostrils
+  _oval(canvas, const Offset(0, 0.72), 0.86, 0.54, pale);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.2, 0.64),
+      0.1,
+      0.14,
+      const Color(0xFF7A5238),
+      tilt: sd * 0.4,
+    );
+    _oval(canvas, Offset(sd * 0.5, 0.26), 0.2, 0.12, _blush);
+  }
+  _eyes(canvas, gap: 0.6, y: -0.12, r: 0.09);
+  _smile(canvas, 0.9, w: 0.12);
+}
+
+void _jaguar(Canvas canvas) {
+  // a jaguar of the Maya forests: golden coat, rosettes rather than stripes,
+  // round ears and a broad, strong face
+  const gold = Color(0xFFE8B24E);
+  const cream = Color(0xFFFFF1D6);
+  const spot = Color(0xFF4A3322);
+  // round ears with dark backs
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.66, -0.64), 0.27, gold);
+    _disc(canvas, Offset(sd * 0.66, -0.62), 0.15, spot);
+  }
+  _oval(canvas, Offset.zero, 1.8, 1.56, gold);
+  // rosettes: a ring with a dot at its heart
+  void rosette(Offset at, double r) {
+    canvas.drawCircle(
+      at,
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = r * 0.5
+        ..color = spot,
+    );
+    _disc(canvas, at, r * 0.28, spot);
+  }
+
+  rosette(const Offset(0, -0.62), 0.1);
+  for (final sd in [-1.0, 1.0]) {
+    rosette(Offset(sd * 0.3, -0.58), 0.085);
+    rosette(Offset(sd * 0.82, -0.14), 0.11);
+    rosette(Offset(sd * 0.78, 0.2), 0.1);
+    rosette(Offset(sd * 0.6, -0.4), 0.09);
+    rosette(Offset(sd * 0.66, 0.46), 0.08);
+  }
+  // the broad cream muzzle and chin
+  _oval(canvas, const Offset(0, 0.34), 1.0, 0.68, cream);
+  for (final sd in [-1.0, 1.0]) {
+    for (final dx in [0.14, 0.28, 0.4]) {
+      _disc(canvas, Offset(sd * dx, 0.36 + dx * 0.1), 0.02, spot);
+    }
+  }
+  _eyes(canvas, gap: 0.64, y: -0.06);
+  _nose(canvas, const Offset(0, 0.2), const Color(0xFFD9786E));
+  _smile(canvas, 0.4);
+  _cheeks(canvas, x: 0.66, y: 0.2);
 }
 
 void _gorilla(Canvas canvas) {
