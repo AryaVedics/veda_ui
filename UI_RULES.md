@@ -129,7 +129,7 @@ numbers; do not eyeball them.
 
 ## The forest friends
 
-- The sixteen forest friends are in the shared library: their drawings and
+- The forest friends are in the shared library: their drawings and
   peek-out (`forest_animals.dart`: `paintAnimalHead`, `ForestPeeker`), and their
   names, stories and round faces (`forest_friends.dart`: `kForestFriends`,
   `forestFriendFor`, `ForestHeadIcon`). Draw them with these, never a copy.

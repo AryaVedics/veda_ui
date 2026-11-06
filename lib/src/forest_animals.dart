@@ -31,7 +31,22 @@ enum ForestAnimal {
   horse,
   gorilla,
   dolphin,
+  // the next round
+  kiwi,
+  stork,
+  capybara,
+  camel,
+  penguin,
+  falcon,
+  monal,
 }
+
+/// The animals that come out to visit. A friend who is resting keeps a drawing
+/// and a story, but does not appear (Milo, for now).
+final List<ForestAnimal> kForestRotation = [
+  for (final a in ForestAnimal.values)
+    if (a != ForestAnimal.monkey) a,
+];
 
 /// The friend's name, for the share caption. Mei is the panda with her bamboo.
 String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
@@ -54,6 +69,13 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.horse => 'Tulpar',
   ForestAnimal.gorilla => 'Mugisha',
   ForestAnimal.dolphin => 'Thalassa',
+  ForestAnimal.kiwi => 'Aroha',
+  ForestAnimal.stork => 'Vesna',
+  ForestAnimal.capybara => 'Dengo',
+  ForestAnimal.camel => 'Karvan',
+  ForestAnimal.penguin => 'Eira',
+  ForestAnimal.falcon => 'Saqr',
+  ForestAnimal.monal => 'Danphe',
 };
 
 const _ink = Color(0xFF2A211C);
@@ -107,6 +129,20 @@ void paintAnimalHead(
       _gorilla(canvas);
     case ForestAnimal.dolphin:
       _dolphin(canvas);
+    case ForestAnimal.kiwi:
+      _kiwi(canvas);
+    case ForestAnimal.stork:
+      _stork(canvas);
+    case ForestAnimal.capybara:
+      _capybara(canvas);
+    case ForestAnimal.camel:
+      _camel(canvas);
+    case ForestAnimal.penguin:
+      _penguin(canvas);
+    case ForestAnimal.falcon:
+      _falcon(canvas);
+    case ForestAnimal.monal:
+      _monal(canvas);
   }
   canvas.restore();
 }
@@ -1115,6 +1151,474 @@ void _dolphin(Canvas canvas) {
   canvas.restore();
 }
 
+// ---- the next round
+
+void _kiwi(Canvas canvas) {
+  const feather = Color(0xFF8C6B44);
+  const dark = Color(0xFF6C5032);
+  const light = Color(0xFFB18C5C);
+  const beak = Color(0xFFEBD6A6);
+  // a fluffy ring of feathers, in two tones
+  for (var i = 0; i < 16; i++) {
+    final a = i * 2 * math.pi / 16;
+    _oval(
+      canvas,
+      Offset(math.cos(a) * 0.8, math.sin(a) * 0.74 - 0.04),
+      0.44,
+      0.28,
+      i.isEven ? feather : dark,
+      tilt: a + math.pi / 2,
+    );
+  }
+  _oval(canvas, const Offset(0, -0.04), 1.72, 1.6, feather);
+  _oval(canvas, const Offset(0, 0.06), 1.0, 0.9, light);
+  // a few streaks of feather
+  final streak = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 0.03
+    ..color = dark.withValues(alpha: 0.55);
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawLine(Offset(sd * 0.55, -0.5), Offset(sd * 0.62, -0.28), streak);
+    canvas.drawLine(Offset(sd * 0.3, -0.68), Offset(sd * 0.36, -0.5), streak);
+    canvas.drawLine(Offset(sd * 0.86, 0.1), Offset(sd * 0.9, 0.3), streak);
+  }
+  _eyes(canvas, gap: 0.62, y: -0.12, r: 0.08);
+  // the long, thin beak, with its nostril at the very tip
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(-0.15, 0.1),
+      Offset(0.15, 0.1),
+      Offset(0.09, 0.9),
+      Offset(0.0, 1.2),
+      Offset(-0.07, 0.9),
+    ]),
+    _fill(beak),
+  );
+  _disc(canvas, const Offset(0.0, 1.08), 0.022, const Color(0xFF9F8A5E));
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.55, 0.24), 0.2, 0.12, _blush);
+  }
+}
+
+void _stork(Canvas canvas) {
+  // drawn in profile, facing right, and moved and shrunk to sit in the same
+  // square as the rest
+  canvas.save();
+  canvas.translate(-0.34, 0.0);
+  canvas.scale(0.88);
+  const white = Color(0xFFFBFBF8);
+  const red = Color(0xFFE0523A);
+  const redDark = Color(0xFFBF3F2C);
+  const black = Color(0xFF2E2D33);
+  // the white neck, rising in a curve
+  canvas.drawPath(
+    Path()
+      ..moveTo(-0.14, 1.25)
+      ..cubicTo(-0.4, 0.62, 0.3, 0.4, 0.0, -0.1),
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.52
+      ..strokeCap = StrokeCap.round
+      ..color = white,
+  );
+  // a little black at the edge of the wing
+  _oval(canvas, const Offset(-0.38, 1.0), 0.3, 0.56, black, tilt: 0.3);
+  // the round white head
+  _disc(canvas, const Offset(0.04, -0.32), 0.46, white);
+  // the long red beak, straight and a little heavy
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0.38, -0.48),
+      Offset(1.5, -0.2),
+      Offset(1.46, -0.12),
+      Offset(0.4, -0.12),
+    ]),
+    _fill(red),
+  );
+  canvas.drawLine(
+    const Offset(0.44, -0.3),
+    const Offset(1.4, -0.17),
+    Paint()
+      ..strokeWidth = 0.03
+      ..strokeCap = StrokeCap.round
+      ..color = redDark,
+  );
+  // the eye, bright against the white, with its blush
+  _disc(canvas, const Offset(0.2, -0.4), 0.08, _ink);
+  _disc(canvas, const Offset(0.18, -0.43), 0.03, Colors.white);
+  _oval(canvas, const Offset(0.0, -0.18), 0.22, 0.12, _blush);
+  canvas.restore();
+}
+
+void _capybara(Canvas canvas) {
+  const brown = Color(0xFFA67B50);
+  const dark = Color(0xFF8A6340);
+  const muzzle = Color(0xFFCDA97E);
+  const nose = Color(0xFF4A3426);
+  // small round ears on top
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.62, -0.6), 0.18, brown);
+    _disc(canvas, Offset(sd * 0.62, -0.58), 0.1, const Color(0xFFC79A7B));
+  }
+  // a wide, blocky head
+  _oval(canvas, Offset.zero, 1.86, 1.52, brown);
+  _oval(canvas, const Offset(0, -0.36), 1.3, 0.5, dark.withValues(alpha: 0.5));
+  // the great blunt muzzle
+  _oval(canvas, const Offset(0, 0.36), 1.16, 0.8, muzzle);
+  _oval(canvas, const Offset(0, 0.12), 0.44, 0.24, nose);
+  _oval(canvas, const Offset(-0.06, 0.07), 0.12, 0.06, const Color(0x55FFFFFF));
+  // small, calm eyes, set wide
+  _eyes(canvas, gap: 0.86, y: -0.14, r: 0.075);
+  // whisker dots
+  for (final sd in [-1.0, 1.0]) {
+    for (final p in const [(0.22, 0.34), (0.34, 0.42), (0.18, 0.46)]) {
+      _disc(canvas, Offset(sd * p.$1, p.$2), 0.018, dark);
+    }
+  }
+  _smile(canvas, 0.52, w: 0.16);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.7, 0.2), 0.2, 0.12, _blush);
+  }
+  // a small orange sitting on his head, as capybaras are said to like
+  const fruit = Offset(0.0, -0.84);
+  _disc(canvas, fruit, 0.22, const Color(0xFFF2A238));
+  _disc(
+    canvas,
+    fruit + const Offset(-0.07, -0.07),
+    0.06,
+    const Color(0x66FFFFFF),
+  );
+  _oval(
+    canvas,
+    fruit + const Offset(0.1, -0.22),
+    0.16,
+    0.08,
+    const Color(0xFF7DB07E),
+    tilt: -0.5,
+  );
+}
+
+void _camel(Canvas canvas) {
+  // a Bactrian camel, the shaggy, two-humped kind of the steppe and the cold
+  // deserts of Mongolia and Central Asia: a thick coat, a woolly topknot and a
+  // beard
+  const fur = Color(0xFF8E6B46);
+  const furDark = Color(0xFF6D4F33);
+  const furLight = Color(0xFFB48B5C);
+  const face = Color(0xFFCDA672);
+  const muzzle = Color(0xFFE3C79B);
+  const pink = Color(0xFFEFB9A8);
+  // the two humps, rising behind the head
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.36, -1.02),
+      0.62,
+      0.7,
+      furDark,
+      tilt: sd * 0.12,
+    );
+    _oval(canvas, Offset(sd * 0.36, -1.0), 0.5, 0.56, fur, tilt: sd * 0.12);
+  }
+  // a shaggy ring of coat round the head, in two tones
+  for (var i = 0; i < 20; i++) {
+    final a = i * 2 * math.pi / 20;
+    _oval(
+      canvas,
+      Offset(math.cos(a) * 0.78, math.sin(a) * 0.9 + 0.02),
+      0.5,
+      0.3,
+      i.isEven ? fur : furDark,
+      tilt: a + math.pi / 2,
+    );
+  }
+  // little ears in the fur
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.56, -0.72), 0.17, fur);
+    _disc(canvas, Offset(sd * 0.56, -0.7), 0.09, pink);
+  }
+  _oval(canvas, const Offset(0, 0.0), 1.56, 1.9, fur);
+  // the woolly topknot between the ears
+  for (final dx in [-0.3, -0.15, 0.0, 0.15, 0.3]) {
+    _oval(
+      canvas,
+      Offset(dx, -0.9 + (dx.abs() * 0.3)),
+      0.34,
+      0.5,
+      dx.abs() > 0.2 ? fur : furLight,
+      tilt: dx * 0.9,
+    );
+  }
+  // the long, gentle face inside the coat
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.72),
+      Offset(0.5, -0.5),
+      Offset(0.58, 0.0),
+      Offset(0.48, 0.5),
+      Offset(0.34, 0.9),
+      Offset(0, 0.96),
+      Offset(-0.34, 0.9),
+      Offset(-0.48, 0.5),
+      Offset(-0.58, 0.0),
+      Offset(-0.5, -0.5),
+    ]),
+    _fill(face),
+  );
+  // heavy lids over the eyes, and the long lashes of a camel
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.34, -0.26),
+      0.3,
+      0.11,
+      furLight,
+      tilt: sd * -0.15,
+    );
+  }
+  _eyes(canvas, gap: 0.68, y: -0.12, r: 0.09);
+  final lash = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 0.028
+    ..color = _ink;
+  for (final sd in [-1.0, 1.0]) {
+    final e = Offset(sd * 0.34, -0.12);
+    canvas.drawLine(
+      e + Offset(sd * 0.1, -0.09),
+      e + Offset(sd * 0.17, -0.16),
+      lash,
+    );
+    canvas.drawLine(
+      e + Offset(sd * 0.04, -0.11),
+      e + Offset(sd * 0.07, -0.2),
+      lash,
+    );
+  }
+  // the soft, split muzzle
+  _oval(canvas, const Offset(0, 0.66), 0.74, 0.5, muzzle);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.13, 0.54),
+      0.1,
+      0.06,
+      const Color(0xFF7A5238),
+      tilt: sd * -0.5,
+    );
+    _oval(canvas, Offset(sd * 0.44, 0.24), 0.18, 0.11, _blush);
+  }
+  canvas.drawLine(
+    const Offset(0, 0.58),
+    const Offset(0, 0.78),
+    Paint()
+      ..strokeWidth = 0.025
+      ..strokeCap = StrokeCap.round
+      ..color = furLight,
+  );
+  _smile(canvas, 0.84, w: 0.13);
+  // the beard
+  for (final dx in [-0.26, -0.1, 0.1, 0.26]) {
+    _oval(
+      canvas,
+      Offset(dx, 1.0 - dx.abs() * 0.2),
+      0.26,
+      0.34,
+      dx.abs() > 0.2 ? furDark : fur,
+      tilt: dx * 0.6,
+    );
+  }
+}
+
+void _penguin(Canvas canvas) {
+  const black = Color(0xFF2B2E3A);
+  const white = Color(0xFFFAFAF7);
+  const beak = Color(0xFFF2A23C);
+  const patch = Color(0xFFF7CC5E);
+  // the round dark head
+  _oval(canvas, const Offset(0, -0.02), 1.72, 1.64, black);
+  // the white face, a heart round the eyes
+  _disc(canvas, const Offset(-0.3, -0.02), 0.46, white);
+  _disc(canvas, const Offset(0.3, -0.02), 0.46, white);
+  _oval(canvas, const Offset(0, 0.3), 0.92, 0.8, white);
+  // the warm patches at the sides of the head
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.78, 0.04), 0.2, 0.34, patch, tilt: sd * 0.2);
+  }
+  _eyes(canvas, gap: 0.5, y: -0.1, r: 0.088);
+  // a small, bright beak
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(-0.15, 0.08),
+      Offset(0.15, 0.08),
+      Offset(0.12, 0.28),
+      Offset(0.0, 0.42),
+      Offset(-0.12, 0.28),
+    ]),
+    _fill(beak),
+  );
+  _smile(canvas, 0.52, w: 0.12);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.5, 0.26), 0.2, 0.12, _blush);
+  }
+}
+
+void _falcon(Canvas canvas) {
+  const slate = Color(0xFF627086);
+  const slateDark = Color(0xFF465266);
+  const cream = Color(0xFFF5ECDD);
+  const cere = Color(0xFFF1CA4F);
+  const beak = Color(0xFF8E98A8);
+  // a ring of feather tufts, in two tones
+  for (var i = 0; i < 16; i++) {
+    final a = i * 2 * math.pi / 16;
+    _oval(
+      canvas,
+      Offset(math.cos(a) * 0.8, math.sin(a) * 0.74 - 0.04),
+      0.44,
+      0.28,
+      i.isEven ? slate : slateDark,
+      tilt: a + math.pi / 2,
+    );
+  }
+  _oval(canvas, const Offset(0, -0.04), 1.72, 1.62, slate);
+  // the darker cap
+  _oval(canvas, const Offset(0, -0.46), 1.3, 0.62, slateDark);
+  // the pale cheeks and throat
+  _disc(canvas, const Offset(-0.36, 0.22), 0.5, cream);
+  _disc(canvas, const Offset(0.36, 0.22), 0.5, cream);
+  _oval(canvas, const Offset(0, 0.52), 0.94, 0.78, cream);
+  // the dark moustache stripe under each eye
+  final stripe = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 0.1
+    ..color = const Color(0xFF2B2F3B);
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(sd * 0.4, 0.04)
+        ..quadraticBezierTo(sd * 0.5, 0.3, sd * 0.36, 0.58),
+      stripe,
+    );
+  }
+  // big dark eyes, each in a pale ring
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.31, -0.1), 0.15, const Color(0xFFF3E1A6));
+    _bigEye(canvas, Offset(sd * 0.31, -0.1), 0.1);
+  }
+  // the hooked beak, with its yellow cere
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(-0.14, 0.2),
+      Offset(0.14, 0.2),
+      Offset(0.1, 0.46),
+      Offset(0.0, 0.7),
+      Offset(-0.08, 0.5),
+    ]),
+    _fill(beak),
+  );
+  _oval(canvas, const Offset(0, 0.22), 0.3, 0.14, cere);
+  for (final sd in [-1.0, 1.0]) {
+    _disc(canvas, Offset(sd * 0.05, 0.22), 0.016, const Color(0xFF8A6B22));
+  }
+}
+
+void _monal(Canvas canvas) {
+  // the male Himalayan monal, in profile, facing right, and moved and shrunk to
+  // sit in the same square as the rest: a shining green head with a crest of
+  // little paddles, a blue patch round the eye, a neck that runs from fire to
+  // gold, and the violet of his back below
+  canvas.save();
+  canvas.translate(-0.2, 0.06);
+  canvas.scale(0.84);
+  const violet = Color(0xFF6A55D6);
+  const blue = Color(0xFF3F7FE0);
+  const teal = Color(0xFF2FA8A0);
+  // the neck: red under the head, through orange, to gold
+  canvas.drawPath(
+    Path()
+      ..moveTo(0.04, 0.6)
+      ..quadraticBezierTo(-0.08, 0.22, 0.0, -0.2),
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.68
+      ..strokeCap = StrokeCap.round
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFC92F2F), Color(0xFFEE7A2B), Color(0xFFF4C542)],
+        stops: [0.25, 0.62, 1],
+      ).createShader(const Rect.fromLTRB(-0.5, -0.3, 0.5, 0.74)),
+  );
+  // the pale collar over the foot of the neck, and the violet back rising
+  // behind it, so the neck grows out of the bird
+  _oval(canvas, const Offset(0.02, 0.6), 1.04, 0.32, const Color(0xFF9CC9B8));
+  _oval(canvas, const Offset(-0.04, 1.0), 1.56, 0.7, violet);
+  _oval(canvas, const Offset(-0.4, 0.96), 0.56, 0.28, blue, tilt: 0.3);
+  // the crest: thin stems curling back, each ending in a little paddle
+  final stem = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 0.035
+    ..color = const Color(0xFF1F8C64);
+  for (final c in const [
+    (Offset(0.1, -0.84), Offset(0.14, -1.14), Offset(-0.02, -1.3)),
+    (Offset(-0.02, -0.84), Offset(-0.04, -1.1), Offset(-0.24, -1.22)),
+    (Offset(-0.12, -0.8), Offset(-0.2, -1.0), Offset(-0.44, -1.06)),
+    (Offset(-0.2, -0.74), Offset(-0.34, -0.86), Offset(-0.58, -0.84)),
+  ]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(c.$1.dx, c.$1.dy)
+        ..quadraticBezierTo(c.$2.dx, c.$2.dy, c.$3.dx, c.$3.dy),
+      stem,
+    );
+    _oval(
+      canvas,
+      c.$3,
+      0.2,
+      0.11,
+      const Color(0xFF39C486),
+      tilt: (c.$3 - c.$2).direction,
+    );
+  }
+  // the round head, shining
+  canvas.drawCircle(
+    const Offset(0.02, -0.38),
+    0.52,
+    Paint()
+      ..shader =
+          const RadialGradient(
+            center: Alignment(-0.25, -0.5),
+            radius: 1,
+            colors: [Color(0xFF6FE7A0), Color(0xFF1F9C6E), Color(0xFF137066)],
+            stops: [0, 0.55, 1],
+          ).createShader(
+            Rect.fromCircle(center: const Offset(0.02, -0.38), radius: 0.52),
+          ),
+  );
+  // a touch of teal where the head meets the neck
+  _oval(canvas, const Offset(-0.06, -0.02), 0.54, 0.16, teal);
+  // the short, curved bill
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0.44, -0.5),
+      Offset(0.76, -0.42),
+      Offset(0.9, -0.22),
+      Offset(0.72, -0.24),
+      Offset(0.44, -0.24),
+    ]),
+    _fill(const Color(0xFFD9D3C2)),
+  );
+  // the bright blue skin round the eye, and the eye itself
+  _disc(canvas, const Offset(0.22, -0.42), 0.17, blue);
+  _bigEye(canvas, const Offset(0.23, -0.42), 0.1);
+  _oval(canvas, const Offset(0.1, -0.16), 0.2, 0.11, const Color(0xAAFFA08F));
+  canvas.restore();
+}
+
 /// Every so often one animal peeks out from the dense foliage round the rim of
 /// the dial, looks in at the clearing, and ducks back. Never while the phone
 /// asks for reduced motion, while another page or sheet is on top, or while the
@@ -1437,7 +1941,7 @@ class _ForestPeekerState extends State<ForestPeeker>
     } else {
       _lastWasPair = false;
       final pool = [
-        for (final a in ForestAnimal.values)
+        for (final a in kForestRotation)
           if (a != _last) a,
       ];
       final animal = pool[_rnd.nextInt(pool.length)];

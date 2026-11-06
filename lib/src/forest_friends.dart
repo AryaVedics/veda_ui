@@ -96,15 +96,6 @@ const kForestFriends = [
         'others secretly envy her.',
   ),
   ForestFriend(
-    ForestAnimal.monkey,
-    'Milo',
-    'The giggler',
-    'Milo swings from vine to vine and is always the first to spot a new '
-        'butterfly. He is hopeless at hide and seek, because he cannot stop '
-        'giggling the moment anyone gets close. He peeks in at the clearing more '
-        'than anyone, just to check that everything is lovely.',
-  ),
-  ForestFriend(
     ForestAnimal.peacock,
     'Nazm',
     'The poet with a soft heart',
@@ -243,11 +234,109 @@ const kForestFriends = [
         'never stopped being curious.',
     means: 'Thalassa means "sea" in Greek.',
   ),
+  // the next round: drafts for the owner to approve, names to be checked by
+  // someone who speaks each language
+  ForestFriend(
+    ForestAnimal.kiwi,
+    'Aroha',
+    'The shy night walker',
+    'Aroha is a kiwi, a small round bird from the islands far to the south-east, '
+        'who likes the evening better than the day. She snuffles through the '
+        'leaves with her long beak, humming, and finds the best things by smell '
+        'rather than sight. She is shy until she knows you, and then she '
+        'follows you everywhere, one step behind.',
+    means: 'Aroha means "love" in Māori.',
+  ),
+  ForestFriend(
+    ForestAnimal.stork,
+    'Vesna',
+    'The spring bringer',
+    'Vesna arrives every year just as the cold lets go, flying in from far '
+        'away with her long legs trailing behind her. She builds her nest on the '
+        'highest chimney in the village and stands on one leg, keeping watch '
+        'over everything below. When she is back, everyone knows the days are '
+        'about to get longer.',
+    means: 'Vesna means "spring" in several Slavic languages.',
+  ),
+  ForestFriend(
+    ForestAnimal.capybara,
+    'Dengo',
+    'The friend to everyone',
+    'Dengo is so calm that other animals sit on him, and he has never once '
+        'minded. Birds nap on his back, a small orange sits on his head, and he '
+        'floats through the day as if nothing could ever be urgent. He is the '
+        'friend you go to when you simply want to sit beside someone.',
+    means: 'Dengo is Brazilian Portuguese for tender, cuddly affection.',
+  ),
+  ForestFriend(
+    ForestAnimal.camel,
+    'Karvan',
+    'The steady traveller',
+    'Karvan is a Bactrian camel, the shaggy, two-humped kind from the steppe '
+        'and the cold deserts. He has walked more miles than anyone can count, '
+        'one slow, even step at a time. His two humps are his pantry, he says, '
+        'and his thick winter coat is the best coat there is. He never hurries, '
+        'because he knows how far it is, and never stops.',
+    means: 'Karvan means "caravan" in Persian.',
+  ),
+  ForestFriend(
+    ForestAnimal.penguin,
+    'Eira',
+    'The far visitor',
+    'Eira comes from the very bottom of the world, where the ice goes on for '
+        'ever and the stars are never shy. She waddles instead of walking and '
+        'slides whenever she can, and she brings a little cold air and a great '
+        'deal of joy. She thinks the forest is wonderfully warm, and says so, '
+        'often.',
+    means: 'Eira means "snow" in Welsh.',
+  ),
+  ForestFriend(
+    ForestAnimal.falcon,
+    'Saqr',
+    'The patient watcher',
+    'Saqr watches the world from the highest perch he can find, and sees '
+        'everything long before the others do. He is very quick, but he is '
+        'also patient: he will sit as still as it takes, and he trusts the '
+        'friend who holds out a glove to him. In his part of the world a falcon '
+        'and a falconer are old and proud partners, and he says the best '
+        'flights begin with waiting.',
+    means: 'Saqr means "falcon" in Arabic.',
+  ),
+  ForestFriend(
+    ForestAnimal.monal,
+    'Danphe',
+    'The dance master',
+    'Danphe is the dance master of the forest. He came down from the mountains '
+        'of Nepal wearing every colour he could find, and by day he is quiet and '
+        'a little shy about them. But when night falls he climbs to Starlight '
+        'Hill and dances under the stars, his crest bobbing and his feathers '
+        'catching every bit of light. Tara sits close by and gazes on, never '
+        'taking her eyes off him. From far away, all the other friends watch the '
+        'dance shimmering on the hill, entranced, until one by one they drift '
+        'off into a dream.',
+    means:
+        'Danphe is the Nepali name for the Himalayan monal, the national bird '
+        'of Nepal.',
+  ),
+];
+
+/// Friends who are resting: not on any card and not out visiting (see
+/// kForestRotation), with their stories kept for when they come back.
+const kRestingFriends = [
+  ForestFriend(
+    ForestAnimal.monkey,
+    'Milo',
+    'The giggler',
+    'Milo swings from vine to vine and is always the first to spot a new '
+        'butterfly. He is hopeless at hide and seek, because he cannot stop '
+        'giggling the moment anyone gets close. He peeks in at the clearing more '
+        'than anyone, just to check that everything is lovely.',
+  ),
 ];
 
 /// The friend for an animal that peeks out; Mei is the panda with her bamboo.
 ForestFriend? forestFriendFor(ForestAnimal animal, {bool special = false}) {
-  for (final f in kForestFriends) {
+  for (final f in [...kForestFriends, ...kRestingFriends]) {
     if (f.animal == animal && f.special == special) return f;
   }
   return null;
