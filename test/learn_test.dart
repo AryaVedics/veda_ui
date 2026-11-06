@@ -97,6 +97,19 @@ void main() {
       }
     });
 
+    test('every ingredient says what kind of product carries it', () {
+      final defs = learnEntriesIn(LearnCategory.ingredients);
+      expect(defs.length, greaterThanOrEqualTo(10));
+      for (final e in defs) {
+        final text = e.body.toLowerCase();
+        expect(
+          text.contains('found in') || text.contains('used in'),
+          isTrue,
+          reason: '${e.id}: a definition names the kind of product',
+        );
+      }
+    });
+
     test('only sources we can stand behind are named', () {
       const allowed = {
         'American Academy of Dermatology Association',

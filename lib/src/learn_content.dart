@@ -1,3 +1,4 @@
+// Copy of Véda's template (flutter_app/lib/data/learn_content.dart). Keep in step.
 // The Learn section's content: short, general notes about everyday skin habits
 // and good-to-know facts, grouped by theme.
 //
@@ -6,9 +7,10 @@
 //     diagnose or tell anyone what to do with their skin. Notes say what is
 //     commonly known or commonly done ("many people", "many dermatologists
 //     suggest"), never "you should".
-//   - No products, brands, doses or supplements. Ingredients (retinol,
-//     vitamin A and the like) are NOT here: they are held back until a clinician
-//     and the lawyer have read them.
+//   - No brands, doses or supplements. Ingredients appear only as plain
+//     definitions in their own theme, each with the KIND of product that
+//     carries it ("found in many acne cleansers"), never a brand, a claim or
+//     a recommendation.
 //   - A source is named only where one clearly applies.
 //   - Warm in tone, like the rest of the app.
 //
@@ -61,7 +63,8 @@ const List<LearnEntry> kLearnEntries = [
     title: 'Retinol',
     body:
         'A form of vitamin A used in skin-care products. Its strength and form '
-        'vary from product to product. Retinoids are known to carry risks in '
+        'vary from product to product. It is found in some night creams, serums '
+        'and moisturisers. Retinoids are known to carry risks in '
         'pregnancy, and many guidelines advise speaking with a doctor before '
         'using them while pregnant or trying to conceive.',
   ),
@@ -71,7 +74,8 @@ const List<LearnEntry> kLearnEntries = [
     title: 'Niacinamide',
     body:
         'Another name for vitamin B3, a nutrient that is also used in some '
-        'skin-care products.',
+        'skin-care products. It is found in many serums, moisturisers and '
+        'toners.',
   ),
   LearnEntry(
     id: 'ingredient-vitamin-c',
@@ -79,7 +83,146 @@ const List<LearnEntry> kLearnEntries = [
     title: 'Vitamin C (in skin care)',
     body:
         'Also called ascorbic acid. An ingredient used in some skin-care '
-        'products, often in the form of L-ascorbic acid.',
+        'products, often in the form of L-ascorbic acid. It is found in many '
+        'serums and some moisturisers.',
+  ),
+  LearnEntry(
+    id: 'ingredient-hyaluronic-acid',
+    category: LearnCategory.ingredients,
+    title: 'Hyaluronic acid',
+    body:
+        'A molecule the body makes itself that holds a great deal of '
+        'water. It is found in many serums, moisturisers and masks.',
+  ),
+  LearnEntry(
+    id: 'ingredient-salicylic-acid',
+    category: LearnCategory.ingredients,
+    title: 'Salicylic acid',
+    body:
+        'A beta hydroxy acid, often shortened to BHA. It is found in many '
+        'acne products, such as cleansers, toners and spot products, and '
+        'in some exfoliating products.',
+  ),
+  LearnEntry(
+    id: 'ingredient-alpha-hydroxy-acids',
+    category: LearnCategory.ingredients,
+    title: 'Glycolic acid and lactic acid',
+    body:
+        'Two of the alpha hydroxy acids, often shortened to AHAs. They are '
+        'found in many exfoliating toners, serums and peels.',
+  ),
+  LearnEntry(
+    id: 'ingredient-benzoyl-peroxide',
+    category: LearnCategory.ingredients,
+    title: 'Benzoyl peroxide',
+    body:
+        'A compound used in many acne products, such as washes, gels and '
+        'spot products.',
+  ),
+  LearnEntry(
+    id: 'ingredient-azelaic-acid',
+    category: LearnCategory.ingredients,
+    title: 'Azelaic acid',
+    body:
+        'An acid that occurs naturally in grains such as barley and wheat, '
+        'and is also made in laboratories. It is found in some creams and '
+        'gels made for blemish-prone skin.',
+  ),
+  LearnEntry(
+    id: 'ingredient-tretinoin',
+    category: LearnCategory.ingredients,
+    title: 'Tretinoin',
+    body:
+        'A retinoid, a form of vitamin A, that is available on '
+        'prescription. It is found in prescription creams and gels. Retinoids are known to '
+        'carry risks in pregnancy, and many guidelines advise speaking '
+        'with a doctor before using them while pregnant or trying to '
+        'conceive.',
+  ),
+  LearnEntry(
+    id: 'ingredient-bakuchiol',
+    category: LearnCategory.ingredients,
+    title: 'Bakuchiol',
+    body:
+        'An ingredient taken from the seeds of a plant, used in some '
+        'serums and moisturisers.',
+  ),
+  LearnEntry(
+    id: 'ingredient-ceramides',
+    category: LearnCategory.ingredients,
+    title: 'Ceramides',
+    body:
+        'Fats that occur naturally in the outer layer of skin. They are '
+        'found in many moisturisers and cleansers.',
+  ),
+  LearnEntry(
+    id: 'ingredient-peptides',
+    category: LearnCategory.ingredients,
+    title: 'Peptides',
+    body:
+        'Short chains of amino acids, the building blocks of proteins. '
+        'They are found in some serums and moisturisers.',
+  ),
+  LearnEntry(
+    id: 'ingredient-glycerin',
+    category: LearnCategory.ingredients,
+    title: 'Glycerin',
+    body:
+        'A common ingredient that attracts water. It is found in a very '
+        'wide range of products, including cleansers, moisturisers and lip '
+        'balms.',
+  ),
+  LearnEntry(
+    id: 'ingredient-panthenol',
+    category: LearnCategory.ingredients,
+    title: 'Panthenol',
+    body:
+        'A form of vitamin B5. It is found in many moisturisers, lip balms '
+        'and hair products.',
+  ),
+  LearnEntry(
+    id: 'ingredient-squalane',
+    category: LearnCategory.ingredients,
+    title: 'Squalane',
+    body:
+        'A light oil, often made from olives or sugar cane. It is found in '
+        'some moisturisers and facial oils.',
+  ),
+  LearnEntry(
+    id: 'ingredient-petrolatum',
+    category: LearnCategory.ingredients,
+    title: 'Petrolatum',
+    body:
+        'A soft, jelly-like substance made from petroleum. It is found in '
+        'many ointments, lip balms and moisturisers.',
+  ),
+  LearnEntry(
+    id: 'ingredient-mineral-filters',
+    category: LearnCategory.ingredients,
+    title: 'Zinc oxide and titanium dioxide',
+    body:
+        'Two minerals used as sunscreen filters, often called the mineral '
+        'filters. They are found in many sunscreens, and in some tinted '
+        'moisturisers and makeup that list an SPF.',
+  ),
+  LearnEntry(
+    id: 'ingredient-chemical-filters',
+    category: LearnCategory.ingredients,
+    title: 'Chemical sunscreen filters',
+    body:
+        'A group of ingredients, such as avobenzone and oxybenzone, that '
+        'are used as filters in sunscreens. They are found in many '
+        'sunscreens, and in some moisturisers and makeup that list an SPF.',
+  ),
+  LearnEntry(
+    id: 'ingredient-fragrance',
+    category: LearnCategory.ingredients,
+    title: 'Fragrance',
+    body:
+        'On an ingredient list, fragrance (or parfum) is a general word '
+        'for the scented parts of a product, and it can stand for many '
+        'different ingredients. It is found in many cleansers, '
+        'moisturisers and body products.',
   ),
   // ---- sleep and rest
   LearnEntry(
