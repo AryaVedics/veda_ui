@@ -6,9 +6,9 @@
 // notes closed to their titles; an open note offers "Also see" links to notes
 // that go with it, and a bookmark to keep it for later.
 //
-// It is reached from the "Learn" row (at the top of Trends in Véda, where it
+// It is reached from the "Education" row (at the top of Trends in Véda, where it
 // sits above the scores on purpose, and on the Shelf and Profile in Routine)
-// and from the "Learn" item in the logo menu.
+// and from the "Education" item in the logo menu.
 //
 // Everything here is descriptive, never advice (see learn_content.dart for the
 // rules, and consent_screen.dart / score_info_screen.dart for the "not a
