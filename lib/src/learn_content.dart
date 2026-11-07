@@ -1,4 +1,5 @@
 // Copy of Véda's template (flutter_app/lib/data/learn_content.dart). Keep in step.
+//
 // The Learn section's content: short, general notes about everyday skin habits
 // and good-to-know facts, grouped by theme.
 //
@@ -24,7 +25,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 enum LearnGroup {
   skin('Your skin'),
   everyday('Everyday life'),
-  products('Products and labels');
+  products('Products and labels'),
+  food('Food and nutrition');
 
   const LearnGroup(this.title);
 
@@ -99,6 +101,24 @@ enum LearnCategory {
     'What common ingredients are, and where they turn up.',
     LearnGroup.products,
     PhosphorIconsThin.flask,
+  ),
+  foodLabels(
+    'Food labels',
+    'What the words and numbers on a food pack mean.',
+    LearnGroup.food,
+    PhosphorIconsThin.tag,
+  ),
+  portions(
+    'Portions and serving sizes',
+    'Servings, portions and why weights differ.',
+    LearnGroup.food,
+    PhosphorIconsThin.scales,
+  ),
+  nutrients(
+    'Protein, fibre and fats',
+    'What the main parts of food are.',
+    LearnGroup.food,
+    PhosphorIconsThin.bowlFood,
   );
 
   const LearnCategory(this.title, this.blurb, this.group, this.icon);
@@ -129,6 +149,18 @@ class LearnEntry {
   /// Where this comes from, when one source clearly stands behind it.
   final List<String> sources;
 }
+
+/// The note about each of the seven measurements, by the measurement's key
+/// (see metric_info.dart). The score page links to these.
+const Map<String, String> kMetricNoteIds = {
+  'redness': 'readings-m-redness',
+  'texture': 'readings-m-texture',
+  'pores': 'readings-m-pores',
+  'spots': 'readings-m-spots',
+  'acne': 'readings-m-acne',
+  'evenness': 'readings-m-evenness',
+  'wrinkles': 'readings-m-wrinkles',
+};
 
 const _aad = 'American Academy of Dermatology Association';
 const _who = 'World Health Organization, Global Solar UV Index';
@@ -666,6 +698,76 @@ const List<LearnEntry> kLearnEntries = [
         'describe how skin looks in a photo, nothing more.',
   ),
   LearnEntry(
+    id: 'readings-m-redness',
+    category: LearnCategory.readings,
+    title: 'What the Redness measurement looks at',
+    body:
+        'Redness in a photo is the pink or red that sits over skin '
+        'tone. Warm rooms, exercise, a hot drink, a flush of feeling '
+        'or rubbed skin can all show up as more redness for a while, '
+        'and it often settles on its own.',
+  ),
+  LearnEntry(
+    id: 'readings-m-texture',
+    category: LearnCategory.readings,
+    title: 'What the Texture measurement looks at',
+    body:
+        'Texture looks at how even the surface of skin appears: small '
+        'bumps, dry flaking and rough patches. Light from the side '
+        'makes the surface look rougher, and dry air or a recent wash '
+        'can change how smooth it looks that day.',
+  ),
+  LearnEntry(
+    id: 'readings-m-pores',
+    category: LearnCategory.readings,
+    title: 'What the Pores measurement looks at',
+    body:
+        'The Pores measurement looks at how visible the small '
+        'openings in skin are. Pores look larger in close, bright '
+        'light and on warm days, and most visible on the nose and '
+        'cheeks, where skin makes more oil.',
+  ),
+  LearnEntry(
+    id: 'readings-m-spots',
+    category: LearnCategory.readings,
+    title: 'What the Spots measurement looks at',
+    body:
+        'Spots looks for small areas that are darker than the skin '
+        'around them. Sun exposure is a common reason skin makes '
+        'darker patches, and a spot that looks darker in one photo '
+        'may simply be a shadow or a mark of the light.',
+  ),
+  LearnEntry(
+    id: 'readings-m-acne',
+    category: LearnCategory.readings,
+    title: 'What the Acne measurement looks at',
+    body:
+        'The Acne measurement looks for inflamed bumps that are '
+        'active now. It is separate from marks left behind after a '
+        'breakout, which belong to Spots and Evenness. It describes '
+        'what a photo shows and is not a medical assessment.',
+  ),
+  LearnEntry(
+    id: 'readings-m-evenness',
+    category: LearnCategory.readings,
+    title: 'What the Evenness measurement looks at',
+    body:
+        'Evenness looks at how uniform skin colour is across the '
+        'face, apart from spots. Uneven light, a tan line or makeup '
+        'at the edge can move it, which is one reason the same '
+        'lighting each time makes readings easier to compare.',
+  ),
+  LearnEntry(
+    id: 'readings-m-wrinkles',
+    category: LearnCategory.readings,
+    title: 'What the Wrinkles measurement looks at',
+    body:
+        'Wrinkles looks at fine lines and creases, mostly around the '
+        'eyes and forehead. Lines look deeper in strong side light '
+        'and when skin is dry, and they look softer in even light, so '
+        'lighting changes this one a lot.',
+  ),
+  LearnEntry(
     id: 'sun-monsoon',
     category: LearnCategory.sun,
     title: 'Rainy and humid seasons',
@@ -673,6 +775,91 @@ const List<LearnEntry> kLearnEntries = [
         'In a rainy season the air is heavy with moisture, and skin '
         'often feels oilier and stickier because sweat stays on it '
         'longer. Cloud still lets a good share of UV through.',
+  ),
+  LearnEntry(
+    id: 'sun-rainy-damp',
+    category: LearnCategory.sun,
+    title: 'Rainy-season humidity and damp clothes',
+    body:
+        'When the air stays wet for weeks, damp clothes, towels and '
+        'shoes take longer to dry. Skin that stays damp inside them can '
+        'feel sticky or irritated, and many people notice it most where '
+        'fabric rubs or folds.',
+  ),
+  LearnEntry(
+    id: 'sun-rainy-oil',
+    category: LearnCategory.sun,
+    title: 'Why skin can look shinier in humid weather',
+    body:
+        'In very humid air, sweat does not evaporate easily, so a '
+        'film of moisture and oil can sit on the surface. A shine at the '
+        'forehead and nose is common in humid seasons and says little '
+        'about skin type.',
+  ),
+  LearnEntry(
+    id: 'sun-heated-rooms',
+    category: LearnCategory.sun,
+    title: 'Heated rooms dry the air',
+    body:
+        'Indoor heating warms the air without adding moisture, so the '
+        'air inside can be drier than the cold air outdoors. Many people '
+        'find their skin feels tighter in the heating season.',
+  ),
+  LearnEntry(
+    id: 'sun-cooled-rooms',
+    category: LearnCategory.sun,
+    title: 'Air conditioning dries indoor air too',
+    body:
+        'Cooling air pulls moisture out of it. After long hours in an '
+        'air-conditioned room, many people notice skin and lips feeling '
+        'drier than they do in the open air of the same day.',
+  ),
+  LearnEntry(
+    id: 'sun-hot-dry',
+    category: LearnCategory.sun,
+    title: 'Hot, dry weather and skin feel',
+    body:
+        'Where heat comes with dry air, sweat dries almost as fast as '
+        'it appears, which can feel cooling while skin loses water '
+        'quietly. Dust and wind often come with it.',
+  ),
+  LearnEntry(
+    id: 'sun-wind',
+    category: LearnCategory.sun,
+    title: 'Wind and exposed skin',
+    body:
+        'Wind carries moisture away from skin faster than still air '
+        'does, and it can leave cheeks and lips feeling rough. Skin '
+        'that is bare to wind and cold at once often shows it first.',
+  ),
+  LearnEntry(
+    id: 'sun-height',
+    category: LearnCategory.sun,
+    title: 'Higher places, stronger UV',
+    body:
+        'The thinner air at height filters less sunlight, so UV rises '
+        'the higher a place is. Mountain days can bring more UV than '
+        'the same hour at sea level.',
+    sources: [_who],
+  ),
+  LearnEntry(
+    id: 'sun-bounce',
+    category: LearnCategory.sun,
+    title: 'Snow, water and sand reflect UV',
+    body:
+        'Bright surfaces bounce UV back up toward the face, so skin '
+        'can receive it from below as well as from above. Snow reflects '
+        'much of it, water and sand somewhat less.',
+    sources: [_aad],
+  ),
+  LearnEntry(
+    id: 'sun-turning',
+    category: LearnCategory.sun,
+    title: 'When the season turns',
+    body:
+        'Skin takes a little while to settle into a new season. Many '
+        'people notice it feeling different for a week or two as the '
+        'weather changes, and readings can move a little with it.',
   ),
   LearnEntry(
     id: 'sun-air',
@@ -1006,6 +1193,133 @@ const List<LearnEntry> kLearnEntries = [
         'with a doctor before using them while pregnant or trying to '
         'conceive.',
   ),
+  LearnEntry(
+    id: 'food-label-serving',
+    category: LearnCategory.foodLabels,
+    title: 'The serving size sets every other number',
+    body:
+        'The numbers on a nutrition label are for one serving, not '
+        'for the whole pack. A pack often holds more than one '
+        'serving, so eating all of it means more than the label '
+        'shows.',
+  ),
+  LearnEntry(
+    id: 'food-label-order',
+    category: LearnCategory.foodLabels,
+    title: 'Ingredients are listed from most to least',
+    body:
+        'In many countries the ingredients on a pack are listed by '
+        'weight, with the largest amount first. The first few names '
+        'tell most of the story of what a food is made of.',
+  ),
+  LearnEntry(
+    id: 'food-label-sugars',
+    category: LearnCategory.foodLabels,
+    title: 'Total sugars and added sugars are different lines',
+    body:
+        'Total sugars include those found naturally in fruit and '
+        'milk. Where a label also shows added sugars, that line '
+        'counts only the sugars put in while the food was made.',
+  ),
+  LearnEntry(
+    id: 'food-label-front',
+    category: LearnCategory.foodLabels,
+    title: 'The front of a pack is not the nutrition label',
+    body:
+        'Words on the front, such as light, natural or wholesome, can '
+        'mean different things in different places. The numbers and '
+        'the ingredient list on the back are where the details are.',
+  ),
+  LearnEntry(
+    id: 'food-label-per100',
+    category: LearnCategory.foodLabels,
+    title: 'Per 100 grams lets two foods be compared',
+    body:
+        'Many labels give amounts per 100 grams as well as per '
+        'serving. Because the amount is the same for every pack, two '
+        'foods of different sizes can be compared side by side.',
+  ),
+  LearnEntry(
+    id: 'portion-vs-serving',
+    category: LearnCategory.portions,
+    title: 'A portion and a serving are not always the same',
+    body:
+        'A serving is the amount a label uses for its numbers. A '
+        'portion is the amount a person actually puts on the plate, '
+        'which may be smaller or larger.',
+  ),
+  LearnEntry(
+    id: 'portion-dish-size',
+    category: LearnCategory.portions,
+    title: 'Bigger plates and bowls tend to hold more',
+    body:
+        'Many people serve more food onto a larger plate or bowl '
+        'without noticing. The same meal can look small on a big '
+        'plate and generous on a small one.',
+  ),
+  LearnEntry(
+    id: 'portion-dry-cooked',
+    category: LearnCategory.portions,
+    title: 'Dry and cooked weights are not the same',
+    body:
+        'Rice, pasta and lentils soak up water as they cook, so '
+        'cooked food weighs more than dry food for the same amount of '
+        'energy. That is why a recipe says whether it weighs things '
+        'raw or cooked.',
+  ),
+  LearnEntry(
+    id: 'portion-measures',
+    category: LearnCategory.portions,
+    title: 'Cups and spoons are rough, scales are steadier',
+    body:
+        'A cup of flour can weigh quite different amounts depending '
+        'on how it is scooped. A kitchen scale gives the same answer '
+        'each time, which is why many recipes give grams.',
+  ),
+  LearnEntry(
+    id: 'nutrient-protein',
+    category: LearnCategory.nutrients,
+    title: 'What protein is',
+    body:
+        'Protein is made of building blocks called amino acids. It '
+        'turns up in beans, lentils, eggs, dairy, fish, meat and '
+        'nuts, and gives about 4 calories per gram.',
+  ),
+  LearnEntry(
+    id: 'nutrient-fibre',
+    category: LearnCategory.nutrients,
+    title: 'What fibre is',
+    body:
+        'Fibre is the part of plant foods that the body does not '
+        'break down for energy. Whole grains, beans, fruit and '
+        'vegetables are common sources.',
+  ),
+  LearnEntry(
+    id: 'nutrient-fat',
+    category: LearnCategory.nutrients,
+    title: 'Fat holds the most energy per gram',
+    body:
+        'Fat gives about 9 calories per gram, more than twice the 4 '
+        'calories in a gram of protein or of carbohydrate. That is '
+        'why oils and nuts are small in weight but large in energy.',
+  ),
+  LearnEntry(
+    id: 'nutrient-carbs',
+    category: LearnCategory.nutrients,
+    title: 'Carbohydrates include sugars, starches and fibre',
+    body:
+        'Carbohydrate is a family: sugars, starches and fibre. Bread, '
+        'rice, fruit and potatoes all contain it in different mixes.',
+  ),
+  LearnEntry(
+    id: 'nutrient-water',
+    category: LearnCategory.nutrients,
+    title: 'Water adds weight but not energy',
+    body:
+        'Soup, fruit and cooked greens are heavy because of the water '
+        'in them, and low in energy for their weight. Dry or oily '
+        'foods hold far more energy in the same weight.',
+  ),
 ];
 
 /// Clusters of notes that belong together. Each note's "Also see" links are the
@@ -1092,6 +1406,7 @@ List<LearnEntry> learnSearch(String query, {int limit = 40}) {
   final inTitle = <LearnEntry>[];
   final inText = <LearnEntry>[];
   for (final e in kLearnEntries) {
+    if (!learnGroupsShown.contains(e.category.group)) continue;
     final title = e.title.toLowerCase();
     final rest = '${e.body} ${e.category.title}'.toLowerCase();
     if (words.every(title.contains)) {
@@ -1105,6 +1420,8 @@ List<LearnEntry> learnSearch(String query, {int limit = 40}) {
 
 /// The themes whose notes are definitions, so the A to Z lists them.
 const Set<LearnCategory> kGlossaryThemes = {
+  LearnCategory.nutrients,
+  LearnCategory.foodLabels,
   LearnCategory.skinBasics,
   LearnCategory.productTypes,
   LearnCategory.labels,
@@ -1117,7 +1434,9 @@ String _sortKey(String title) =>
 /// The definitions in alphabetical order, for the A to Z.
 List<LearnEntry> learnGlossary() => [
   for (final e in kLearnEntries)
-    if (kGlossaryThemes.contains(e.category)) e,
+    if (kGlossaryThemes.contains(e.category) &&
+        learnGroupsShown.contains(e.category.group))
+      e,
 ]..sort((a, b) => _sortKey(a.title).compareTo(_sortKey(b.title)));
 
 /// The letter a glossary entry is filed under.
@@ -1129,6 +1448,20 @@ String learnGlossaryLetter(LearnEntry e) {
 /// Who read the notes, if the owner wants a line saying so on the "Where these
 /// notes come from" page: set it only when it is true, for example 'Dr. A.'.
 const String? kLearnReviewedBy = null;
+
+/// Which groups of themes an app shows. A skin app shows the skin groups, a
+/// food app (Kitchen, Lifestyle) sets this to just [LearnGroup.food] in main().
+Set<LearnGroup> learnGroupsShown = {
+  LearnGroup.skin,
+  LearnGroup.everyday,
+  LearnGroup.products,
+};
+
+/// The themes this app shows, in the order written.
+List<LearnCategory> learnCategoriesShown() => [
+  for (final c in LearnCategory.values)
+    if (learnGroupsShown.contains(c.group)) c,
+];
 
 /// The entries of one theme, in the order written.
 List<LearnEntry> learnEntriesIn(LearnCategory category) => [
@@ -1142,4 +1475,35 @@ LearnEntry? learnEntry(String id) {
     if (e.id == id) return e;
   }
   return null;
+}
+
+/// The note shown as "Did you know?" on [day]: the same one all day, a different
+/// one tomorrow, every note once before any repeats. The skin-care ingredient
+/// notes are left out, so a daily note never reads like a product pointer.
+LearnEntry learnNoteOfDay(DateTime day) {
+  final pool = [
+    for (final e in kLearnEntries)
+      if (e.category != LearnCategory.ingredients &&
+          learnGroupsShown.contains(e.category.group))
+        e,
+  ];
+  final n = pool.length;
+  // a step that shares no factor with n, so the walk visits every note
+  var step = (n * 0.618).round();
+  int gcd(int a, int b) => b == 0 ? a : gcd(b, a % b);
+  while (gcd(step, n) != 1) {
+    step++;
+  }
+  final days = DateTime.utc(
+    day.year,
+    day.month,
+    day.day,
+  ).difference(DateTime.utc(2026)).inDays;
+  return pool[((days % n) * step) % n];
+}
+
+/// The first sentence of a note's text, for a short card.
+String learnFirstSentence(LearnEntry e) {
+  final m = RegExp(r'^(.+?[.!?])(\s|$)', dotAll: true).firstMatch(e.body);
+  return (m?.group(1) ?? e.body).replaceAll(RegExp(r'\s+'), ' ');
 }

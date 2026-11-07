@@ -15,13 +15,15 @@ import 'mini_ring.dart';
 const kNoticeLifetime = Duration(days: 14);
 
 /// One message: a stable [id] (what its dismissal and first showing are
-/// remembered under), its icon, and its text.
+/// remembered under), its icon, and its text. With [onTap] the message is a
+/// button (the "Did you know?" note opens its page).
 class NoticeMessage {
-  const NoticeMessage(this.id, this.icon, this.text);
+  const NoticeMessage(this.id, this.icon, this.text, {this.onTap});
 
   final String id;
   final IconData icon;
   final String text;
+  final void Function(BuildContext context)? onTap;
 }
 
 /// Which of [messages] should show now, in order. Records the first showing of
@@ -238,12 +240,17 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
         Icon(m.icon, size: 14, color: colors.accentText),
         const SizedBox(width: 7),
         Expanded(
-          child: Text(
-            m.text,
-            style: TextStyle(
-              fontSize: compact ? 10.5 : 11.5,
-              color: colors.textSecondary,
-              height: compact ? 1.3 : 1.4,
+          child: GestureDetector(
+            key: Key('notice-${m.id}'),
+            behavior: HitTestBehavior.opaque,
+            onTap: m.onTap == null ? null : () => m.onTap!(context),
+            child: Text(
+              m.text,
+              style: TextStyle(
+                fontSize: compact ? 10.5 : 11.5,
+                color: colors.textSecondary,
+                height: compact ? 1.3 : 1.4,
+              ),
             ),
           ),
         ),

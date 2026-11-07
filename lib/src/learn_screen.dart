@@ -23,8 +23,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'app_colors.dart';
 import 'brand.dart';
 import 'learn_content.dart';
+import 'learn_read.dart';
 import 'learn_saved.dart';
 import 'learn_quiz_screen.dart';
+import 'learn_share.dart';
 
 /// The education-only note under the heading of the front page and of each
 /// theme page (the website's pages carry the same words).
@@ -33,10 +35,24 @@ const String kLearnTopNote =
     'mentioned here. These notes are for education only and are not medical '
     'advice.';
 
-const String _disclaimer =
+const String _skinDisclaimer =
     'This is general information, not medical advice. If something changes '
     'suddenly or concerns you, that is a conversation for a doctor or '
     'dermatologist, not a note in this app.';
+
+const String _foodDisclaimer =
+    'This is general information, not medical or nutrition advice. What is '
+    'right for one person to eat is a conversation for a doctor or a '
+    'dietitian, not a note in this app.';
+
+String get _disclaimer => _foodOnly ? _foodDisclaimer : _skinDisclaimer;
+
+/// The three games about products and labels are for the skin apps; a food
+/// app has the quiz alone.
+bool get _skinPractice => learnGroupsShown.contains(LearnGroup.products);
+
+/// Wording that names the subject: skin, or food.
+bool get _foodOnly => !learnGroupsShown.contains(LearnGroup.skin);
 
 /// Opens [entry]'s theme page with the note already open.
 void openLearnNote(BuildContext context, LearnEntry entry) {
@@ -166,60 +182,71 @@ class _LearnScreenState extends State<LearnScreen> {
                 ),
               ),
             ),
-            for (final group in LearnGroup.values) ...[
-              const SizedBox(height: 24),
-              Text(
-                group.title,
-                style: TextStyle(fontSize: 14, color: colors.textPrimary),
-              ),
-              const SizedBox(height: 10),
-              _ThemeGrid(
-                themes: [
-                  for (final c in LearnCategory.values)
-                    if (c.group == group) c,
-                ],
-              ),
-            ],
+            for (final group in LearnGroup.values)
+              if (learnGroupsShown.contains(group)) ...[
+                const SizedBox(height: 24),
+                Text(
+                  group.title,
+                  style: TextStyle(fontSize: 14, color: colors.textPrimary),
+                ),
+                const SizedBox(height: 10),
+                _ThemeGrid(
+                  themes: [
+                    for (final c in LearnCategory.values)
+                      if (c.group == group) c,
+                  ],
+                ),
+              ],
             const SizedBox(height: 24),
             Text(
               'Practice',
               style: TextStyle(fontSize: 14, color: colors.textPrimary),
             ),
             const SizedBox(height: 10),
-            _TilePair(
-              left: _Tile(
+            if (!_skinPractice)
+              _Tile(
                 key: const Key('learnQuiz'),
                 icon: PhosphorIconsThin.question,
                 title: 'Which is it?',
                 blurb: 'A few gentle questions. No score.',
                 onTap: () => _push(context, const LearnQuizScreen()),
+              )
+            else ...[
+              _TilePair(
+                left: _Tile(
+                  key: const Key('learnQuiz'),
+                  icon: PhosphorIconsThin.question,
+                  title: 'Which is it?',
+                  blurb: 'A few gentle questions. No score.',
+                  onTap: () => _push(context, const LearnQuizScreen()),
+                ),
+                right: _Tile(
+                  key: const Key('learnMatch'),
+                  icon: PhosphorIconsThin.arrowsLeftRight,
+                  title: 'Ingredient match',
+                  blurb: 'Pair an ingredient with where it turns up.',
+                  onTap: () => _push(context, const IngredientMatchScreen()),
+                ),
               ),
-              right: _Tile(
-                key: const Key('learnMatch'),
-                icon: PhosphorIconsThin.arrowsLeftRight,
-                title: 'Ingredient match',
-                blurb: 'Pair an ingredient with where it turns up.',
-                onTap: () => _push(context, const IngredientMatchScreen()),
+              const SizedBox(height: 10),
+              _TilePair(
+                left: _Tile(
+                  key: const Key('learnLabels'),
+                  icon: PhosphorIconsThin.magnifyingGlassPlus,
+                  title: 'Label detective',
+                  blurb: 'What do the words on a pack mean?',
+                  onTap: () =>
+                      _push(context, const LearnQuizScreen(labels: true)),
+                ),
+                right: _Tile(
+                  key: const Key('learnMyth'),
+                  icon: PhosphorIconsThin.sparkle,
+                  title: 'Myth or fact',
+                  blurb: 'Is it true? A tap to find out.',
+                  onTap: () => _push(context, const LearnMythScreen()),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            _TilePair(
-              left: _Tile(
-                key: const Key('learnLabels'),
-                icon: PhosphorIconsThin.magnifyingGlassPlus,
-                title: 'Label detective',
-                blurb: 'What do the words on a pack mean?',
-                onTap: () =>
-                    _push(context, const LearnQuizScreen(labels: true)),
-              ),
-              right: _Tile(
-                key: const Key('learnMyth'),
-                icon: PhosphorIconsThin.sparkle,
-                title: 'Myth or fact',
-                blurb: 'Is it true? A tap to find out.',
-                onTap: () => _push(context, const LearnMythScreen()),
-              ),
-            ),
+            ],
             const SizedBox(height: 24),
             InkWell(
               key: const Key('learnAbout'),
@@ -584,6 +611,13 @@ class _EntryTileState extends State<_EntryTile> {
   void initState() {
     super.initState();
     LearnSaved.load();
+    LearnRead.load();
+    if (_open) {
+      // after this frame: the tick listens to the same notifier
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => LearnRead.mark(widget.entry.id),
+      );
+    }
   }
 
   @override
@@ -597,7 +631,10 @@ class _EntryTileState extends State<_EntryTile> {
       child: InkWell(
         key: Key('learn-${e.id}'),
         borderRadius: BorderRadius.circular(14),
-        onTap: () => setState(() => _open = !_open),
+        onTap: () {
+          setState(() => _open = !_open);
+          if (_open) LearnRead.mark(e.id);
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
           child: Column(
@@ -627,6 +664,20 @@ class _EntryTileState extends State<_EntryTile> {
                           ),
                       ],
                     ),
+                  ),
+                  ValueListenableBuilder<Set<String>>(
+                    valueListenable: LearnRead.ids,
+                    builder: (context, read, _) => read.contains(e.id)
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 2),
+                            child: Icon(
+                              PhosphorIconsThin.check,
+                              key: Key('learnRead-${e.id}'),
+                              size: 15,
+                              color: colors.textMuted,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                   ValueListenableBuilder<Set<String>>(
                     valueListenable: LearnSaved.ids,
@@ -687,6 +738,34 @@ class _EntryTileState extends State<_EntryTile> {
                                 ),
                               ),
                             ],
+                            const SizedBox(height: 6),
+                            InkWell(
+                              key: Key('learnShare-${e.id}'),
+                              onTap: () => openLearnShareCard(context, e),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      PhosphorIconsThin.shareNetwork,
+                                      size: 16,
+                                      color: colors.accentText,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Share as a card',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: colors.accentText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             if (related.isNotEmpty) ...[
                               const SizedBox(height: 12),
                               Text(
@@ -1015,30 +1094,45 @@ class LearnAboutScreen extends StatelessWidget {
             ),
             heading('How they are written'),
             para(
-              'Every note is written in plain words from general, widely known '
-              'information about skin. A note says what is commonly known or '
-              'commonly done, and none of it is advice for you.',
+              _foodOnly
+                  ? 'Every note is written in plain words from general, widely '
+                        'known information about food and labels. A note says what '
+                        'is commonly known or commonly done, and none of it is '
+                        'advice for you.'
+                  : 'Every note is written in plain words from general, widely '
+                        'known information about skin. A note says what is '
+                        'commonly known or commonly done, and none of it is advice '
+                        'for you.',
             ),
             heading('Sources'),
             para(
-              'Where one source clearly stands behind a note, the note names '
-              'it: the American Academy of Dermatology Association for '
-              'everyday skin habits and sun care, and the World Health '
-              'Organization for the UV index. A note with no source named is '
-              'general knowledge.',
+              _foodOnly
+                  ? 'These notes are general knowledge about food and labels, '
+                        'and none names a source.'
+                  : 'Where one source clearly stands behind a note, the note '
+                        'names it: the American Academy of Dermatology '
+                        'Association for everyday skin habits and sun care, and '
+                        'the World Health Organization for the UV index. A note '
+                        'with no source named is general knowledge.',
             ),
             heading('What they leave out'),
             para(
-              'No brands, doses, supplements or promises. An ingredient note '
-              'says what something is and what kind of product it turns up in, '
-              'and nothing about whether to use it.',
+              _foodOnly
+                  ? 'No brands, diets, doses, supplements or promises. A note '
+                        'says what something is and how it is commonly '
+                        'described, and nothing about what to eat.'
+                  : 'No brands, doses, supplements or promises. An ingredient '
+                        'note says what something is and what kind of product it '
+                        'turns up in, and nothing about whether to use it.',
             ),
-            heading('Pregnancy'),
-            para(
-              'Where an ingredient is known to carry risks in pregnancy '
-              '(the retinoids, for example), its note says so and suggests '
-              'speaking with a doctor first.',
-            ),
+            if (!_foodOnly) ...[
+              heading('Pregnancy'),
+              para(
+                'Where an ingredient is known to carry risks in pregnancy '
+                '(the retinoids, for example), its note says so and suggests '
+                'speaking with a doctor first.',
+              ),
+            ],
             if (kLearnReviewedBy != null) ...[
               heading('Read by'),
               para('These notes were read by $kLearnReviewedBy.'),

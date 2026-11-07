@@ -57,6 +57,94 @@ class MatchPair {
 }
 
 const List<QuizQuestion> kQuizQuestions = [
+  // ---- food and nutrition
+  QuizQuestion(
+    'food-label-serving',
+    'On a nutrition label, the numbers are for what amount?',
+    ['One serving', 'The whole pack', 'Exactly 100 grams'],
+    0,
+    'The numbers are for one serving. A pack can hold more than one, so eating '
+        'the whole pack means more than the label shows.',
+  ),
+  QuizQuestion(
+    'food-label-order',
+    'In many countries, which ingredient is listed first on a pack?',
+    [
+      'The one there is most of',
+      'The one there is least of',
+      'The one added last',
+    ],
+    0,
+    'Ingredients are often listed by weight, largest first, so the first few '
+        'names tell most of the story.',
+  ),
+  QuizQuestion(
+    'food-label-sugars',
+    'What does an added sugars line count?',
+    [
+      'Only sugars put in while the food was made',
+      'All sugars, including those in fruit and milk',
+      'Only sugars from sweet drinks',
+    ],
+    0,
+    'Total sugars include natural ones in fruit and milk. Added sugars count '
+        'only what went in during making.',
+  ),
+  QuizQuestion(
+    'portion-dry-cooked',
+    'Why does cooked rice weigh more than dry rice?',
+    ['It soaks up water', 'It gains energy', 'It loses fibre'],
+    0,
+    'Rice soaks up water as it cooks, which adds weight but no energy.',
+  ),
+  QuizQuestion(
+    'portion-vs-serving',
+    'What is a serving?',
+    [
+      'The amount a label uses for its numbers',
+      'Whatever ends up on the plate',
+      'Always one cup',
+    ],
+    0,
+    'A serving is the label\'s own amount. A portion is what a person actually '
+        'serves, which may be smaller or larger.',
+  ),
+  QuizQuestion(
+    'portion-measures',
+    'Which gives the steadier answer for flour?',
+    ['A kitchen scale', 'A scooped cup', 'A heaped spoon'],
+    0,
+    'A cup of flour can weigh quite different amounts depending on how it is '
+        'scooped. A scale gives the same answer each time.',
+  ),
+  QuizQuestion(
+    'nutrient-fat',
+    'Which holds the most energy per gram?',
+    ['Fat', 'Protein', 'Carbohydrate'],
+    0,
+    'Fat gives about 9 calories per gram. Protein and carbohydrate give about '
+        '4 each.',
+  ),
+  QuizQuestion(
+    'nutrient-fibre',
+    'What is fibre?',
+    [
+      'The part of plant foods the body does not break down for energy',
+      'A kind of fat',
+      'A sugar found in milk',
+    ],
+    0,
+    'Fibre is the part of plant foods that is not broken down for energy. '
+        'Whole grains, beans, fruit and vegetables are common sources.',
+  ),
+  QuizQuestion(
+    'nutrient-water',
+    'Why is soup heavy but low in energy for its weight?',
+    ['Much of its weight is water', 'It contains no food', 'It is cooked'],
+    0,
+    'Water adds weight but no energy, so watery foods are low in energy for '
+        'their weight.',
+  ),
   // ---- skin basics
   QuizQuestion(
     'skin-layers',

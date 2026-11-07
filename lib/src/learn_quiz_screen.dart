@@ -133,7 +133,7 @@ class _LearnQuizScreenState extends State<LearnQuizScreen> {
     if (widget.labels) {
       pool = ([...kLabelQuestions]..shuffle(_rnd)).take(n).toList();
     } else if (widget.category == null) {
-      final themes = [...LearnCategory.values]..shuffle(_rnd);
+      final themes = [...learnCategoriesShown()]..shuffle(_rnd);
       pool = [
         for (final c in themes.take(n))
           (quizQuestionsIn(c)..shuffle(_rnd)).first,

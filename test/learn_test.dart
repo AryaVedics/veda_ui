@@ -146,10 +146,10 @@ void main() {
       await t.pumpWidget(host(const LearnScreen()));
       await t.pump();
       expect(find.text('Véda Education'), findsOneWidget);
-      for (final g in LearnGroup.values) {
+      for (final g in learnGroupsShown) {
         expect(find.text(g.title), findsOneWidget);
       }
-      for (final c in LearnCategory.values) {
+      for (final c in learnCategoriesShown()) {
         expect(find.byKey(Key('learnTheme-${c.name}')), findsOneWidget);
         expect(find.text(c.title), findsOneWidget);
       }
