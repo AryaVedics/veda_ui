@@ -23,6 +23,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
 
+/// Where the icon reads the date from. A test sets it to a fixed day, so a
+/// picture of the tab bar does not change with the calendar.
+@visibleForTesting
+DateTime Function() todayTabIconClock = DateTime.now;
+
 class TodayTabIcon extends StatefulWidget {
   const TodayTabIcon({super.key, required this.selected, required this.color});
 
@@ -35,7 +40,7 @@ class TodayTabIcon extends StatefulWidget {
 
 class _TodayTabIconState extends State<TodayTabIcon>
     with WidgetsBindingObserver {
-  late int _day = DateTime.now().day;
+  late int _day = todayTabIconClock().day;
   Timer? _midnightTimer;
 
   @override
@@ -49,16 +54,16 @@ class _TodayTabIconState extends State<TodayTabIcon>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed) return;
     _midnightTimer?.cancel();
-    setState(() => _day = DateTime.now().day);
+    setState(() => _day = todayTabIconClock().day);
     _scheduleMidnightRefresh();
   }
 
   void _scheduleMidnightRefresh() {
-    final now = DateTime.now();
+    final now = todayTabIconClock();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
     _midnightTimer = Timer(nextMidnight.difference(now), () {
       if (!mounted) return;
-      setState(() => _day = DateTime.now().day);
+      setState(() => _day = todayTabIconClock().day);
       _scheduleMidnightRefresh();
     });
   }

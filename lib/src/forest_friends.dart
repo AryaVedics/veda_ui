@@ -120,14 +120,16 @@ const kForestFriends = [
   ),
   ForestFriend(
     ForestAnimal.hippo,
-    'Hadi',
-    'The calm one',
-    'Hadi is the biggest of the friends and the quietest. He spends the day '
-        'half in the shallows with only his eyes above the water, watching '
-        'clouds go by, and says the secret of a good day is to move slowly and '
-        'notice everything. When the others hurry, he simply waits, and '
-        'somehow nothing ever rushes him.',
-    means: 'Hadi means "calm" in Arabic.',
+    'Nefer',
+    'The one who sees the good',
+    'Nefer is the biggest of the friends and the quietest. He spends the day '
+        'half in the shallows with only his eyes above the water, and he finds '
+        'something good in nearly everything he sees: a ripple, a heron, the '
+        'light on the river. He moves slowly on purpose and notices '
+        'everything. When the others hurry, he simply waits, and somehow '
+        'nothing ever rushes him. Ask him what is beautiful today, and he '
+        'will smile and say, very slowly, that it is all of it.',
+    means: 'Nefer means "good" or "beautiful" in ancient Egyptian.',
     kind: 'Hippopotamus',
   ),
   ForestFriend(
@@ -376,6 +378,34 @@ const kForestFriends = [
         'is a calm heart.',
     means: 'Balam means "jaguar" in Maya.',
     kind: 'Jaguar, the great cat of the Americas',
+  ),
+  ForestFriend(
+    ForestAnimal.bison,
+    'Tatanka',
+    'The grassland walker',
+    'Tatanka walks the wide grasslands, where the grass moves like water and '
+        'the sky goes on for ever. He is one of the biggest of the friends and '
+        'one of the gentlest. He travels with his herd, never in a hurry, and '
+        'when the weather turns he lowers his great head, faces the wind and '
+        'waits for it to pass. For the people of the plains the buffalo has '
+        'long been a friend and a teacher, and Tatanka carries that with quiet '
+        'pride.',
+    means: 'Tatanka means "buffalo" in Lakota.',
+    kind: 'American bison, often called a buffalo',
+  ),
+  ForestFriend(
+    ForestAnimal.wolf,
+    'Dolce',
+    'The one who gathers the table',
+    'Dolce looks fierce at first glance, with her pointed ears and her long '
+        'grey coat, and then she smiles, and everyone remembers that she is '
+        'the sweetest of the friends. She loves a full table more than '
+        'anything: a big pot on the fire, a crowd of friends round it, and '
+        'someone always asking for more. In her part of the world a wolf is '
+        'a family animal, and she says the best meals are the ones where '
+        'nobody is left out.',
+    means: 'Dolce means "sweet" in Italian.',
+    kind: 'Wolf, a wild cousin of the dog',
   ),
 ];
 

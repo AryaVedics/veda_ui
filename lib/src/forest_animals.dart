@@ -41,6 +41,8 @@ enum ForestAnimal {
   monal,
   onager,
   jaguar,
+  bison,
+  wolf,
 }
 
 /// The animals that come out to visit. A friend who is resting keeps a drawing
@@ -59,7 +61,7 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.bear => 'Bela',
   ForestAnimal.monkey => 'Milo',
   ForestAnimal.peacock => 'Nazm',
-  ForestAnimal.hippo => 'Hadi',
+  ForestAnimal.hippo => 'Nefer',
   ForestAnimal.owl => 'Luna',
   ForestAnimal.fox => 'Renard',
   ForestAnimal.redPanda => 'Pema',
@@ -80,6 +82,8 @@ String friendNameOf(ForestAnimal a, {bool special = false}) => switch (a) {
   ForestAnimal.monal => 'Danphe',
   ForestAnimal.onager => 'Gur',
   ForestAnimal.jaguar => 'Balam',
+  ForestAnimal.bison => 'Tatanka',
+  ForestAnimal.wolf => 'Dolce',
 };
 
 const _ink = Color(0xFF2A211C);
@@ -151,6 +155,10 @@ void paintAnimalHead(
       _onager(canvas);
     case ForestAnimal.jaguar:
       _jaguar(canvas);
+    case ForestAnimal.bison:
+      _bison(canvas);
+    case ForestAnimal.wolf:
+      _wolf(canvas);
   }
   canvas.restore();
 }
@@ -1170,6 +1178,230 @@ void _jaguar(Canvas canvas) {
   _nose(canvas, const Offset(0, 0.2), const Color(0xFFD9786E));
   _smile(canvas, 0.4);
   _cheeks(canvas, x: 0.66, y: 0.2);
+}
+
+void _bison(Canvas canvas) {
+  // an American bison: a great shaggy head and shoulders, short horns curving
+  // up, a beard and a gentle face
+  const mane = Color(0xFF5B3E2A);
+  const maneDark = Color(0xFF3F2B1E);
+  const maneLight = Color(0xFF7A5539);
+  const face = Color(0xFF8A6A4A);
+  const muzzle = Color(0xFFB08C66);
+  const horn = Color(0xFFEADBB5);
+  const hornTip = Color(0xFF4A3A2A);
+  // short horns curving up from the sides of the head
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.6, -0.36),
+        Offset(sd * 0.96, -0.42),
+        Offset(sd * 1.02, -0.84),
+        Offset(sd * 0.9, -0.76),
+        Offset(sd * 0.78, -0.52),
+      ]),
+      _fill(horn),
+    );
+    _oval(
+      canvas,
+      Offset(sd * 0.98, -0.82),
+      0.14,
+      0.2,
+      hornTip,
+      tilt: sd * -0.3,
+    );
+  }
+  // small ears under the mane
+  for (final sd in [-1.0, 1.0]) {
+    _oval(canvas, Offset(sd * 0.8, -0.28), 0.3, 0.18, face, tilt: sd * 0.4);
+  }
+  // the big shaggy mane, in three tones
+  for (var i = 0; i < 22; i++) {
+    final a = i * 2 * math.pi / 22;
+    _oval(
+      canvas,
+      Offset(math.cos(a) * 0.72, math.sin(a) * 0.8 - 0.06),
+      0.5,
+      0.34,
+      i % 3 == 0 ? maneLight : (i.isEven ? mane : maneDark),
+      tilt: a + math.pi / 2,
+    );
+  }
+  _oval(canvas, const Offset(0, -0.08), 1.5, 1.66, mane);
+  // the hump of curls on the forehead
+  for (final dx in [-0.34, -0.17, 0.0, 0.17, 0.34]) {
+    _oval(
+      canvas,
+      Offset(dx, -0.7 + dx.abs() * 0.22),
+      0.34,
+      0.5,
+      dx.abs() > 0.2 ? mane : maneLight,
+      tilt: dx * 0.8,
+    );
+  }
+  // the beard under the chin
+  for (final dx in [-0.2, 0.0, 0.2]) {
+    _oval(canvas, Offset(dx, 0.92), 0.3, 0.46, maneDark, tilt: dx * 0.7);
+  }
+  // the broad face inside the mane
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.5),
+      Offset(0.46, -0.3),
+      Offset(0.5, 0.12),
+      Offset(0.42, 0.6),
+      Offset(0.24, 0.9),
+      Offset(0, 0.96),
+      Offset(-0.24, 0.9),
+      Offset(-0.42, 0.6),
+      Offset(-0.5, 0.12),
+      Offset(-0.46, -0.3),
+    ]),
+    _fill(face),
+  );
+  _oval(canvas, const Offset(0, 0.58), 0.74, 0.5, muzzle);
+  for (final sd in [-1.0, 1.0]) {
+    _oval(
+      canvas,
+      Offset(sd * 0.14, 0.52),
+      0.1,
+      0.07,
+      const Color(0xFF4A3322),
+      tilt: sd * -0.4,
+    );
+    _oval(canvas, Offset(sd * 0.4, 0.2), 0.18, 0.11, _blush);
+  }
+  _eyes(canvas, gap: 0.62, y: -0.1, r: 0.09);
+  _smile(canvas, 0.8, w: 0.13);
+}
+
+void _wolf(Canvas canvas) {
+  // a wolf who looks fierce at a glance and is anything but: a long face with a
+  // pale muzzle, a dark grey cap, tall ears, a ruff of cream fur at each cheek
+  // and a small pink tongue
+  const cap = Color(0xFF5C646B);
+  const fur = Color(0xFF8B949B);
+  const cream = Color(0xFFE9E3D6);
+  const earIn = Color(0xFFCDB9B0);
+  const amber = Color(0xFFE0A03C);
+  const nose = Color(0xFF2E2826);
+  // tall pointed ears
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.2, -0.7),
+        Offset(sd * 0.52, -1.48),
+        Offset(sd * 0.92, -0.62),
+        Offset(sd * 0.6, -0.4),
+      ]),
+      _fill(cap),
+    );
+    canvas.drawPath(
+      _smoothShape([
+        Offset(sd * 0.36, -0.74),
+        Offset(sd * 0.54, -1.2),
+        Offset(sd * 0.76, -0.66),
+        Offset(sd * 0.56, -0.54),
+      ]),
+      _fill(earIn),
+    );
+  }
+  // the ruff of cream fur at each cheek, in three soft points
+  for (final sd in [-1.0, 1.0]) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(sd * 0.5, -0.14)
+        ..quadraticBezierTo(sd * 0.96, -0.14, sd * 1.14, 0.1)
+        ..quadraticBezierTo(sd * 0.88, 0.14, sd * 0.7, 0.2)
+        ..quadraticBezierTo(sd * 1.04, 0.3, sd * 1.1, 0.52)
+        ..quadraticBezierTo(sd * 0.82, 0.5, sd * 0.62, 0.56)
+        ..quadraticBezierTo(sd * 0.88, 0.7, sd * 0.88, 0.9)
+        ..quadraticBezierTo(sd * 0.64, 0.8, sd * 0.4, 0.78)
+        ..close(),
+      _fill(cream),
+    );
+  }
+  // the head: wide at the brow, narrowing to a long muzzle
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.92),
+      Offset(0.62, -0.7),
+      Offset(0.74, -0.1),
+      Offset(0.6, 0.45),
+      Offset(0.34, 0.92),
+      Offset(0, 1.08),
+      Offset(-0.34, 0.92),
+      Offset(-0.6, 0.45),
+      Offset(-0.74, -0.1),
+      Offset(-0.62, -0.7),
+    ]),
+    _fill(fur),
+  );
+  // the dark cap over the brow, and the grey down the bridge of the nose
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.92),
+      Offset(0.62, -0.7),
+      Offset(0.72, -0.3),
+      Offset(0.34, -0.22),
+      Offset(0, -0.32),
+      Offset(-0.34, -0.22),
+      Offset(-0.72, -0.3),
+      Offset(-0.62, -0.7),
+    ]),
+    _fill(cap),
+  );
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0, -0.4),
+      Offset(0.14, -0.1),
+      Offset(0.14, 0.4),
+      Offset(0, 0.6),
+      Offset(-0.14, 0.4),
+      Offset(-0.14, -0.1),
+    ]),
+    _fill(fur),
+  );
+  // the pale lower face and muzzle
+  canvas.drawPath(
+    _smoothShape(const [
+      Offset(0.16, 0.0),
+      Offset(0.5, 0.2),
+      Offset(0.52, 0.6),
+      Offset(0.3, 0.94),
+      Offset(0, 1.04),
+      Offset(-0.3, 0.94),
+      Offset(-0.52, 0.6),
+      Offset(-0.5, 0.2),
+      Offset(-0.16, 0.0),
+      Offset(-0.1, 0.45),
+      Offset(0.1, 0.45),
+    ]),
+    _fill(cream),
+  );
+  _nose(canvas, const Offset(0, 0.56), nose, w: 0.26);
+  // warm amber eyes, set a little aslant
+  for (final sd in [-1.0, 1.0]) {
+    final e = Offset(sd * 0.32, -0.22);
+    _oval(canvas, e, 0.26, 0.2, amber, tilt: sd * -0.3);
+    _disc(canvas, e, 0.075, _ink);
+    _disc(canvas, e + const Offset(-0.03, -0.035), 0.026, Colors.white);
+  }
+  // a soft smile under the nose, and a small pink tongue
+  final mouth = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = 0.035
+    ..color = nose;
+  canvas.drawLine(const Offset(0, 0.66), const Offset(0, 0.74), mouth);
+  canvas.drawPath(
+    Path()
+      ..moveTo(-0.2, 0.72)
+      ..quadraticBezierTo(-0.1, 0.84, 0, 0.74)
+      ..quadraticBezierTo(0.1, 0.84, 0.2, 0.72),
+    mouth,
+  );
+  _oval(canvas, const Offset(0, 0.9), 0.13, 0.17, const Color(0xFFEFA8A0));
 }
 
 void _gorilla(Canvas canvas) {

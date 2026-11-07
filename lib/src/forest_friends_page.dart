@@ -171,8 +171,8 @@ class ForestFriendsPeek extends StatelessWidget {
   }
 }
 
-/// Everyone, one to a row: face, name, what kind of animal, and a line.
-/// [onOpen] defaults to the friend's sheet.
+/// Everyone, four to a row: face and name. A tap opens the friend's sheet,
+/// which says what kind of animal they are. [onOpen] defaults to that sheet.
 class ForestFriendsPage extends StatelessWidget {
   const ForestFriendsPage({
     super.key,
@@ -213,70 +213,50 @@ class ForestFriendsPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Container(
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: colors.card,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Column(
-                children: [
-                  for (final (i, f) in kForestFriends.indexed) ...[
-                    if (i > 0) Divider(height: 1, color: colors.divider),
-                    InkWell(
-                      key: Key('friendRow-${f.name}'),
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () => (onOpen ?? _defaultOpen)(context, f),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                        child: Row(
-                          children: [
-                            ForestHeadIcon(
-                              f.animal,
-                              special: f.special,
-                              size: 56,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    f.name,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: kDisplayFont,
-                                      color: colors.textPrimary,
-                                    ),
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  const gap = 8.0;
+                  final tile = (box.maxWidth - gap * 3) / 4;
+                  return Wrap(
+                    spacing: gap,
+                    runSpacing: 14,
+                    children: [
+                      for (final f in kForestFriends)
+                        SizedBox(
+                          width: tile,
+                          child: InkWell(
+                            key: Key('friendRow-${f.name}'),
+                            onTap: () => (onOpen ?? _defaultOpen)(context, f),
+                            customBorder: const StadiumBorder(),
+                            child: Column(
+                              children: [
+                                ForestHeadIcon(
+                                  f.animal,
+                                  special: f.special,
+                                  size: tile * 0.9,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  f.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: colors.textPrimary,
                                   ),
-                                  Text(
-                                    f.kind,
-                                    style: TextStyle(
-                                      fontSize: 12.5,
-                                      height: 1.3,
-                                      color: colors.textSecondary,
-                                    ),
-                                  ),
-                                  Text(
-                                    f.line,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      height: 1.3,
-                                      color: colors.accentText,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            Icon(
-                              PhosphorIconsThin.caretRight,
-                              size: 16,
-                              color: colors.textMuted,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ],
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),

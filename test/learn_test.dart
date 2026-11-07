@@ -128,52 +128,56 @@ void main() {
     });
   });
 
-  group('the Learn page', () {
-    Widget host(Widget child) => MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        extensions: const [AppColors.nightfall],
-      ),
-      home: child,
-    );
+  Widget host(Widget child) =>
+      MaterialApp(theme: vedaTheme(AppColors.nightfall), home: child);
 
+  group('the Learn portal', () {
     Future<void> phone(WidgetTester t) async {
       t.view.physicalSize = const Size(412, 900);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.reset);
     }
 
-    testWidgets('lists every theme, with each note closed to its title', (
-      t,
-    ) async {
-      await phone(t);
+    testWidgets('the front page lists every theme under its group', (t) async {
+      // tall enough that the whole front page is built at once
+      t.view.physicalSize = const Size(412, 3200);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
       await t.pumpWidget(host(const LearnScreen()));
       await t.pump();
-      expect(find.text('Learn'), findsOneWidget);
+      expect(find.text('Véda Education'), findsOneWidget);
+      for (final g in LearnGroup.values) {
+        expect(find.text(g.title), findsOneWidget);
+      }
       for (final c in LearnCategory.values) {
-        await t.scrollUntilVisible(
-          find.text(c.title),
-          300,
-          scrollable: find.byType(Scrollable).first,
-        );
+        expect(find.byKey(Key('learnTheme-${c.name}')), findsOneWidget);
         expect(find.text(c.title), findsOneWidget);
       }
-      // closed: no note's body is on the page yet
-      expect(find.byKey(const Key('learn-body-sleep-repair')), findsNothing);
-      await t.scrollUntilVisible(
-        find.textContaining('not medical advice'),
-        300,
-        scrollable: find.byType(Scrollable).first,
+      expect(find.textContaining('not medical advice'), findsWidgets);
+      expect(find.byKey(const Key('learnTopNote')), findsOneWidget);
+      expect(
+        find.textContaining('does not recommend, promote or sell'),
+        findsOneWidget,
       );
-      expect(find.textContaining('not medical advice'), findsOneWidget);
     });
 
-    testWidgets('a note opens on a tap and closes on another', (t) async {
-      await phone(t);
+    testWidgets('a theme opens its own page, and a note opens on a tap', (
+      t,
+    ) async {
+      // tall enough that the whole front page is built at once
+      t.view.physicalSize = const Size(412, 3600);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
       await t.pumpWidget(host(const LearnScreen()));
       await t.pump();
+      final theme = find.byKey(Key('learnTheme-${LearnCategory.sleep.name}'));
+      await t.ensureVisible(theme);
+      await t.tap(theme);
+      await t.pumpAndSettle();
+      // the notes are closed to their titles
       final tile = find.byKey(const Key('learn-sleep-repair'));
-      await t.ensureVisible(tile);
+      expect(tile, findsOneWidget);
+      expect(find.byKey(const Key('learn-body-sleep-repair')), findsNothing);
       await t.tap(tile);
       await t.pumpAndSettle();
       expect(find.byKey(const Key('learn-body-sleep-repair')), findsOneWidget);
@@ -182,7 +186,7 @@ void main() {
       expect(find.byKey(const Key('learn-body-sleep-repair')), findsNothing);
     });
 
-    testWidgets('a note with a source shows it, one without shows none', (
+    testWidgets('openId opens the note in its theme, with back to the portal', (
       t,
     ) async {
       await phone(t);
@@ -195,16 +199,16 @@ void main() {
         find.textContaining('Source: World Health Organization'),
         findsOneWidget,
       );
-
-      final plain = find.byKey(const Key('learn-sleep-repair'));
+      // another note in the theme has no source and shows none
+      final plain = find.byKey(const Key('learn-sun-cloud'));
       await t.ensureVisible(plain);
       await t.tap(plain);
       await t.pumpAndSettle();
-      expect(
-        find.textContaining('Source:'),
-        findsOneWidget,
-        reason: 'only the note that names one shows it',
-      );
+      expect(find.textContaining('Source: American Academy'), findsOneWidget);
+      // back returns to the portal's front page
+      await t.pageBack();
+      await t.pumpAndSettle();
+      expect(find.text('Véda Education'), findsOneWidget);
     });
   });
 }

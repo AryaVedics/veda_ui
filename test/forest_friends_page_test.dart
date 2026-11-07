@@ -36,7 +36,7 @@ void main() {
   });
 
   group('the page', () {
-    testWidgets('lists a friend with their kind and opens their sheet', (
+    testWidgets('lists the friends four to a row and opens their sheet', (
       t,
     ) async {
       t.view.physicalSize = const Size(412, 900);
@@ -48,11 +48,15 @@ void main() {
       final row = find.byKey(const Key('friendRow-Vesna'));
       await t.ensureVisible(row);
       await t.pump();
-      expect(find.textContaining('White stork'), findsOneWidget);
       await t.tap(row);
       await t.pumpAndSettle();
       expect(find.byKey(const Key('friendSheet')), findsOneWidget);
       expect(find.byKey(const Key('friendKind')), findsOneWidget);
+      expect(
+        find.textContaining('White stork'),
+        findsOneWidget,
+        reason: 'the sheet says what kind of animal',
+      );
     });
 
     testWidgets('the peek shows a few faces and a way to see them all', (
