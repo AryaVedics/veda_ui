@@ -32,6 +32,11 @@ const _format = 'veda-backup/1';
 const _plainFormat = 'veda-backup-plain/1';
 const kBackupIterations = 150000;
 
+/// The most key rounds a backup file may ask for. The number is read from the
+/// file, so without a bound a damaged or edited one could ask for billions and
+/// leave the restore working for hours. Ten times what the apps use.
+const kMaxBackupIterations = 10 * kBackupIterations;
+
 /// Something the person should be told, in plain words.
 class BackupException implements Exception {
   BackupException(this.message);
@@ -138,7 +143,11 @@ Future<String> openBackup(
   }
   try {
     final salt = base64Decode(m['salt'] as String);
-    final key = await _key(passphrase, salt, (m['iterations'] as num).toInt());
+    final iterations = (m['iterations'] as num).toInt();
+    if (iterations < 1 || iterations > kMaxBackupIterations) {
+      throw const FormatException('key rounds out of range');
+    }
+    final key = await _key(passphrase, salt, iterations);
     final box = SecretBox.fromConcatenation(
       base64Decode(m['data'] as String),
       nonceLength: 12,

@@ -53,6 +53,36 @@ void main() {
       );
     });
 
+    test('a file asking for an absurd number of key rounds is refused, not worked through', () async {
+      // The rounds are read from the file, so a damaged or edited one could
+      // ask for billions and leave the restore working for hours. Nothing a
+      // Véda app makes uses more than kBackupIterations.
+      final sealed = await sealBackup(
+        'sun',
+        '{"x":1}',
+        'passphrase1',
+        iterations: _fast,
+      );
+      final m = jsonDecode(sealed) as Map<String, dynamic>;
+      for (final rounds in [2000000000, 0, -5]) {
+        await expectLater(
+          openBackup(
+            'sun',
+            jsonEncode({...m, 'iterations': rounds}),
+            'passphrase1',
+          ),
+          throwsA(
+            isA<BackupException>().having(
+              (e) => e.message,
+              'message',
+              'That backup file is damaged.',
+            ),
+          ),
+          reason: '$rounds rounds',
+        );
+      }
+    }, timeout: const Timeout(Duration(seconds: 20)));
+
     test('a changed file does not open', () async {
       final sealed = await sealBackup(
         'sun',
