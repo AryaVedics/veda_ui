@@ -35,6 +35,13 @@ const String kLearnTopNote =
     'mentioned here. These notes are for education only and are not medical '
     'advice.';
 
+const String _foodTopNote =
+    'Véda does not recommend, promote or sell any food, product or '
+    'ingredient mentioned here. These notes are for education only and are '
+    'not medical or nutrition advice.';
+
+String get _topNote => _foodOnly ? _foodTopNote : kLearnTopNote;
+
 const String _skinDisclaimer =
     'This is general information, not medical advice. If something changes '
     'suddenly or concerns you, that is a conversation for a doctor or '
@@ -111,9 +118,15 @@ class _LearnScreenState extends State<LearnScreen> {
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
           children: [
             Text(
-              'Short, plain notes about skin, your readings, everyday life and '
-              'the products on your shelf. They are general notes about what '
-              'is commonly known or commonly done, not advice for you.',
+              _foodOnly
+                  ? 'Short, plain notes about food labels, portions, cooking '
+                        'words and everyday spices. They are general notes about '
+                        'what is commonly known or commonly done, not advice for '
+                        'you.'
+                  : 'Short, plain notes about skin, your readings, everyday '
+                        'life and the products on your shelf. They are general '
+                        'notes about what is commonly known or commonly done, '
+                        'not advice for you.',
               style: TextStyle(
                 fontSize: 13.5,
                 color: colors.textSecondary,
@@ -122,7 +135,7 @@ class _LearnScreenState extends State<LearnScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              kLearnTopNote,
+              _topNote,
               key: const Key('learnTopNote'),
               style: TextStyle(
                 fontSize: 12.5,
@@ -204,12 +217,21 @@ class _LearnScreenState extends State<LearnScreen> {
             ),
             const SizedBox(height: 10),
             if (!_skinPractice)
-              _Tile(
-                key: const Key('learnQuiz'),
-                icon: PhosphorIconsThin.question,
-                title: 'Which is it?',
-                blurb: 'A few gentle questions. No score.',
-                onTap: () => _push(context, const LearnQuizScreen()),
+              _TilePair(
+                left: _Tile(
+                  key: const Key('learnQuiz'),
+                  icon: PhosphorIconsThin.question,
+                  title: 'Which is it?',
+                  blurb: 'A few gentle questions. No score.',
+                  onTap: () => _push(context, const LearnQuizScreen()),
+                ),
+                right: _Tile(
+                  key: const Key('learnMyth'),
+                  icon: PhosphorIconsThin.sparkle,
+                  title: 'Myth or fact',
+                  blurb: 'Is it true? A tap to find out.',
+                  onTap: () => _push(context, const LearnMythScreen()),
+                ),
               )
             else ...[
               _TilePair(
@@ -239,12 +261,21 @@ class _LearnScreenState extends State<LearnScreen> {
                       _push(context, const LearnQuizScreen(labels: true)),
                 ),
                 right: _Tile(
-                  key: const Key('learnMyth'),
-                  icon: PhosphorIconsThin.sparkle,
-                  title: 'Myth or fact',
-                  blurb: 'Is it true? A tap to find out.',
-                  onTap: () => _push(context, const LearnMythScreen()),
+                  key: const Key('learnClaims'),
+                  icon: PhosphorIconsThin.megaphone,
+                  title: 'Spot the claim',
+                  blurb: 'A promise, or just a description?',
+                  onTap: () =>
+                      _push(context, const LearnQuizScreen(claims: true)),
                 ),
+              ),
+              const SizedBox(height: 10),
+              _Tile(
+                key: const Key('learnMyth'),
+                icon: PhosphorIconsThin.sparkle,
+                title: 'Myth or fact',
+                blurb: 'Is it true? A tap to find out.',
+                onTap: () => _push(context, const LearnMythScreen()),
               ),
             ],
             const SizedBox(height: 24),
@@ -493,7 +524,7 @@ class LearnThemeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              kLearnTopNote,
+              _topNote,
               key: const Key('learnTopNote'),
               style: TextStyle(
                 fontSize: 12.5,
@@ -727,6 +758,26 @@ class _EntryTileState extends State<_EntryTile> {
                                 color: colors.textSecondary,
                               ),
                             ),
+                            if (e.aka.isNotEmpty) ...[
+                              const SizedBox(height: 10),
+                              Text(
+                                'Also called on labels',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: colors.textMuted,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                e.aka.join(', '),
+                                key: Key('learn-aka-${e.id}'),
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  height: 1.6,
+                                  color: colors.textSecondary,
+                                ),
+                              ),
+                            ],
                             if (e.why != null) ...[
                               const SizedBox(height: 10),
                               Text(
@@ -1104,7 +1155,7 @@ class LearnAboutScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              kLearnTopNote,
+              _topNote,
               key: const Key('learnTopNote'),
               style: TextStyle(
                 fontSize: 12.5,

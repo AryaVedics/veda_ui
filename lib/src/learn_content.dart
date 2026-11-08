@@ -48,6 +48,12 @@ enum LearnCategory {
     LearnGroup.skin,
     PhosphorIconsThin.camera,
   ),
+  lifeStages(
+    'Through the years',
+    'How skin changes from the teens to later life.',
+    LearnGroup.skin,
+    PhosphorIconsThin.hourglass,
+  ),
   sleep(
     'Sleep and rest',
     'Rest, rhythm and how skin renews overnight.',
@@ -119,6 +125,18 @@ enum LearnCategory {
     'What the main parts of food are.',
     LearnGroup.food,
     PhosphorIconsThin.bowlFood,
+  ),
+  cookingWords(
+    'Cooking words',
+    'What simmer, blanch, temper and fold mean.',
+    LearnGroup.food,
+    PhosphorIconsThin.cookingPot,
+  ),
+  spicesStaples(
+    'Spices and staples',
+    'What common spices and kitchen staples are.',
+    LearnGroup.food,
+    PhosphorIconsThin.leaf,
   );
 
   const LearnCategory(this.title, this.blurb, this.group, this.icon);
@@ -139,6 +157,7 @@ class LearnEntry {
     required this.body,
     this.sources = const [],
     this.why,
+    this.aka = const [],
   });
 
   /// Stable, never reused: a card or a link can point at it.
@@ -153,6 +172,10 @@ class LearnEntry {
   /// For an ingredient: why makers add it to a product, in one sentence. What
   /// the ingredient is used for, never whether it works.
   final String? why;
+
+  /// For an ingredient: the other names it goes by on a label ("Ascorbic acid").
+  /// Search finds the note under each of them.
+  final List<String> aka;
 }
 
 /// The note about each of the seven measurements, by the measurement's key
@@ -185,6 +208,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at the look of fine lines, '
         'uneven tone and rough texture.',
+    aka: ['Retinyl palmitate', 'Retinyl acetate', 'Retinaldehyde', 'Vitamin A'],
   ),
   LearnEntry(
     id: 'ingredient-niacinamide',
@@ -197,6 +221,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at the look of uneven tone, '
         'oiliness and large-looking pores.',
+    aka: ['Nicotinamide', 'Vitamin B3'],
   ),
   LearnEntry(
     id: 'ingredient-vitamin-c',
@@ -209,6 +234,13 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at the look of dull or uneven '
         'skin, and as an antioxidant ingredient.',
+    aka: [
+      'Ascorbic acid',
+      'L-ascorbic acid',
+      'Sodium ascorbyl phosphate',
+      'Magnesium ascorbyl phosphate',
+      'Ascorbyl glucoside',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-hyaluronic-acid',
@@ -220,6 +252,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at skin that feels dry, '
         'because it holds a great deal of water.',
+    aka: ['Sodium hyaluronate', 'Hyaluronan'],
   ),
   LearnEntry(
     id: 'ingredient-salicylic-acid',
@@ -233,6 +266,7 @@ const List<LearnEntry> kLearnEntries = [
         'Makers add it to products aimed at oily, blemish-prone skin, '
         'because it dissolves oil and loosens dead cells at the '
         'surface.',
+    aka: ['BHA', 'Beta hydroxy acid', '2-hydroxybenzoic acid'],
   ),
   LearnEntry(
     id: 'ingredient-alpha-hydroxy-acids',
@@ -244,6 +278,13 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to products meant to loosen dead cells on the '
         'surface, for skin that looks dull or rough.',
+    aka: [
+      'Glycolic acid',
+      'Lactic acid',
+      'Mandelic acid',
+      'AHA',
+      'Alpha hydroxy acid',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-benzoyl-peroxide',
@@ -255,6 +296,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at acne-prone skin, because it '
         'is active against the bacteria linked to breakouts.',
+    aka: ['BPO'],
   ),
   LearnEntry(
     id: 'ingredient-azelaic-acid',
@@ -267,6 +309,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at blemish-prone skin, and at '
         'the look of redness and uneven tone.',
+    aka: ['Nonanedioic acid'],
   ),
   LearnEntry(
     id: 'ingredient-tretinoin',
@@ -282,6 +325,7 @@ const List<LearnEntry> kLearnEntries = [
         'Makers add it to prescription products meant for acne and for '
         'the look of fine lines. Whether it is used is a decision for a '
         'doctor.',
+    aka: ['Retinoic acid', 'All-trans retinoic acid'],
   ),
   LearnEntry(
     id: 'ingredient-bakuchiol',
@@ -294,6 +338,7 @@ const List<LearnEntry> kLearnEntries = [
         'Makers add it to products offered as a plant-based alternative '
         'to retinol, aimed at the same concerns: fine lines and uneven '
         'tone.',
+    aka: ['Babchi', 'Psoralea corylifolia seed extract'],
   ),
   LearnEntry(
     id: 'ingredient-ceramides',
@@ -305,6 +350,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to moisturisers meant to support the skin '
         'barrier and keep skin from feeling dry.',
+    aka: ['Ceramide NP', 'Ceramide AP', 'Ceramide EOP'],
   ),
   LearnEntry(
     id: 'ingredient-peptides',
@@ -316,6 +362,11 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to products aimed at the look of fine lines '
         'and firmness.',
+    aka: [
+      'Palmitoyl tripeptide-1',
+      'Palmitoyl pentapeptide-4',
+      'Copper tripeptide-1',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-glycerin',
@@ -328,6 +379,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it as a humectant: it draws water to the surface of '
         'skin, so a product feels moisturising and soft.',
+    aka: ['Glycerol', 'Glycerine'],
   ),
   LearnEntry(
     id: 'ingredient-panthenol',
@@ -339,6 +391,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products meant to soothe skin and lips that '
         'feel dry or rough.',
+    aka: ['Dexpanthenol', 'Provitamin B5', 'Vitamin B5'],
   ),
   LearnEntry(
     id: 'ingredient-squalane',
@@ -350,6 +403,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it as a light oil that gives a soft, non-greasy '
         'feel and helps keep moisture in.',
+    aka: ['Squalene'],
   ),
   LearnEntry(
     id: 'ingredient-petrolatum',
@@ -361,6 +415,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to form a seal on the skin that slows water '
         'loss, in products for dry or chapped skin.',
+    aka: ['Petroleum jelly', 'Soft paraffin', 'Paraffinum molle'],
   ),
   LearnEntry(
     id: 'ingredient-mineral-filters',
@@ -373,6 +428,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to block and scatter UV light, so that a '
         'product can carry an SPF rating.',
+    aka: ['Zinc oxide', 'Titanium dioxide'],
   ),
   LearnEntry(
     id: 'ingredient-chemical-filters',
@@ -385,6 +441,14 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to absorb UV light, so that a product can '
         'carry an SPF rating.',
+    aka: [
+      'Avobenzone',
+      'Oxybenzone',
+      'Octinoxate',
+      'Octocrylene',
+      'Homosalate',
+      'Octisalate',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-fragrance',
@@ -398,6 +462,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to give a product a scent, or to cover the smell '
         'of other ingredients.',
+    aka: ['Parfum', 'Perfume', 'Aroma'],
   ),
   // ---- sleep and rest
   LearnEntry(
@@ -1140,6 +1205,7 @@ const List<LearnEntry> kLearnEntries = [
         'Makers add it as an antioxidant that keeps the oils in a '
         'product from going off, and for the soft feel it gives on '
         'skin.',
+    aka: ['Tocopherol', 'Tocopheryl acetate', 'Alpha-tocopherol'],
   ),
   LearnEntry(
     id: 'ingredient-urea',
@@ -1152,6 +1218,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products for very dry or rough skin, because '
         'it holds water and softens thick, rough patches.',
+    aka: ['Carbamide'],
   ),
   LearnEntry(
     id: 'ingredient-sulfur',
@@ -1164,6 +1231,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at oily, blemish-prone skin '
         'and at flaking on the scalp.',
+    aka: ['Sulphur'],
   ),
   LearnEntry(
     id: 'ingredient-clay',
@@ -1175,6 +1243,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to masks and cleansers meant to soak up extra '
         'oil.',
+    aka: ['Kaolin', 'Bentonite', 'Montmorillonite'],
   ),
   LearnEntry(
     id: 'ingredient-aloe-vera',
@@ -1187,6 +1256,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it for its cool, watery feel, in products meant to '
         'soothe skin after sun and to give light moisture.',
+    aka: ['Aloe barbadensis leaf juice', 'Aloe barbadensis leaf extract'],
   ),
   LearnEntry(
     id: 'ingredient-tea-tree-oil',
@@ -1200,6 +1270,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at blemish-prone skin and an '
         'oily scalp, for its long use as an antiseptic.',
+    aka: ['Melaleuca alternifolia leaf oil'],
   ),
   LearnEntry(
     id: 'ingredient-dimethicone',
@@ -1212,6 +1283,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to give a smooth, silky feel, to fill in a '
         'rough-looking surface and to form a light barrier on skin.',
+    aka: ['Polydimethylsiloxane', 'Silicone'],
   ),
   LearnEntry(
     id: 'ingredient-caffeine',
@@ -1236,6 +1308,13 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them to do the cleaning: they lift oil and dirt so '
         'they rinse away, and they make the lather.',
+    aka: [
+      'Sodium lauryl sulfate',
+      'Sodium laureth sulfate',
+      'Cocamidopropyl betaine',
+      'SLS',
+      'SLES',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-preservatives',
@@ -1249,6 +1328,13 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add them so that a product stays safe to use for months '
         'once water is in it.',
+    aka: [
+      'Phenoxyethanol',
+      'Methylparaben',
+      'Propylparaben',
+      'Sodium benzoate',
+      'Potassium sorbate',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-alcohol',
@@ -1263,6 +1349,13 @@ const List<LearnEntry> kLearnEntries = [
         'Makers add ethanol to make a product thin and quick-drying or '
         'to carry other ingredients, and fatty alcohols to thicken and '
         'soften creams.',
+    aka: [
+      'Alcohol denat.',
+      'Ethanol',
+      'SD alcohol',
+      'Cetyl alcohol',
+      'Cetearyl alcohol',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-centella',
@@ -1275,6 +1368,14 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products aimed at skin that looks red, '
         'irritated or sensitive.',
+    aka: [
+      'Centella asiatica extract',
+      'Madecassoside',
+      'Asiaticoside',
+      'Cica',
+      'Tiger grass',
+      'Gotu kola',
+    ],
   ),
   LearnEntry(
     id: 'ingredient-colloidal-oatmeal',
@@ -1286,6 +1387,7 @@ const List<LearnEntry> kLearnEntries = [
     why:
         'Makers add it to products meant to soothe skin that feels dry '
         'or itchy.',
+    aka: ['Avena sativa kernel flour', 'Oat flour'],
   ),
   LearnEntry(
     id: 'ingredient-adapalene',
@@ -1427,6 +1529,436 @@ const List<LearnEntry> kLearnEntries = [
         'in them, and low in energy for their weight. Dry or oily '
         'foods hold far more energy in the same weight.',
   ),
+  LearnEntry(
+    id: 'ingredient-turmeric',
+    category: LearnCategory.ingredients,
+    title: 'Turmeric',
+    body:
+        'A yellow-orange root, dried and ground, with a long place in '
+        'South Asian cooking and in traditional home remedies. Its '
+        'colour comes from curcumin, which can stain skin, cloth and '
+        'surfaces. It is found in some face masks, soaps and creams, '
+        'and in nearly every kitchen.',
+    why:
+        'Makers add it to face masks and creams for its traditional '
+        'link with a glowing complexion, and for its colour.',
+    aka: ['Curcuma longa root extract', 'Curcumin', 'Haldi'],
+  ),
+  LearnEntry(
+    id: 'ingredient-neem',
+    category: LearnCategory.ingredients,
+    title: 'Neem',
+    body:
+        'The leaves, bark and oil of the neem tree, which grows across '
+        'South Asia and has a long place in traditional Indian '
+        'practice. The oil has a strong smell. It is found in some '
+        'soaps, face washes and scalp products.',
+    why:
+        'Makers add it to soaps, face washes and scalp products for its '
+        'long traditional use on skin and hair.',
+    aka: [
+      'Azadirachta indica leaf extract',
+      'Azadirachta indica seed oil',
+      'Neem oil',
+    ],
+  ),
+  LearnEntry(
+    id: 'ingredient-multani-mitti',
+    category: LearnCategory.ingredients,
+    title: 'Multani mitti (fuller\'s earth)',
+    body:
+        'A fine clay that has long been used in South Asia as a face '
+        'pack. Mixed with water or rose water, it dries on skin and '
+        'soaks up oil. It is found in many face packs and in some '
+        'soaps.',
+    why:
+        'Makers add it to face packs and cleansers meant to soak up '
+        'extra oil.',
+    aka: ['Fuller\'s earth', 'Multani mitti', 'Calcium bentonite'],
+  ),
+  LearnEntry(
+    id: 'ingredient-rose-water',
+    category: LearnCategory.ingredients,
+    title: 'Rose water',
+    body:
+        'Water scented with rose petals, made by steaming or soaking '
+        'them. It has been used for centuries in South Asia, the Middle '
+        'East and Europe, in cooking as well as on skin. It is found in '
+        'many toners, face mists and some creams.',
+    why:
+        'Makers add it to toners and mists for its light scent and '
+        'cool, fresh feel.',
+    aka: ['Rosa damascena flower water', 'Gulab jal', 'Rosewater'],
+  ),
+  LearnEntry(
+    id: 'ingredient-sandalwood',
+    category: LearnCategory.ingredients,
+    title: 'Sandalwood',
+    body:
+        'A fragrant wood, and the oil or powder taken from it, with a '
+        'long place in Indian ritual and traditional skin care. Real '
+        'sandalwood oil is costly, and many products use a scent made '
+        'to resemble it. It is found in some soaps, face packs, creams '
+        'and perfumes.',
+    why:
+        'Makers add it for a warm, woody scent and for its traditional '
+        'place in skin-care rituals.',
+    aka: ['Santalum album oil', 'Santalum album wood extract', 'Chandan'],
+  ),
+  LearnEntry(
+    id: 'ingredient-coconut-oil',
+    category: LearnCategory.ingredients,
+    title: 'Coconut oil',
+    body:
+        'An oil pressed from coconut kernels, solid in a cool room and '
+        'liquid in a warm one. It has been used on skin and hair for '
+        'generations across South Asia, Southeast Asia and the Pacific. '
+        'It is found in many soaps, moisturisers, hair oils and lip '
+        'balms.',
+    why:
+        'Makers add it as a rich, plant-based oil that makes products '
+        'feel soft and moisturising.',
+    aka: ['Cocos nucifera oil', 'Cocos nucifera fruit extract', 'Coconut'],
+  ),
+  LearnEntry(
+    id: 'ingredient-honey',
+    category: LearnCategory.ingredients,
+    title: 'Honey',
+    body:
+        'A thick, sweet liquid that bees make from nectar, long used in '
+        'food and in home skin care. It attracts water. It is found in '
+        'some face masks, lip balms and cleansers.',
+    why:
+        'Makers add it to masks and balms because it draws water and '
+        'feels smooth.',
+    aka: ['Mel', 'Honey extract'],
+  ),
+  LearnEntry(
+    id: 'ingredient-almond-oil',
+    category: LearnCategory.ingredients,
+    title: 'Almond oil',
+    body:
+        'A light oil pressed from almonds, used on skin and hair for '
+        'centuries and a common oil for massage. People with a nut '
+        'allergy are often advised to look for it on labels. It is '
+        'found in some body oils, moisturisers and massage products.',
+    why:
+        'Makers add it as a light oil that spreads easily and softens '
+        'skin.',
+    aka: ['Prunus amygdalus dulcis oil', 'Sweet almond oil'],
+  ),
+  LearnEntry(
+    id: 'prod-aha-bha',
+    category: LearnCategory.productTypes,
+    title: 'AHA or BHA: how they differ',
+    body:
+        'Both are acids used in exfoliating products. AHAs, such as '
+        'glycolic and lactic acid, dissolve in water and stay mostly on '
+        'the surface of skin. BHA, usually salicylic acid, dissolves in '
+        'oil, so it can reach into pores, which is why it is common in '
+        'products for oily skin.',
+  ),
+  LearnEntry(
+    id: 'prod-chem-mineral',
+    category: LearnCategory.productTypes,
+    title: 'Chemical or mineral sunscreen',
+    body:
+        'A mineral sunscreen uses zinc oxide or titanium dioxide, which '
+        'sit on skin and reflect and scatter UV. A chemical sunscreen '
+        'uses filters that absorb UV and give it off as a little heat. '
+        'Many products mix both, and either kind can carry the same SPF '
+        'number.',
+  ),
+  LearnEntry(
+    id: 'prod-serum-moisturiser',
+    category: LearnCategory.productTypes,
+    title: 'Serum or moisturiser',
+    body:
+        'A serum is a thin, light liquid made to carry a small amount '
+        'of an ingredient. A moisturiser is thicker and meant to hold '
+        'water in skin. Many routines put a serum on first and a '
+        'moisturiser after, because thin goes before thick.',
+  ),
+  LearnEntry(
+    id: 'prod-texture-names',
+    category: LearnCategory.productTypes,
+    title: 'Cream, lotion, gel or ointment',
+    body:
+        'The names describe how much oil and water a product holds. A '
+        'gel is mostly water and feels light. A lotion is thin and '
+        'spreads easily. A cream is thicker. An ointment is mostly oil '
+        'or jelly and feels heavy and greasy.',
+  ),
+  LearnEntry(
+    id: 'prod-cleanser-kinds',
+    category: LearnCategory.productTypes,
+    title: 'Gel, cream or oil cleanser',
+    body:
+        'A gel cleanser is clear and foams easily. A cream cleanser is '
+        'milky, makes little foam and leaves skin feeling softer. An '
+        'oil cleanser is made to dissolve oil, makeup and sunscreen, '
+        'and is rinsed or wiped away.',
+  ),
+  LearnEntry(
+    id: 'prod-toner-essence',
+    category: LearnCategory.productTypes,
+    title: 'Toner or essence',
+    body:
+        'Both are thin, watery products used after cleansing. A toner '
+        'is the step that follows a cleanser. An essence is a light, '
+        'watery layer between cleanser and serum, popular in Korean '
+        'routines. The line between them is blurry, and the label is '
+        'the only guide.',
+  ),
+  LearnEntry(
+    id: 'label-claims',
+    category: LearnCategory.labels,
+    title: 'Results words on a pack',
+    body:
+        'Lines such as erases wrinkles or instantly younger-looking '
+        'describe a result the maker hopes for. They are the maker\'s '
+        'own words, usually on the front. The ingredient list and the '
+        'symbols on the back hold the facts.',
+  ),
+  LearnEntry(
+    id: 'life-teens',
+    category: LearnCategory.lifeStages,
+    title: 'Skin in the teen years',
+    body:
+        'Hormones rise at puberty and make the oil glands larger and '
+        'busier, so many teenagers notice shinier skin and breakouts. '
+        'It is very common, and it often eases through the late teens '
+        'and twenties, though not for everyone.',
+  ),
+  LearnEntry(
+    id: 'life-twenties-thirties',
+    category: LearnCategory.lifeStages,
+    title: 'Skin in the twenties and thirties',
+    body:
+        'Skin renews itself a little more slowly with each decade. Many '
+        'people in these years see the first fine lines around the '
+        'eyes, and sun from earlier years begins to show as uneven '
+        'tone. Breakouts can still come and go, often with stress and '
+        'with monthly cycles.',
+  ),
+  LearnEntry(
+    id: 'life-pregnancy',
+    category: LearnCategory.lifeStages,
+    title: 'Skin during pregnancy',
+    body:
+        'Hormone changes in pregnancy alter skin for many people. Some '
+        'notice darker patches on the face, a dark line down the belly, '
+        'stretch marks, or a change in oiliness. Some products are not '
+        'used in pregnancy, and for those questions a doctor is the '
+        'right person to ask.',
+  ),
+  LearnEntry(
+    id: 'life-midlife',
+    category: LearnCategory.lifeStages,
+    title: 'Skin around menopause',
+    body:
+        'When oestrogen falls around menopause, skin tends to become '
+        'drier and thinner and holds less collagen. Many people notice '
+        'more dryness and more visible lines in these years, and for '
+        'some, breakouts return.',
+  ),
+  LearnEntry(
+    id: 'life-later',
+    category: LearnCategory.lifeStages,
+    title: 'Skin in later life',
+    body:
+        'With age the outer layer renews more slowly, and skin holds '
+        'less fat and water. It can bruise more easily and recovers '
+        'more slowly after a cut or scrape. Dry, itchy skin is common, '
+        'and often worse in winter.',
+  ),
+  LearnEntry(
+    id: 'life-tone-ageing',
+    category: LearnCategory.lifeStages,
+    title: 'Skin tone and how skin ages',
+    body:
+        'Skin with more melanin tends to show fine lines later, but '
+        'dark marks can show up more easily after a breakout or an '
+        'injury. Every skin tone ages, and every skin tone can burn in '
+        'the sun.',
+  ),
+  LearnEntry(
+    id: 'cook-simmer',
+    category: LearnCategory.cookingWords,
+    title: 'Simmer, boil and poach',
+    body:
+        'Boiling is bubbles breaking hard across the surface. Simmering '
+        'is gentler, with small bubbles now and then. Poaching cooks '
+        'food in liquid just below a simmer, as for eggs and fish.',
+  ),
+  LearnEntry(
+    id: 'cook-blanch',
+    category: LearnCategory.cookingWords,
+    title: 'Blanch',
+    body:
+        'To drop food briefly into boiling water and then into cold '
+        'water. It cooks the outside a little, loosens the skins of '
+        'tomatoes and almonds, and keeps green vegetables bright.',
+  ),
+  LearnEntry(
+    id: 'cook-fry',
+    category: LearnCategory.cookingWords,
+    title: 'Saute, shallow fry and deep fry',
+    body:
+        'Saute means cooking in a little fat over fairly high heat, '
+        'stirring often. Shallow frying uses fat to about halfway up '
+        'the food. Deep frying covers the food completely.',
+  ),
+  LearnEntry(
+    id: 'cook-temper',
+    category: LearnCategory.cookingWords,
+    title: 'Tempering (tadka, chhaunk)',
+    body:
+        'Hot oil or ghee with whole spices such as cumin and mustard '
+        'seeds, poured over a dish or cooked at the start of it. The '
+        'hot fat lets the spices give up their flavour. It goes by '
+        'tadka, chhaunk or baghar in different places.',
+  ),
+  LearnEntry(
+    id: 'cook-bhuna',
+    category: LearnCategory.cookingWords,
+    title: 'Bhuna',
+    body:
+        'To fry onion, ginger, garlic and spices slowly, stirring, '
+        'until the oil separates from the paste. Many Indian curries '
+        'begin this way, and it is the step that takes the longest.',
+  ),
+  LearnEntry(
+    id: 'cook-fold-whisk',
+    category: LearnCategory.cookingWords,
+    title: 'Fold, whisk and cream',
+    body:
+        'Folding turns a light mixture over gently so the air stays in, '
+        'as with whipped egg whites. Whisking beats air in. Creaming '
+        'beats butter and sugar together until pale and soft.',
+  ),
+  LearnEntry(
+    id: 'cook-knead-prove',
+    category: LearnCategory.cookingWords,
+    title: 'Knead, prove and rest',
+    body:
+        'Kneading works dough so that it stretches. Proving leaves '
+        'yeast dough to rise. Resting lets a dough relax, or lets '
+        'cooked meat settle before it is cut.',
+  ),
+  LearnEntry(
+    id: 'cook-reduce',
+    category: LearnCategory.cookingWords,
+    title: 'Reduce',
+    body:
+        'To boil or simmer a liquid, uncovered, until some of the water '
+        'has gone and what is left is thicker and stronger in flavour.',
+  ),
+  LearnEntry(
+    id: 'spice-garam-masala',
+    category: LearnCategory.spicesStaples,
+    title: 'Garam masala',
+    body:
+        'A blend of ground spices, often cumin, coriander, cardamom, '
+        'cinnamon, cloves and black pepper. The mix differs from home '
+        'to home and region to region. It is usually added near the end '
+        'of cooking, so that its smell stays bright.',
+  ),
+  LearnEntry(
+    id: 'spice-hing',
+    category: LearnCategory.spicesStaples,
+    title: 'Hing (asafoetida)',
+    body:
+        'A resin from the roots of a giant fennel plant, sold as a '
+        'powder and often mixed with flour. It smells strong when raw '
+        'and mellows in hot oil into something like cooked onion and '
+        'garlic. A pinch is enough.',
+  ),
+  LearnEntry(
+    id: 'spice-ghee',
+    category: LearnCategory.spicesStaples,
+    title: 'Ghee',
+    body:
+        'Butter cooked until the water has boiled off and the milk '
+        'solids have browned and been strained out, leaving a golden '
+        'fat. It keeps well, smells nutty, and can be heated higher '
+        'than butter.',
+  ),
+  LearnEntry(
+    id: 'spice-tamarind',
+    category: LearnCategory.spicesStaples,
+    title: 'Tamarind',
+    body:
+        'The sticky, sour pulp from the pods of the tamarind tree. It '
+        'is soaked and strained, or bought as a paste, and used in '
+        'chutneys, sambar, curries and drinks.',
+  ),
+  LearnEntry(
+    id: 'spice-turmeric-food',
+    category: LearnCategory.spicesStaples,
+    title: 'Turmeric in cooking',
+    body:
+        'A yellow root, dried and ground, used for its colour and its '
+        'warm, earthy, slightly bitter taste. It stains cloth, plastic '
+        'and chopping boards.',
+  ),
+  LearnEntry(
+    id: 'spice-cumin-coriander',
+    category: LearnCategory.spicesStaples,
+    title: 'Cumin and coriander seeds',
+    body:
+        'Two of the most common seeds in Indian, Middle Eastern and '
+        'Mexican food. Cumin is earthy and warm. Coriander seed is '
+        'lemony and mild, and comes from the same plant as the fresh '
+        'leaves called cilantro.',
+  ),
+  LearnEntry(
+    id: 'spice-mustard-seeds',
+    category: LearnCategory.spicesStaples,
+    title: 'Mustard seeds',
+    body:
+        'Small black, brown or yellow seeds. In hot oil they pop and '
+        'turn nutty. They are used whole in tempering, and ground into '
+        'mustard.',
+  ),
+  LearnEntry(
+    id: 'spice-chilli-heat',
+    category: LearnCategory.spicesStaples,
+    title: 'How chillies carry heat',
+    body:
+        'Chillies get their heat from capsaicin, which sits mostly in '
+        'the white ribs and the seeds. Dried and ground chillies vary '
+        'widely in heat, and Kashmiri chilli is mild and mostly adds '
+        'colour.',
+  ),
+  LearnEntry(
+    id: 'spice-paneer',
+    category: LearnCategory.spicesStaples,
+    title: 'Paneer',
+    body:
+        'A fresh cheese made by curdling hot milk with lemon juice or '
+        'vinegar and pressing the curds. It does not melt, so it holds '
+        'its shape in curries and on skewers.',
+  ),
+  LearnEntry(
+    id: 'staple-dal',
+    category: LearnCategory.spicesStaples,
+    title: 'Dal',
+    body:
+        'The word means both split dried pulses and the dish made from '
+        'them. Toor, moong, masoor and chana are common kinds. Washed '
+        'and simmered until soft, they are the base of many everyday '
+        'meals.',
+  ),
+  LearnEntry(
+    id: 'staple-atta',
+    category: LearnCategory.spicesStaples,
+    title: 'Atta',
+    body:
+        'Wholewheat flour ground finely, used for roti, chapati and '
+        'paratha. It takes up more water than plain white flour, so the '
+        'dough is softer and is rested before rolling.',
+  ),
 ];
 
 /// Clusters of notes that belong together. Each note's "Also see" links are the
@@ -1514,7 +2046,8 @@ List<LearnEntry> learnSearch(String query, {int limit = 40}) {
   final inText = <LearnEntry>[];
   for (final e in kLearnEntries) {
     if (!learnGroupsShown.contains(e.category.group)) continue;
-    final title = e.title.toLowerCase();
+    // the other names on a label count as the title
+    final title = '${e.title} ${e.aka.join(' ')}'.toLowerCase();
     final rest = '${e.body} ${e.category.title}'.toLowerCase();
     if (words.every(title.contains)) {
       inTitle.add(e);
@@ -1527,6 +2060,8 @@ List<LearnEntry> learnSearch(String query, {int limit = 40}) {
 
 /// The themes whose notes are definitions, so the A to Z lists them.
 const Set<LearnCategory> kGlossaryThemes = {
+  LearnCategory.cookingWords,
+  LearnCategory.spicesStaples,
   LearnCategory.nutrients,
   LearnCategory.foodLabels,
   LearnCategory.skinBasics,

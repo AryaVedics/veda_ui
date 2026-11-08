@@ -57,6 +57,101 @@ class MatchPair {
 }
 
 const List<QuizQuestion> kQuizQuestions = [
+  QuizQuestion(
+    'life-teens',
+    'Why do many teenagers notice shinier skin?',
+    [
+      'Hormones make the oil glands larger and busier',
+      'Skin stops renewing itself',
+      'The outer layer gets thinner',
+    ],
+    0,
+    'Hormones rise at puberty and make the oil glands larger and busier. It is very common, and it often eases through the late teens and twenties.',
+  ),
+  QuizQuestion(
+    'life-midlife',
+    'What tends to happen to skin around menopause?',
+    [
+      'It becomes drier and thinner',
+      'It becomes oilier and thicker',
+      'It stops changing',
+    ],
+    0,
+    'When oestrogen falls, skin tends to become drier and thinner and holds less collagen.',
+  ),
+  QuizQuestion(
+    'life-tone-ageing',
+    'Which skin tones can burn in the sun?',
+    ['Every skin tone', 'Only the palest tones', 'None with more melanin'],
+    0,
+    'Every skin tone ages, and every skin tone can burn.',
+  ),
+  QuizQuestion(
+    'cook-simmer',
+    'What is simmering?',
+    [
+      'Gentle cooking with small bubbles now and then',
+      'Bubbles breaking hard across the surface',
+      'Cooking with no liquid at all',
+    ],
+    0,
+    'Boiling is hard bubbling. Simmering is gentler, and poaching is just below a simmer.',
+  ),
+  QuizQuestion(
+    'cook-temper',
+    'What is tempering, or tadka?',
+    [
+      'Hot oil or ghee with whole spices, poured over a dish',
+      'Cooling a dish quickly in cold water',
+      'Beating butter and sugar together',
+    ],
+    0,
+    'The hot fat lets whole spices such as cumin and mustard seeds give up their flavour.',
+  ),
+  QuizQuestion(
+    'cook-fold-whisk',
+    'What does folding do?',
+    [
+      'Turns a light mixture over gently so the air stays in',
+      'Beats air in quickly',
+      'Cooks a mixture dry',
+    ],
+    0,
+    'Folding is gentle, as with whipped egg whites. Whisking beats air in, and creaming beats butter and sugar until pale.',
+  ),
+  QuizQuestion(
+    'spice-ghee',
+    'What is ghee?',
+    [
+      'Butter cooked until the water is gone and the milk solids are strained out',
+      'A kind of cream cheese',
+      'Oil pressed from sesame seeds',
+    ],
+    0,
+    'It is a golden fat that keeps well, smells nutty, and can be heated higher than butter.',
+  ),
+  QuizQuestion(
+    'spice-hing',
+    'What does hing mellow into in hot oil?',
+    [
+      'Something like cooked onion and garlic',
+      'Something like vanilla',
+      'Something like fresh mint',
+    ],
+    0,
+    'Hing smells strong when raw, and a pinch is enough.',
+  ),
+  QuizQuestion(
+    'staple-dal',
+    'What does the word dal mean?',
+    [
+      'Both split dried pulses and the dish made from them',
+      'Only a kind of flatbread',
+      'Only a spice blend',
+    ],
+    0,
+    'Toor, moong, masoor and chana are common kinds, simmered until soft.',
+  ),
   // ---- food and nutrition
   QuizQuestion(
     'food-label-serving',
@@ -758,6 +853,150 @@ const List<QuizQuestion> kLabelQuestions = [
 /// Myth or fact: short statements, each tied to a note.
 const List<MythCard> kMythCards = [
   MythCard(
+    'sun-rainy-oil',
+    'Shiny skin in humid weather means a person has oily skin.',
+    false,
+    'In very humid air sweat does not evaporate easily, so a film of moisture and oil can sit on the surface. A shine at the forehead and nose is common and says little about skin type.',
+  ),
+  MythCard(
+    'sun-heated-rooms',
+    'Indoor heating adds moisture to the air.',
+    false,
+    'Heating warms the air without adding moisture, so the air inside can be drier than the cold air outdoors.',
+  ),
+  MythCard(
+    'sun-cooled-rooms',
+    'Air conditioning dries indoor air.',
+    true,
+    'Cooling air pulls moisture out of it, so skin and lips can feel drier after long hours in a cooled room.',
+  ),
+  MythCard(
+    'sun-height',
+    'UV is stronger the higher a place is.',
+    true,
+    'Thinner air at height filters less sunlight, so mountain days can bring more UV than the same hour at sea level.',
+  ),
+  MythCard(
+    'sun-bounce',
+    'Snow can bounce UV back up toward the face.',
+    true,
+    'Bright surfaces reflect UV, so skin can receive it from below as well as from above. Snow reflects much of it.',
+  ),
+  MythCard(
+    'sun-wind',
+    'Wind carries moisture away from skin faster than still air does.',
+    true,
+    'That is why bare cheeks and lips can feel rough on a windy day.',
+  ),
+  MythCard(
+    'sun-turning',
+    'Skin settles into a new season straight away.',
+    false,
+    'Skin takes a little while to settle. Many people notice it feeling different for a week or two as the weather changes.',
+  ),
+  MythCard(
+    'readings-m-pores',
+    'Pores look larger in close, bright light.',
+    true,
+    'Light and distance change how visible pores look, which is why the same lighting each time makes readings easier to compare.',
+  ),
+  MythCard(
+    'readings-m-redness',
+    'A flush after exercise or a hot drink can show up as more redness in a reading.',
+    true,
+    'Warm rooms, exercise, a hot drink or rubbed skin can all show as more redness for a while, and it often settles on its own.',
+  ),
+  MythCard(
+    'readings-m-wrinkles',
+    'Fine lines look deeper in strong side light.',
+    true,
+    'Lighting changes this measurement a lot. Lines look softer in even light.',
+  ),
+  MythCard(
+    'readings-m-acne',
+    'The Acne measurement counts marks left behind after a breakout.',
+    false,
+    'It looks for inflamed bumps that are active now. Marks left behind belong to Spots and Evenness.',
+  ),
+  MythCard(
+    'prod-chem-mineral',
+    'A mineral sunscreen and a chemical sunscreen can carry the same SPF number.',
+    true,
+    'Either kind can carry the same SPF number, and many products mix both.',
+  ),
+  MythCard(
+    'prod-aha-bha',
+    'BHA dissolves in oil, which is why it is common in products for oily skin.',
+    true,
+    'BHA, usually salicylic acid, dissolves in oil, so it can reach into pores. AHAs dissolve in water and stay mostly on the surface.',
+  ),
+  MythCard(
+    'prod-texture-names',
+    'An ointment is mostly water.',
+    false,
+    'An ointment is mostly oil or jelly and feels heavy and greasy. A gel is the one that is mostly water.',
+  ),
+  MythCard(
+    'life-teens',
+    'Breakouts in the teen years are rare.',
+    false,
+    'They are very common, because hormones make the oil glands larger and busier at puberty.',
+  ),
+  MythCard(
+    'life-midlife',
+    'Skin often becomes drier around menopause.',
+    true,
+    'When oestrogen falls, skin tends to become drier and thinner.',
+  ),
+  MythCard(
+    'food-label-order',
+    'In many countries, the ingredients on a pack are listed from most to least.',
+    true,
+    'They are often listed by weight, largest first, so the first few names tell most of the story.',
+  ),
+  MythCard(
+    'food-label-front',
+    'Words such as natural on the front of a pack mean the same everywhere.',
+    false,
+    'Words on the front can mean different things in different places. The numbers and the ingredient list on the back hold the details.',
+  ),
+  MythCard(
+    'portion-dry-cooked',
+    'Cooked rice weighs the same as dry rice.',
+    false,
+    'Rice soaks up water as it cooks, so cooked rice weighs more for the same amount of energy.',
+  ),
+  MythCard(
+    'nutrient-fat',
+    'A gram of fat holds more energy than a gram of protein.',
+    true,
+    'Fat gives about 9 calories per gram, and protein about 4.',
+  ),
+  MythCard(
+    'portion-measures',
+    'A cup of flour weighs the same however it is scooped.',
+    false,
+    'It can weigh quite different amounts depending on how it is scooped. A kitchen scale gives the same answer each time.',
+  ),
+  MythCard(
+    'portion-vs-serving',
+    'A serving and a portion mean the same thing.',
+    false,
+    'A serving is the amount a label uses for its numbers. A portion is what a person actually serves.',
+  ),
+  MythCard(
+    'nutrient-fibre',
+    'Fibre is broken down by the body for energy.',
+    false,
+    'Fibre is the part of plant foods that the body does not break down for energy.',
+  ),
+  MythCard(
+    'nutrient-water',
+    'Soup is heavy because of the water in it.',
+    true,
+    'Water adds weight but not energy, so soup is heavy and low in energy for its weight.',
+  ),
+  MythCard(
     'sun-cloud',
     'You can only burn on a sunny day.',
     false,
@@ -891,6 +1130,81 @@ const List<MatchPair> kMatchPairs = [
   ),
   MatchPair('ingredient-squalane', 'Squalane', 'Facial oils'),
   MatchPair('ingredient-tretinoin', 'Tretinoin', 'Prescription gels'),
+];
+
+/// "Spot the claim": is a line on a pack a promise about results, or a plain
+/// description? Same rules as the rest: warm, no score.
+const List<QuizQuestion> kClaimQuestions = [
+  QuizQuestion(
+    'label-claims',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    0,
+    'That is a result the maker hopes for, in the maker\'s own words.',
+    snippet: 'Erases wrinkles in 7 days',
+  ),
+  QuizQuestion(
+    'label-order',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    1,
+    'That describes what is inside, and the ingredient list is where to check it.',
+    snippet: 'Contains aloe vera',
+  ),
+  QuizQuestion(
+    'label-claims',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    0,
+    'Results words like this describe what the maker hopes people will see.',
+    snippet: 'Instantly younger-looking skin',
+  ),
+  QuizQuestion(
+    'label-fragrance',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    1,
+    'That describes the product: no fragrance ingredients were added.',
+    snippet: 'Fragrance-free',
+  ),
+  QuizQuestion(
+    'label-claims',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    0,
+    'That is a promise about results, not a fact about the product.',
+    snippet: 'Pores gone for good',
+  ),
+  QuizQuestion(
+    'label-claims',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    1,
+    'That describes how it was made, not what it will do.',
+    snippet: 'Made in small batches',
+  ),
+  QuizQuestion(
+    'label-claims',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    0,
+    'Results words are the maker\'s own, usually on the front of the pack.',
+    snippet: 'Visibly flawless in one use',
+  ),
+  QuizQuestion(
+    'label-spf',
+    'Is this line a promise about results, or a description?',
+    ['A promise about results', 'A description of the product'],
+    1,
+    'That describes a rating, a number from testing, and not a promise about how skin will look.',
+    snippet: 'Sunscreen, SPF 30',
+  ),
+];
+
+/// The Myth or fact cards of the themes this app shows.
+List<MythCard> mythCardsShown() => [
+  for (final m in kMythCards)
+    if (learnGroupsShown.contains(learnEntry(m.noteId)!.category.group)) m,
 ];
 
 /// The questions that come from one theme.

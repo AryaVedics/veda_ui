@@ -91,10 +91,14 @@ class LearnQuizScreen extends StatefulWidget {
     this.random,
     this.count,
     this.labels = false,
+    this.claims = false,
   });
 
   /// Label detective: questions about the words and symbols on a pack.
   final bool labels;
+
+  /// Spot the claim: is a line on a pack a promise, or a description?
+  final bool claims;
 
   /// One theme's questions; null for a mix from five themes.
   final LearnCategory? category;
@@ -112,7 +116,7 @@ class LearnQuizScreen extends StatefulWidget {
 class _LearnQuizScreenState extends State<LearnQuizScreen> {
   late final math.Random _rnd = widget.random ?? math.Random();
   late final QuizHost? _host = quizHostBuilder?.call(
-    widget.labels ? LearnCategory.labels : widget.category,
+    widget.labels || widget.claims ? LearnCategory.labels : widget.category,
   );
   late List<QuizQuestion> _qs;
   late List<List<int>> _orders;
@@ -128,9 +132,14 @@ class _LearnQuizScreenState extends State<LearnQuizScreen> {
 
   void _newRound() {
     final n =
-        widget.count ?? (widget.labels ? 4 : (widget.category == null ? 5 : 3));
+        widget.count ??
+        (widget.labels || widget.claims
+            ? 4
+            : (widget.category == null ? 5 : 3));
     final List<QuizQuestion> pool;
-    if (widget.labels) {
+    if (widget.claims) {
+      pool = ([...kClaimQuestions]..shuffle(_rnd)).take(n).toList();
+    } else if (widget.labels) {
       pool = ([...kLabelQuestions]..shuffle(_rnd)).take(n).toList();
     } else if (widget.category == null) {
       final themes = [...learnCategoriesShown()]..shuffle(_rnd);
@@ -172,7 +181,9 @@ class _LearnQuizScreenState extends State<LearnQuizScreen> {
         foregroundColor: colors.textPrimary,
         elevation: 0,
         title: Text(
-          widget.labels
+          widget.claims
+              ? 'Spot the claim'
+              : widget.labels
               ? 'Label detective'
               : (widget.category == null
                     ? 'Which is it?'
@@ -681,7 +692,7 @@ class _LearnMythScreenState extends State<LearnMythScreen> {
   }
 
   void _newRound() {
-    _cards = ([...kMythCards]..shuffle(_rnd)).take(widget.count).toList();
+    _cards = ([...mythCardsShown()]..shuffle(_rnd)).take(widget.count).toList();
     _i = 0;
     _said = null;
     _done = false;
