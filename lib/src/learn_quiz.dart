@@ -152,6 +152,64 @@ const List<QuizQuestion> kQuizQuestions = [
     0,
     'Toor, moong, masoor and chana are common kinds, simmered until soft.',
   ),
+  QuizQuestion(
+    'readings-facial-hair',
+    'Why is a bearded face not like for like with a clean-shaven one?',
+    [
+      'The photo shows hair as well as skin, and hair hides skin',
+      'Beards change the phone\'s camera',
+      'The app ignores faces with hair',
+    ],
+    0,
+    'Hair can read as texture, larger pores or uneven tone, and it covers the skin under it.',
+  ),
+  QuizQuestion(
+    'readings-makeup-detail',
+    'Which can foundation make read clearer than bare skin?',
+    ['Redness, spots and uneven tone', 'Only the pores', 'Nothing at all'],
+    0,
+    'Foundation and concealer cover redness, spots and uneven tone. Powder and primer soften shine.',
+  ),
+  QuizQuestion(
+    'readings-bare-vs-made-up',
+    'What do many people do to keep trends comparable?',
+    [
+      'Take readings bare-faced, or only before makeup',
+      'Take readings only in the evening',
+      'Change their makeup each time',
+    ],
+    0,
+    'A made-up face and a bare one are two different measurements, so many people keep them apart.',
+  ),
+  QuizQuestion(
+    'readings-skin-tone',
+    'When do readings compare best?',
+    [
+      'With your own earlier ones, in the same light',
+      'With other people\'s readings',
+      'Between different phones',
+    ],
+    0,
+    'Cameras and phones treat skin tones and light differently, so your own earlier readings are the fairest comparison.',
+  ),
+  QuizQuestion(
+    'label-patch-test',
+    'What is a patch test?',
+    [
+      'A little of a product on a small patch of skin, watched for a day or two',
+      'A test done on the face in a laboratory',
+      'A sticker that shows skin type',
+    ],
+    0,
+    'It is a way to check for a reaction before using a product more widely.',
+  ),
+  QuizQuestion(
+    'food-label-datemarks',
+    'What is a use-by date about?',
+    ['Safety', 'Quality only', 'The day it was packed'],
+    0,
+    'Use-by is about safety. Best-before is about quality.',
+  ),
   // ---- food and nutrition
   QuizQuestion(
     'food-label-serving',
@@ -852,6 +910,78 @@ const List<QuizQuestion> kLabelQuestions = [
 
 /// Myth or fact: short statements, each tied to a note.
 const List<MythCard> kMythCards = [
+  MythCard(
+    'readings-facial-hair',
+    'A beard does not change what the Texture measurement sees.',
+    false,
+    'Hair can read as texture, larger pores or uneven tone, and it hides the skin under it.',
+  ),
+  MythCard(
+    'readings-shave',
+    'A fresh shave can leave skin looking pinker for a few hours.',
+    true,
+    'A fresh shave can leave skin pink or rough, which can show as more redness or texture.',
+  ),
+  MythCard(
+    'readings-makeup-detail',
+    'Foundation can make redness read lower than it is on bare skin.',
+    true,
+    'Foundation and concealer cover redness, spots and uneven tone.',
+  ),
+  MythCard(
+    'readings-makeup-detail',
+    'Blush and bronzer cannot affect a reading.',
+    false,
+    'They add colour that can read as redness or uneven tone.',
+  ),
+  MythCard(
+    'readings-bare-vs-made-up',
+    'The app can tell makeup from skin.',
+    false,
+    'It cannot. A reading with makeup on describes the makeup as much as the skin.',
+  ),
+  MythCard(
+    'readings-skin-tone',
+    'Different skin tones are measured the same way by every camera.',
+    false,
+    'Cameras and phones see skin tones differently, most of all in dim light.',
+  ),
+  MythCard(
+    'sun-holi-colours',
+    'A reading taken with festival colour still on the skin describes the colour.',
+    true,
+    'Many people wait until it has washed off.',
+  ),
+  MythCard(
+    'sun-flight-air',
+    'Cabin air on a long flight is very dry.',
+    true,
+    'Skin can feel tight after a long flight.',
+  ),
+  MythCard(
+    'label-clean-natural',
+    'Natural on a skin-care pack has one strict legal meaning everywhere.',
+    false,
+    'In many countries none of these words has one strict legal meaning for skin-care products.',
+  ),
+  MythCard(
+    'label-patch-test',
+    'A patch test uses a small area of skin, such as the inner forearm.',
+    true,
+    'A small amount is put on a small patch and watched for a day or two.',
+  ),
+  MythCard(
+    'food-label-datemarks',
+    'A best-before date is a safety deadline.',
+    false,
+    'Best-before is about quality. Use-by is the one about safety.',
+  ),
+  MythCard(
+    'food-label-sugarnames',
+    'Honey and jaggery on an ingredient list are forms of sugar.',
+    true,
+    'Sugar goes by many names, and each is a form of sugar.',
+  ),
   MythCard(
     'sun-rainy-oil',
     'Shiny skin in humid weather means a person has oily skin.',

@@ -1959,6 +1959,157 @@ const List<LearnEntry> kLearnEntries = [
         'paratha. It takes up more water than plain white flour, so the '
         'dough is softer and is rested before rolling.',
   ),
+  LearnEntry(
+    id: 'readings-facial-hair',
+    category: LearnCategory.readings,
+    title: 'Facial hair and your readings',
+    body:
+        'A beard, stubble or a moustache covers part of the skin the '
+        'measurements look at, so the photo shows hair as well as skin. '
+        'Hair can read as texture, as larger pores or as uneven tone, '
+        'and it hides the skin under it. A clean-shaven face and a '
+        'bearded one are not like for like.',
+  ),
+  LearnEntry(
+    id: 'readings-shave',
+    category: LearnCategory.readings,
+    title: 'Shaving, trimming and the day after',
+    body:
+        'A fresh shave can leave skin pink or rough for a few hours, '
+        'which can show as more redness or texture. A day or two of '
+        'stubble looks different again, and so does a beard that has '
+        'just been trimmed. Many people who follow a trend take their '
+        'readings at the same point relative to shaving.',
+  ),
+  LearnEntry(
+    id: 'readings-makeup-detail',
+    category: LearnCategory.readings,
+    title: 'What makeup does to each measurement',
+    body:
+        'Foundation and concealer cover redness, spots and uneven tone, '
+        'so those can read clearer than bare skin does. Powder and '
+        'primer soften shine and can make pores look smaller. Blush and '
+        'bronzer add colour that can read as redness or uneven tone, '
+        'and shimmer catches the light as shine.',
+  ),
+  LearnEntry(
+    id: 'readings-bare-vs-made-up',
+    category: LearnCategory.readings,
+    title: 'A made-up face and a bare one are different readings',
+    body:
+        'A reading with makeup on describes the makeup as much as the '
+        'skin, and the app cannot tell which is which. A bare-faced '
+        'reading and a made-up one are two different measurements. Many '
+        'people keep them apart, for example by taking readings only '
+        'bare-faced, or only before makeup.',
+  ),
+  LearnEntry(
+    id: 'readings-skin-tone',
+    category: LearnCategory.readings,
+    title: 'Skin tone and readings',
+    body:
+        'Cameras see different skin tones differently, most of all in '
+        'dim light, and phones process photos in their own ways. Two '
+        'people with different skin tones can read differently for '
+        'reasons that have more to do with light and camera than with '
+        'skin. Readings compare best with your own earlier ones, taken '
+        'in the same light.',
+  ),
+  LearnEntry(
+    id: 'habit-heavy-makeup-days',
+    category: LearnCategory.habits,
+    title: 'Heavy makeup days and the days after',
+    body:
+        'Long days in heavy makeup, hot lights and late nights are '
+        'common at weddings and festivals. Skin can look and feel '
+        'different the next day, and a reading then may describe the '
+        'occasion as much as the skin. Readings taken a few days later '
+        'often settle back to the usual range.',
+  ),
+  LearnEntry(
+    id: 'sun-holi-colours',
+    category: LearnCategory.sun,
+    title: 'Holi colours and skin',
+    body:
+        'Festival colours are often powders or pastes made for a day of '
+        'play. Some are gritty, some can leave skin dry or irritated, '
+        'and many stain skin for days. A reading taken while colour is '
+        'still on the skin describes the colour, so many people wait '
+        'until it has washed off.',
+  ),
+  LearnEntry(
+    id: 'sun-flight-air',
+    category: LearnCategory.sun,
+    title: 'Long flights and dry cabin air',
+    body:
+        'The air inside an aeroplane cabin is very dry, and skin can '
+        'feel tight after a long flight. Time zones also change when '
+        'people sleep and eat. Readings in the days after travel may '
+        'differ from the usual range for those reasons.',
+  ),
+  LearnEntry(
+    id: 'label-clean-natural',
+    category: LearnCategory.labels,
+    title: 'Clean, natural and organic on a label',
+    body:
+        'These words are used on many packs, and in many countries none '
+        'of them has one strict legal meaning for skin-care products. '
+        'They describe what a maker chose to emphasise. The ingredient '
+        'list on the back says what is actually in the product.',
+  ),
+  LearnEntry(
+    id: 'label-patch-test',
+    category: LearnCategory.labels,
+    title: 'What a patch test is',
+    body:
+        'A patch test means putting a small amount of a product on a '
+        'small patch of skin, such as the inner forearm, and watching '
+        'it for a day or two to see whether the skin reacts. Makers and '
+        'many dermatologists describe it as a way to check for a '
+        'reaction before a product is used more widely.',
+  ),
+  LearnEntry(
+    id: 'label-ph',
+    category: LearnCategory.labels,
+    title: 'What pH-balanced means',
+    body:
+        'pH is a measure of how acidic or alkaline something is. '
+        'Skin\'s surface is slightly acidic, and pH-balanced on a label '
+        'means the maker aimed for a product close to that. There is no '
+        'single standard behind the words, so they describe what the '
+        'maker intended.',
+  ),
+  LearnEntry(
+    id: 'food-label-datemarks',
+    category: LearnCategory.foodLabels,
+    title: 'Use-by and best-before',
+    body:
+        'A use-by date is about safety: after it, the food is not meant '
+        'to be eaten. A best-before date is about quality: after it, '
+        'the food may be less good but is usually still safe if it has '
+        'been kept properly. Many packs carry one or the other, not '
+        'both.',
+  ),
+  LearnEntry(
+    id: 'food-label-sugarnames',
+    category: LearnCategory.foodLabels,
+    title: 'Sugar by other names',
+    body:
+        'Sugar can appear on an ingredient list under many names, such '
+        'as syrup, honey, jaggery, glucose, fructose, dextrose or fruit '
+        'juice concentrate. Each is a form of sugar. Listing them '
+        'separately can spread sugar across several lines of the list.',
+  ),
+  LearnEntry(
+    id: 'food-label-salt',
+    category: LearnCategory.foodLabels,
+    title: 'Salt and sodium on a label',
+    body:
+        'Many labels show sodium, not salt. Sodium is one part of salt, '
+        'about 40 percent of it by weight, so 1 gram of sodium is about '
+        '2.5 grams of salt. Some labels give both numbers and some give '
+        'only one, so it helps to know which is shown.',
+  ),
 ];
 
 /// Clusters of notes that belong together. Each note's "Also see" links are the
@@ -1972,7 +2123,29 @@ const List<List<String>> kLearnLinks = [
   ],
   ['sun-cloud', 'sun-index', 'sun-glass', 'sun-tone'],
   ['sun-amount', 'sun-shade', 'prod-sunscreen'],
+  [
+    'readings-makeup',
+    'readings-makeup-detail',
+    'readings-bare-vs-made-up',
+    'habit-heavy-makeup-days',
+  ],
   ['readings-light', 'readings-time', 'readings-makeup', 'readings-angle'],
+  [
+    'readings-facial-hair',
+    'readings-shave',
+    'readings-m-texture',
+    'readings-m-pores',
+  ],
+  ['readings-skin-tone', 'readings-light', 'readings-phone', 'sun-tone'],
+  ['sun-holi-colours', 'habit-heavy-makeup-days', 'sun-air'],
+  [
+    'label-clean-natural',
+    'label-hypoallergenic',
+    'label-patch-test',
+    'label-ph',
+  ],
+  ['food-label-sugarnames', 'food-label-sugars', 'food-label-order'],
+  ['food-label-datemarks', 'food-label-front'],
   ['readings-phone', 'readings-trend', 'sleep-one-night'],
   ['readings-seven', 'skin-layers'],
   ['move-flush', 'readings-time', 'move-sweat'],
