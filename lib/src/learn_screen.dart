@@ -644,10 +644,18 @@ class _EntryTileState extends State<_EntryTile> {
     LearnSaved.load();
     LearnRead.load();
     if (_open) {
-      // after this frame: the tick listens to the same notifier
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => LearnRead.mark(widget.entry.id),
-      );
+      // after this frame: the tick listens to the same notifier, and a note a
+      // link opened is centred on the page rather than left below the fold
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        LearnRead.mark(widget.entry.id);
+        if (!mounted || !widget.startOpen) return;
+        Scrollable.ensureVisible(
+          context,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     }
   }
 
