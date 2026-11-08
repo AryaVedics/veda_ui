@@ -2027,17 +2027,6 @@ const List<LearnEntry> kLearnEntries = [
         'often settle back to the usual range.',
   ),
   LearnEntry(
-    id: 'sun-holi-colours',
-    category: LearnCategory.sun,
-    title: 'Holi colours and skin',
-    body:
-        'Festival colours are often powders or pastes made for a day of '
-        'play. Some are gritty, some can leave skin dry or irritated, '
-        'and many stain skin for days. A reading taken while colour is '
-        'still on the skin describes the colour, so many people wait '
-        'until it has washed off.',
-  ),
-  LearnEntry(
     id: 'sun-flight-air',
     category: LearnCategory.sun,
     title: 'Long flights and dry cabin air',
@@ -2137,7 +2126,6 @@ const List<List<String>> kLearnLinks = [
     'readings-m-pores',
   ],
   ['readings-skin-tone', 'readings-light', 'readings-phone', 'sun-tone'],
-  ['sun-holi-colours', 'habit-heavy-makeup-days', 'sun-air'],
   [
     'label-clean-natural',
     'label-hypoallergenic',

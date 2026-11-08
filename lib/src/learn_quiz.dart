@@ -947,12 +947,6 @@ const List<MythCard> kMythCards = [
     'Cameras and phones see skin tones differently, most of all in dim light.',
   ),
   MythCard(
-    'sun-holi-colours',
-    'A reading taken with festival colour still on the skin describes the colour.',
-    true,
-    'Many people wait until it has washed off.',
-  ),
-  MythCard(
     'sun-flight-air',
     'Cabin air on a long flight is very dry.',
     true,
