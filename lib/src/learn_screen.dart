@@ -727,6 +727,26 @@ class _EntryTileState extends State<_EntryTile> {
                                 color: colors.textSecondary,
                               ),
                             ),
+                            if (e.why != null) ...[
+                              const SizedBox(height: 10),
+                              Text(
+                                'Why it is added',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: colors.textMuted,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                e.why!,
+                                key: Key('learn-why-${e.id}'),
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  height: 1.6,
+                                  color: colors.textSecondary,
+                                ),
+                              ),
+                            ],
                             if (e.sources.isNotEmpty) ...[
                               const SizedBox(height: 8),
                               Text(

@@ -138,6 +138,7 @@ class LearnEntry {
     required this.title,
     required this.body,
     this.sources = const [],
+    this.why,
   });
 
   /// Stable, never reused: a card or a link can point at it.
@@ -148,6 +149,10 @@ class LearnEntry {
 
   /// Where this comes from, when one source clearly stands behind it.
   final List<String> sources;
+
+  /// For an ingredient: why makers add it to a product, in one sentence. What
+  /// the ingredient is used for, never whether it works.
+  final String? why;
 }
 
 /// The note about each of the seven measurements, by the measurement's key
@@ -177,6 +182,9 @@ const List<LearnEntry> kLearnEntries = [
         'and moisturisers. Retinoids are known to carry risks in '
         'pregnancy, and many guidelines advise speaking with a doctor before '
         'using them while pregnant or trying to conceive.',
+    why:
+        'Makers add it to products aimed at the look of fine lines, '
+        'uneven tone and rough texture.',
   ),
   LearnEntry(
     id: 'ingredient-niacinamide',
@@ -186,6 +194,9 @@ const List<LearnEntry> kLearnEntries = [
         'Another name for vitamin B3, a nutrient that is also used in some '
         'skin-care products. It is found in many serums, moisturisers and '
         'toners.',
+    why:
+        'Makers add it to products aimed at the look of uneven tone, '
+        'oiliness and large-looking pores.',
   ),
   LearnEntry(
     id: 'ingredient-vitamin-c',
@@ -195,6 +206,9 @@ const List<LearnEntry> kLearnEntries = [
         'Also called ascorbic acid. An ingredient used in some skin-care '
         'products, often in the form of L-ascorbic acid. It is found in many '
         'serums and some moisturisers.',
+    why:
+        'Makers add it to products aimed at the look of dull or uneven '
+        'skin, and as an antioxidant ingredient.',
   ),
   LearnEntry(
     id: 'ingredient-hyaluronic-acid',
@@ -203,6 +217,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'A molecule the body makes itself that holds a great deal of '
         'water. It is found in many serums, moisturisers and masks.',
+    why:
+        'Makers add it to products aimed at skin that feels dry, '
+        'because it holds a great deal of water.',
   ),
   LearnEntry(
     id: 'ingredient-salicylic-acid',
@@ -212,6 +229,10 @@ const List<LearnEntry> kLearnEntries = [
         'A beta hydroxy acid, often shortened to BHA. It is found in many '
         'acne products, such as cleansers, toners and spot products, and '
         'in some exfoliating products.',
+    why:
+        'Makers add it to products aimed at oily, blemish-prone skin, '
+        'because it dissolves oil and loosens dead cells at the '
+        'surface.',
   ),
   LearnEntry(
     id: 'ingredient-alpha-hydroxy-acids',
@@ -220,6 +241,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'Two of the alpha hydroxy acids, often shortened to AHAs. They are '
         'found in many exfoliating toners, serums and peels.',
+    why:
+        'Makers add them to products meant to loosen dead cells on the '
+        'surface, for skin that looks dull or rough.',
   ),
   LearnEntry(
     id: 'ingredient-benzoyl-peroxide',
@@ -228,6 +252,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'A compound used in many acne products, such as washes, gels and '
         'spot products.',
+    why:
+        'Makers add it to products aimed at acne-prone skin, because it '
+        'is active against the bacteria linked to breakouts.',
   ),
   LearnEntry(
     id: 'ingredient-azelaic-acid',
@@ -237,6 +264,9 @@ const List<LearnEntry> kLearnEntries = [
         'An acid that occurs naturally in grains such as barley and wheat, '
         'and is also made in laboratories. It is found in some creams and '
         'gels made for blemish-prone skin.',
+    why:
+        'Makers add it to products aimed at blemish-prone skin, and at '
+        'the look of redness and uneven tone.',
   ),
   LearnEntry(
     id: 'ingredient-tretinoin',
@@ -248,6 +278,10 @@ const List<LearnEntry> kLearnEntries = [
         'carry risks in pregnancy, and many guidelines advise speaking '
         'with a doctor before using them while pregnant or trying to '
         'conceive.',
+    why:
+        'Makers add it to prescription products meant for acne and for '
+        'the look of fine lines. Whether it is used is a decision for a '
+        'doctor.',
   ),
   LearnEntry(
     id: 'ingredient-bakuchiol',
@@ -256,6 +290,10 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'An ingredient taken from the seeds of a plant, used in some '
         'serums and moisturisers.',
+    why:
+        'Makers add it to products offered as a plant-based alternative '
+        'to retinol, aimed at the same concerns: fine lines and uneven '
+        'tone.',
   ),
   LearnEntry(
     id: 'ingredient-ceramides',
@@ -264,6 +302,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'Fats that occur naturally in the outer layer of skin. They are '
         'found in many moisturisers and cleansers.',
+    why:
+        'Makers add them to moisturisers meant to support the skin '
+        'barrier and keep skin from feeling dry.',
   ),
   LearnEntry(
     id: 'ingredient-peptides',
@@ -272,6 +313,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'Short chains of amino acids, the building blocks of proteins. '
         'They are found in some serums and moisturisers.',
+    why:
+        'Makers add them to products aimed at the look of fine lines '
+        'and firmness.',
   ),
   LearnEntry(
     id: 'ingredient-glycerin',
@@ -281,6 +325,9 @@ const List<LearnEntry> kLearnEntries = [
         'A common ingredient that attracts water. It is found in a very '
         'wide range of products, including cleansers, moisturisers and lip '
         'balms.',
+    why:
+        'Makers add it as a humectant: it draws water to the surface of '
+        'skin, so a product feels moisturising and soft.',
   ),
   LearnEntry(
     id: 'ingredient-panthenol',
@@ -289,6 +336,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'A form of vitamin B5. It is found in many moisturisers, lip balms '
         'and hair products.',
+    why:
+        'Makers add it to products meant to soothe skin and lips that '
+        'feel dry or rough.',
   ),
   LearnEntry(
     id: 'ingredient-squalane',
@@ -297,6 +347,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'A light oil, often made from olives or sugar cane. It is found in '
         'some moisturisers and facial oils.',
+    why:
+        'Makers add it as a light oil that gives a soft, non-greasy '
+        'feel and helps keep moisture in.',
   ),
   LearnEntry(
     id: 'ingredient-petrolatum',
@@ -305,6 +358,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'A soft, jelly-like substance made from petroleum. It is found in '
         'many ointments, lip balms and moisturisers.',
+    why:
+        'Makers add it to form a seal on the skin that slows water '
+        'loss, in products for dry or chapped skin.',
   ),
   LearnEntry(
     id: 'ingredient-mineral-filters',
@@ -314,6 +370,9 @@ const List<LearnEntry> kLearnEntries = [
         'Two minerals used as sunscreen filters, often called the mineral '
         'filters. They are found in many sunscreens, and in some tinted '
         'moisturisers and makeup that list an SPF.',
+    why:
+        'Makers add them to block and scatter UV light, so that a '
+        'product can carry an SPF rating.',
   ),
   LearnEntry(
     id: 'ingredient-chemical-filters',
@@ -323,6 +382,9 @@ const List<LearnEntry> kLearnEntries = [
         'A group of ingredients, such as avobenzone and oxybenzone, that '
         'are used as filters in sunscreens. They are found in many '
         'sunscreens, and in some moisturisers and makeup that list an SPF.',
+    why:
+        'Makers add them to absorb UV light, so that a product can '
+        'carry an SPF rating.',
   ),
   LearnEntry(
     id: 'ingredient-fragrance',
@@ -333,6 +395,9 @@ const List<LearnEntry> kLearnEntries = [
         'for the scented parts of a product, and it can stand for many '
         'different ingredients. It is found in many cleansers, '
         'moisturisers and body products.',
+    why:
+        'Makers add it to give a product a scent, or to cover the smell '
+        'of other ingredients.',
   ),
   // ---- sleep and rest
   LearnEntry(
@@ -1071,6 +1136,10 @@ const List<LearnEntry> kLearnEntries = [
         'A group of fat-soluble compounds, the best known being '
         'tocopherol, that also occur naturally in nuts and seed oils. It '
         'is found in many moisturisers and sunscreens.',
+    why:
+        'Makers add it as an antioxidant that keeps the oils in a '
+        'product from going off, and for the soft feel it gives on '
+        'skin.',
   ),
   LearnEntry(
     id: 'ingredient-urea',
@@ -1080,6 +1149,9 @@ const List<LearnEntry> kLearnEntries = [
         'A substance the body makes naturally, also made in '
         'laboratories, that attracts water. It is found in many '
         'moisturisers, especially creams for hands and feet.',
+    why:
+        'Makers add it to products for very dry or rough skin, because '
+        'it holds water and softens thick, rough patches.',
   ),
   LearnEntry(
     id: 'ingredient-sulfur',
@@ -1089,6 +1161,9 @@ const List<LearnEntry> kLearnEntries = [
         'A natural element that has been used in skin products for a '
         'very long time. It is found in some acne masks and spot '
         'products, and in some shampoos.',
+    why:
+        'Makers add it to products aimed at oily, blemish-prone skin '
+        'and at flaking on the scalp.',
   ),
   LearnEntry(
     id: 'ingredient-clay',
@@ -1097,6 +1172,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'Fine mineral powders that soak up oil and water. They are found '
         'in many face masks and in some cleansers.',
+    why:
+        'Makers add them to masks and cleansers meant to soak up extra '
+        'oil.',
   ),
   LearnEntry(
     id: 'ingredient-aloe-vera',
@@ -1106,6 +1184,9 @@ const List<LearnEntry> kLearnEntries = [
         'A gel taken from the leaves of the aloe plant, and mostly '
         'water. It is found in many gels, lotions and after-sun '
         'products.',
+    why:
+        'Makers add it for its cool, watery feel, in products meant to '
+        'soothe skin after sun and to give light moisture.',
   ),
   LearnEntry(
     id: 'ingredient-tea-tree-oil',
@@ -1116,6 +1197,9 @@ const List<LearnEntry> kLearnEntries = [
         'is found in some acne spot products, washes and shampoos. As an '
         'essential oil it can irritate some people\'s skin, so it is '
         'usually diluted.',
+    why:
+        'Makers add it to products aimed at blemish-prone skin and an '
+        'oily scalp, for its long use as an antiseptic.',
   ),
   LearnEntry(
     id: 'ingredient-dimethicone',
@@ -1125,6 +1209,9 @@ const List<LearnEntry> kLearnEntries = [
         'A silicone: a smooth, slippery liquid that sits on top of skin '
         'and leaves it feeling soft. It is found in many primers, '
         'moisturisers and sunscreens.',
+    why:
+        'Makers add it to give a smooth, silky feel, to fill in a '
+        'rough-looking surface and to form a light barrier on skin.',
   ),
   LearnEntry(
     id: 'ingredient-caffeine',
@@ -1133,6 +1220,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'The same compound that is in coffee and tea, also made in '
         'laboratories. It is found in some eye creams and serums.',
+    why:
+        'Makers add it to eye products aimed at the look of puffiness '
+        'and tired-looking skin.',
   ),
   LearnEntry(
     id: 'ingredient-surfactants',
@@ -1143,6 +1233,9 @@ const List<LearnEntry> kLearnEntries = [
         'can be rinsed away. They are found in cleansers, body washes '
         'and shampoos, where they do the cleaning, and some are gentler '
         'than others.',
+    why:
+        'Makers add them to do the cleaning: they lift oil and dirt so '
+        'they rinse away, and they make the lather.',
   ),
   LearnEntry(
     id: 'ingredient-preservatives',
@@ -1153,6 +1246,9 @@ const List<LearnEntry> kLearnEntries = [
         'once water is in it. They are found in most creams, lotions and '
         'cleansers that contain water. Different preservatives are '
         'allowed in different countries.',
+    why:
+        'Makers add them so that a product stays safe to use for months '
+        'once water is in it.',
   ),
   LearnEntry(
     id: 'ingredient-alcohol',
@@ -1163,6 +1259,10 @@ const List<LearnEntry> kLearnEntries = [
         'alcohol, is the thin, quick-drying kind found in some toners '
         'and gel sunscreens. Fatty alcohols such as cetyl alcohol are '
         'waxy and are found in many creams as thickeners.',
+    why:
+        'Makers add ethanol to make a product thin and quick-drying or '
+        'to carry other ingredients, and fatty alcohols to thicken and '
+        'soften creams.',
   ),
   LearnEntry(
     id: 'ingredient-centella',
@@ -1172,6 +1272,9 @@ const List<LearnEntry> kLearnEntries = [
         'A herb that grows in wet places across Asia and is often called '
         'cica or tiger grass. It is found in many serums, creams and '
         'masks, especially ones from Korea.',
+    why:
+        'Makers add it to products aimed at skin that looks red, '
+        'irritated or sensitive.',
   ),
   LearnEntry(
     id: 'ingredient-colloidal-oatmeal',
@@ -1180,6 +1283,9 @@ const List<LearnEntry> kLearnEntries = [
     body:
         'Oats ground so finely that they stay suspended in liquid. It is '
         'found in many creams, lotions and bath products.',
+    why:
+        'Makers add it to products meant to soothe skin that feels dry '
+        'or itchy.',
   ),
   LearnEntry(
     id: 'ingredient-adapalene',
@@ -1192,6 +1298,7 @@ const List<LearnEntry> kLearnEntries = [
         'carry risks in pregnancy, and many guidelines advise speaking '
         'with a doctor before using them while pregnant or trying to '
         'conceive.',
+    why: 'Makers add it to gels and creams aimed at acne-prone skin.',
   ),
   LearnEntry(
     id: 'food-label-serving',
