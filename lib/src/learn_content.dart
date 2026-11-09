@@ -24,8 +24,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 /// The three parts of the portal: what themes sit together on its front page.
 enum LearnGroup {
   skin('Your skin'),
-  everyday('Everyday life'),
   products('Products and labels'),
+  everyday('Everyday life'),
   food('Food and nutrition');
 
   const LearnGroup(this.title);

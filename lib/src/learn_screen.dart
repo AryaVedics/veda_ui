@@ -1,8 +1,8 @@
 // Copy of Véda's template (flutter_app/lib/screens/learn_screen.dart). Keep in step.
 //
 // The front page has a search box, an A to Z of definitions, the notes a person
-// saved, the themes in three groups (Your skin, Everyday life, Products and
-// labels) and, last, four practice games. A theme is a page of its own, with its
+// saved, the themes in three groups (Your skin, Products and labels,
+// Everyday life) and, last, four practice games. A theme is a page of its own, with its
 // notes closed to their titles; an open note offers "Also see" links to notes
 // that go with it, and a bookmark to keep it for later.
 //
