@@ -174,6 +174,21 @@ abstract class JsonStore<T> extends ChangeNotifier {
   }
 }
 
+/// Empties the app's temporary folder: the export, backup, report and picture
+/// files made for sharing, which hold copies of the person's data and are
+/// otherwise never removed. "Delete everything" calls this.
+Future<void> deleteTemporaryFiles() async {
+  try {
+    final dir = await getTemporaryDirectory();
+    if (!await dir.exists()) return;
+    await for (final e in dir.list()) {
+      try {
+        await e.delete(recursive: true);
+      } catch (_) {}
+    }
+  } catch (_) {}
+}
+
 /// Hands [json] to the phone's share sheet as a file.
 Future<void> shareJsonFile(String fileName, String json, String subject) async {
   final dir = await getTemporaryDirectory();

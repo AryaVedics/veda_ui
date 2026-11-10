@@ -97,4 +97,16 @@ void main() {
     expect(await RestoreInbox.undoAvailableSince(), isNull);
     expect(undoCopy().existsSync(), isFalse);
   });
+
+  test('Delete everything clears the undo copy and a restore still waiting', () async {
+    await leave();
+    await RestoreInbox.applyIfWaiting(target());
+    await leave(); // a second restore left waiting
+    expect(undoCopy().existsSync(), isTrue);
+    expect(pending().existsSync(), isTrue);
+    await RestoreInbox.clearUndo();
+    expect(undoCopy().existsSync(), isFalse);
+    expect(pending().existsSync(), isFalse);
+    expect(await RestoreInbox.undo(target()), isFalse);
+  });
 }

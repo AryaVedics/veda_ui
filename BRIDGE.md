@@ -69,7 +69,9 @@ identically (its own provider or App Group file, its own switch):
   (`group.com.aryavedics.veda`) that only Véda-family apps under the same
   Apple developer team can open.
 - The companion reads it when it opens and replaces its copy. When Véda's
-  switch is off, the companion forgets its copy.
+  switch is off the companion stops receiving new readings but keeps the copy
+  it has until the person chooses "Remove my Véda readings" or "Delete
+  everything" in the companion's Profile.
 - **Every other direction:** each app publishes its own feed the same way
   (its own content provider under the same signature permission, or its own
   file in the App Group), behind one switch, "Share my entries with my other

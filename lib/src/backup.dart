@@ -306,8 +306,9 @@ class BackupController {
 
   /// Picks a backup file, asks for its passphrase, and puts it back.
   Future<bool> restore(BuildContext context) async {
-    final picked = await FilePicker.platform.pickFiles(withData: true);
-    final bytes = picked?.files.single.bytes;
+    final picked = await FilePicker.platform.pickFiles(withData: false);
+    final file = picked?.files.single;
+    final bytes = file == null ? null : await readPickedBytes(file);
     if (bytes == null || !context.mounted) return false;
     final text = utf8.decode(bytes, allowMalformed: true);
     final messenger = ScaffoldMessenger.of(context);
@@ -532,7 +533,7 @@ class _BackupCardState extends State<BackupCard> {
   String _lastWords() {
     final l = _last;
     if (l == null) return 'You have not made a backup yet.';
-    return 'Last backed up ${l.day}/${l.month}/${l.year}.';
+    return 'Last backed up ${shortDate(l)}.';
   }
 
   @override
@@ -650,4 +651,17 @@ class _BackupNudgeState extends State<BackupNudge> {
       ),
     );
   }
+}
+
+/// The bytes of a picked file, or null if it is bigger than [maxBytes]: a very
+/// large file chosen by mistake would otherwise be read whole into memory.
+/// Backups and shelf cards are small.
+Future<Uint8List?> readPickedBytes(
+  PlatformFile f, {
+  int maxBytes = 20 * 1024 * 1024,
+}) async {
+  if (f.size > maxBytes) return null;
+  if (f.bytes != null) return f.bytes;
+  final path = f.path;
+  return path == null ? null : File(path).readAsBytes();
 }

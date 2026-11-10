@@ -144,6 +144,19 @@ class RestoreInbox {
     }
   }
 
+  /// Removes the copy from before the last restore, and any restore Véda left
+  /// waiting. "Delete everything" calls this, so nothing is left to undo back
+  /// into the data that was just deleted.
+  static Future<void> clearUndo() async {
+    try {
+      final dir = await _dir();
+      for (final name in [_undoName, _pendingName]) {
+        final f = File('${dir.path}/$name');
+        if (await f.exists()) await f.delete();
+      }
+    } catch (_) {}
+  }
+
   /// Puts back what the app held before the last restore. False if there is
   /// nothing to put back.
   static Future<bool> undo(RestoreTarget target) async {

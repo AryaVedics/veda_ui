@@ -61,6 +61,8 @@ class DataSection extends StatelessWidget {
     if (ok != true) return;
     await store.deleteEverything();
     await alsoDelete?.call();
+    await RestoreInbox.clearUndo();
+    await deleteTemporaryFiles();
     if (context.mounted) {
       ScaffoldMessenger.of(
         context,
