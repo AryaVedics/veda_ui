@@ -32,7 +32,15 @@ enum LinkApp {
     'Véda Lifestyle',
     'Wellness Score, check-ins and food',
   ),
-  cycle('cycle', 'com.aryavedics.cycle.link', 'Véda Cycle', 'Cycle phase'),
+  // Véda Cycle only reads: it publishes nothing to any app (BRIDGE.md, "Véda
+  // Cycle reads, never shares"), so no other app lists it or asks it for a feed.
+  cycle(
+    'cycle',
+    'com.aryavedics.cycle.link',
+    'Véda Cycle',
+    'Reads only, shares nothing',
+    publishes: false,
+  ),
   routine(
     'routine',
     'com.aryavedics.routine.link',
@@ -46,9 +54,19 @@ enum LinkApp {
     'Skin readings, food and check-ins',
   );
 
-  const LinkApp(this.id, this.authority, this.name, this.gives);
+  const LinkApp(
+    this.id,
+    this.authority,
+    this.name,
+    this.gives, {
+    this.publishes = true,
+  });
 
   final String id;
+
+  /// False for an app that only reads (Véda Cycle): it never publishes a feed,
+  /// and the other apps neither list it nor ask it for one.
+  final bool publishes;
   final String authority;
   final String name;
 
@@ -134,8 +152,12 @@ class LinkBridge extends ChangeNotifier {
   /// The feed of [app], if it is connected right now.
   LinkFeed? feedOf(LinkApp app) => readOf(app).feed;
 
-  /// The other apps this one can look at.
-  Iterable<LinkApp> get others => LinkApp.values.where((a) => a != self);
+  /// True for an app that only reads (Véda Cycle): it shares nothing, ever.
+  bool get readOnly => !self.publishes;
+
+  /// The other apps this one can look at: the ones that publish something.
+  Iterable<LinkApp> get others =>
+      LinkApp.values.where((a) => a != self && a.publishes);
 
   Map<String, Object?>? _lastPublished;
 
@@ -144,14 +166,21 @@ class LinkBridge extends ChangeNotifier {
 
   /// Whether this app and [app] are linked: connecting is on, and this pair
   /// has not been switched off.
-  bool isLinked(LinkApp app) => _share && _use && !_unlinked.contains(app);
+  bool isLinked(LinkApp app) =>
+      (readOnly || _share) && _use && !_unlinked.contains(app);
 
   int get linkedCount => others.where(isLinked).length;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _share = prefs.getBool(_shareKey) ?? false;
+    _share = !readOnly && (prefs.getBool(_shareKey) ?? false);
     _use = prefs.getBool(_useKey) ?? false;
+    if (readOnly && (prefs.getBool(_shareKey) ?? false)) {
+      // An older version of this app did publish with this switch on: make
+      // sure nothing it left is still being served, once.
+      await prefs.remove(_shareKey);
+      await _write(null);
+    }
     _unlinked
       ..clear()
       ..addAll([
@@ -175,7 +204,7 @@ class LinkBridge extends ChangeNotifier {
   /// Links or unlinks this app with just [app]. Linking one while nothing is
   /// connected connects that one only.
   Future<void> setLinked(LinkApp app, bool on) async {
-    if (on && !(_share && _use)) {
+    if (on && !((readOnly || _share) && _use)) {
       _unlinked
         ..clear()
         ..addAll(others.where((a) => a != app));
@@ -210,6 +239,7 @@ class LinkBridge extends ChangeNotifier {
   // other apps) follows. Waiting for it before redrawing left the switch
   // looking dead until the next rebuild.
   Future<void> setShare(bool on) async {
+    if (readOnly) return; // this app shares nothing
     _share = on;
     notifyListeners();
     await (await SharedPreferences.getInstance()).setBool(_shareKey, on);
@@ -234,6 +264,7 @@ class LinkBridge extends ChangeNotifier {
 
   /// Hand over this app's feed. Remembered, and only served if sharing is on.
   Future<void> publish(Map<String, Object?> data) async {
+    if (readOnly) return;
     _lastPublished = data;
     if (_share) await _write(data);
   }

@@ -21,7 +21,7 @@ class LinkSection extends StatefulWidget {
   const LinkSection({
     super.key,
     required this.bridge,
-    required this.shares,
+    this.shares,
     this.reads,
     this.link,
     this.why,
@@ -30,8 +30,8 @@ class LinkSection extends StatefulWidget {
   final LinkBridge bridge;
 
   /// What this app publishes, in a few words: "your period days and the
-  /// estimated phase".
-  final String shares;
+  /// estimated phase". Null for an app that only reads.
+  final String? shares;
 
   /// What this app does with the others' entries: "Shows your sleep and
   /// stress beside your cycle."
@@ -127,12 +127,19 @@ class _LinkSectionState extends State<LinkSection> {
         title: const Text('What is shared'),
         content: SingleChildScrollView(
           child: Text(
-            'This app shares ${widget.shares} with the apps you link.'
-            '${widget.reads == null ? '' : ' ${widget.reads}'}\n\n'
-            'It all stays on this phone: only Véda apps signed by us can read '
-            'it, and nothing is sent anywhere. A link is two-way for a pair of '
-            'apps; switch one off and that pair stops sharing, nothing else '
-            'changes.',
+            bridge.readOnly
+                ? 'This app shares nothing with any other app. Linking only '
+                      'lets it read what the others choose to share.'
+                      '${widget.reads == null ? '' : ' ${widget.reads}'}\n\n'
+                      'It all stays on this phone: only Véda apps signed by us '
+                      'can be read, and nothing is sent anywhere. Switch one '
+                      'off and this app stops reading it; nothing else changes.'
+                : 'This app shares ${widget.shares} with the apps you link.'
+                      '${widget.reads == null ? '' : ' ${widget.reads}'}\n\n'
+                      'It all stays on this phone: only Véda apps signed by us '
+                      'can read it, and nothing is sent anywhere. A link is '
+                      'two-way for a pair of apps; switch one off and that '
+                      'pair stops sharing, nothing else changes.',
             style: const TextStyle(fontSize: 14, height: 1.45),
           ),
         ),
@@ -326,8 +333,12 @@ class _LinkSectionState extends State<LinkSection> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
                   child: Text(
-                    'Each switch links this app with that one, both ways. Turn '
-                    'one off and the two stop sharing; nothing else changes.',
+                    bridge.readOnly
+                        ? 'Each switch lets this app read that one. This app '
+                              'shares nothing with any of them.'
+                        : 'Each switch links this app with that one, both ways. '
+                              'Turn one off and the two stop sharing; nothing '
+                              'else changes.',
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.45,

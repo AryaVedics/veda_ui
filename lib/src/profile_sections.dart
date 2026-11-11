@@ -22,7 +22,11 @@ class DataSection extends StatelessWidget {
     required this.whatIsDeleted,
     this.alsoDelete,
     this.restoreTarget,
+    this.strict = false,
   });
+
+  /// For Véda Cycle: backups are always sealed and carry a neutral file name.
+  final bool strict;
 
   final String appName;
   final JsonStore store;
@@ -77,6 +81,7 @@ class DataSection extends StatelessWidget {
       appName: appName,
       exportJson: store.exportJson,
       restoreJson: store.restoreJson,
+      strict: strict,
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

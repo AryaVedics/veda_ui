@@ -22,12 +22,11 @@ its own copy if the person wants it.
 |---|---|---|
 | Skin readings | Véda | every companion, for its charts |
 | Daily check-ins (sleep, water, exercise, stress) and food | Véda Lifestyle | Véda (its Lifestyle tab and food card, so nothing is entered twice); Cycle (sleep and stress by phase) |
-| Period days and estimated phase | Véda Cycle | Véda (its Cycle tab); Lifestyle (phase beside sleep and stress). Symptoms are not shared beyond Véda |
+| ~~Period days and estimated phase~~ | ~~Véda Cycle~~ | **Not shared, 2026-11-11.** Véda Cycle publishes nothing (see "Véda Cycle reads, never shares") |
 | Products started and stopped, daily checklist | Véda Routine | Sun (which sunscreen, its SPF); later Véda's Trends markers, only if it stays uncluttered |
 | Sunscreen put on, UV by day | Véda Sun | Routine (tick "sunscreen" on the checklist); Lifestyle (sun days beside sleep) |
 
-Cycle is the most sensitive: its sharing switch is off until turned on, and
-even then it publishes only period days and the estimated phase.
+Cycle is the most sensitive: it publishes nothing at all (see below).
 
 ## What crosses
 From Véda: only what a chart needs, per reading: when it was taken, the
@@ -119,7 +118,21 @@ identically (its own provider or App Group file, its own switch):
 There is no manual import: the readings only arrive live over the link
 (a hand-made import went stale with every new reading, so nobody would use it).
 
-## Véda Cycle is an island (decided 2026-10-27, supersedes the Cycle rows above)
+## Véda Cycle reads, never shares (decided 2026-11-11, after the leak-proof audit)
+
+The island decision below was deferred (2026-11-05) and Cycle kept its Skin tab and Link. The audit
+(`play-store/AUDIT-REPORT-cycle-0.6.14.md`) found the outward feed was the only real leak surface and that only
+Lifestyle used one line of it, so on 2026-11-11 the owner chose **read-only**:
+
+- **Cycle publishes nothing.** `LinkApp.cycle.publishes` is false: no other app lists it (`LinkBridge.others`) or
+  asks it for a feed, Véda's link list and Lifestyle's phase note are gone, Cycle's own manifest removes the shared
+  content provider (`tools:node="remove"`), and `LinkBridge` ignores publish and share for it and deletes any feed an
+  older version left. On iPhone Cycle must not join the App Group.
+- **Cycle still reads** Véda's skin readings (its Skin tab) and Lifestyle's check-ins, under one switch ("Use entries
+  from my other Véda apps"); the other apps keep their own sharing switches. Cycle stays in `FamilyKeys` so it can read.
+- Cycle's backups are always sealed with a passphrase and carry neutral file names (`BackupController.strict`).
+
+## Véda Cycle is an island (decided 2026-10-27; DEFERRED, and for now superseded by the section above)
 
 Period days and cycle phase are the most sensitive entries in the family, and the people who use Véda Cycle
 will, understandably, want every possible risk removed, and even an optional link makes an app look less sealed. So:

@@ -185,8 +185,14 @@ class BackupController {
     required this.exportJson,
     required this.restoreJson,
     this.iterations = kBackupIterations,
+    this.strict = false,
     DateTime Function()? clock,
   }) : clock = clock ?? DateTime.now;
+
+  /// For the app holding the most sensitive data (Véda Cycle): a backup is
+  /// always sealed with a passphrase (there is no "No passphrase" choice), and
+  /// the file's name says nothing about what is inside it.
+  final bool strict;
 
   /// "cycle", "lifestyle": names the file and binds it to this app.
   final String appKey;
@@ -259,7 +265,7 @@ class BackupController {
   /// Asks for a passphrase twice, seals the data and opens the share sheet.
   Future<bool> backUp(BuildContext context) async {
     // null: no passphrase (the person chose that); '': cancelled
-    final pass = await _askNewPassphrase(context, appName);
+    final pass = await _askNewPassphrase(context, appName, strict: strict);
     if (pass == '' || !context.mounted) return false;
     final messenger = ScaffoldMessenger.of(context);
     showDialog<void>(
@@ -284,7 +290,9 @@ class BackupController {
       if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
     }
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/${backupFileName(appKey, clock())}');
+    final file = File(
+      '${dir.path}/${backupFileName(strict ? 'data' : appKey, clock())}',
+    );
     await file.writeAsString(sealed);
     final result = await Share.shareXFiles([
       XFile(file.path, mimeType: 'application/octet-stream'),
@@ -430,7 +438,11 @@ Future<String?> _askPassphrase(BuildContext context) {
   );
 }
 
-Future<String?> _askNewPassphrase(BuildContext context, String appName) {
+Future<String?> _askNewPassphrase(
+  BuildContext context,
+  String appName, {
+  bool strict = false,
+}) {
   final a = TextEditingController();
   final b = TextEditingController();
   String? problem;
@@ -445,11 +457,17 @@ Future<String?> _askNewPassphrase(BuildContext context, String appName) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Your $appName backup can be sealed with a passphrase. Nobody '
-                'can open a sealed file without it, including us, and there is '
-                'no way to recover a forgotten one. At least 8 characters. Or '
-                'leave the passphrase out: the file is then not sealed, so keep '
-                'it somewhere safe.',
+                strict
+                    ? 'Your $appName backup is sealed with a passphrase. Nobody '
+                          'can open it without it, including us, and there is '
+                          'no way to recover a forgotten one. At least 8 '
+                          'characters.'
+                    : 'Your $appName backup can be sealed with a passphrase. '
+                          'Nobody can open a sealed file without it, including '
+                          'us, and there is no way to recover a forgotten one. '
+                          'At least 8 characters. Or leave the passphrase out: '
+                          'the file is then not sealed, so keep it somewhere '
+                          'safe.',
                 style: const TextStyle(fontSize: 13, height: 1.4),
               ),
               const SizedBox(height: 12),
@@ -482,11 +500,12 @@ Future<String?> _askNewPassphrase(BuildContext context, String appName) {
             onPressed: () => Navigator.pop(d, ''),
             child: const Text('Cancel'),
           ),
-          TextButton(
-            key: const Key('backupWithoutPassphrase'),
-            onPressed: () => Navigator.pop(d),
-            child: const Text('No passphrase'),
-          ),
+          if (!strict)
+            TextButton(
+              key: const Key('backupWithoutPassphrase'),
+              onPressed: () => Navigator.pop(d),
+              child: const Text('No passphrase'),
+            ),
           TextButton(
             onPressed: () {
               if (a.text.length < 8) {
