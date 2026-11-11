@@ -252,6 +252,8 @@ class LinkBridge extends ChangeNotifier {
           .invokeMethod('publish', {
             'feed': text,
             'blocked': [for (final a in _unlinked) a.package],
+            // the iPhone files each app's feed under its own id
+            'app': self.id,
           })
           .timeout(const Duration(seconds: 6));
     } on TimeoutException {
@@ -286,6 +288,8 @@ class LinkBridge extends ChangeNotifier {
       final r = await _channel
           .invokeMapMethod<String, Object?>('read', {
             'authority': app.authority,
+            // so the other app can tell whether it has unlinked this one
+            'as': self.id,
           })
           .timeout(const Duration(seconds: 8));
       switch (r?['status']) {

@@ -42,6 +42,8 @@ flutter:
       android:
         package: com.aryavedics.veda_ui
         pluginClass: VedaUiPlugin
+      ios:
+        pluginClass: VedaUiPlugin
   fonts:
     # Véda's display serif, for titles only. Apps use it as kDisplayFont
     # ('packages/veda_ui/Marcellus').

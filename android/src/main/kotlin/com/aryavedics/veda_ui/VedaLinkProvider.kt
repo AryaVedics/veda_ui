@@ -33,6 +33,14 @@ class VedaLinkProvider : ContentProvider() {
         if (!FamilyKeys.isFamily(ctx, Binder.getCallingUid())) {
             throw SecurityException("Only Véda apps may read this feed")
         }
+        // The Patron flag ("this phone has a membership"): no personal data, so it
+        // is served to any family app, whatever the sharing switch says.
+        if (uri.lastPathSegment == "patron") {
+            val patron = MatrixCursor(arrayOf("patron"))
+            val pf = patronFile(ctx)
+            if (pf.exists()) patron.addRow(arrayOf<Any?>(pf.readText(Charsets.UTF_8)))
+            return patron
+        }
         val cursor = MatrixCursor(arrayOf("feed", "updated_at"))
         // An app the person has unlinked from this one sees an empty feed, the
         // same as sharing being off.
@@ -106,6 +114,7 @@ class VedaLinkProvider : ContentProvider() {
     companion object {
         const val FEED_FILE = "veda_link_feed.json"
         const val BLOCKED_FILE = "veda_link_blocked.txt"
+        const val PATRON_FILE = "veda_patron.json"
         const val RESTORE_FILE = "veda_restore_pending.json"
         const val VEDA_PACKAGE = "com.aryavedics.skin"
         const val BACKUP_FILE_KEY = "com.aryavedics.veda_ui.BACKUP_FILE"
@@ -127,6 +136,9 @@ class VedaLinkProvider : ContentProvider() {
 
         /** In the app's private files folder; the Dart side writes the same file. */
         fun feedFile(context: android.content.Context): File = File(context.filesDir, FEED_FILE)
+
+        /** This app's Patron entry (active, and until when), in its private folder. */
+        fun patronFile(context: android.content.Context): File = File(context.filesDir, PATRON_FILE)
 
         /** The packages the person has unlinked, one per line. */
         fun blockedFile(context: android.content.Context): File = File(context.filesDir, BLOCKED_FILE)

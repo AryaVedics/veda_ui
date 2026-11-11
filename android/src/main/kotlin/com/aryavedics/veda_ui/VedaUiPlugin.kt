@@ -67,6 +67,36 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
+            "publishPatron" -> {
+                val active = call.argument<Boolean>("active") == true
+                val until = call.argument<String>("until")
+                val file = VedaLinkProvider.patronFile(context)
+                workers.execute {
+                    try {
+                        if (active) {
+                            val json = org.json.JSONObject()
+                            json.put("active", true)
+                            if (until != null) json.put("until", until)
+                            val tmp = java.io.File(file.path + ".tmp")
+                            tmp.writeText(json.toString(), Charsets.UTF_8)
+                            tmp.renameTo(file)
+                        } else if (file.exists()) {
+                            file.delete()
+                        }
+                        main.post { result.success(true) }
+                    } catch (e: Exception) {
+                        main.post { result.error("publish_failed", e.message, null) }
+                    }
+                }
+            }
+
+            "readPatron" -> {
+                workers.execute {
+                    val member = readPatron()
+                    main.post { result.success(member) }
+                }
+            }
+
             "deviceInfo" -> {
                 // For a support email: the app, its version, and the phone.
                 val pm = context.packageManager
@@ -107,6 +137,60 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
 
             else -> result.notImplemented()
         }
+    }
+
+    /**
+     * True if any family app on this phone (this one included) has a Patron
+     * entry that has not run out. An app that is not installed, not allowed or
+     * not answering simply does not count. Never throws.
+     */
+    private fun readPatron(): Boolean {
+        for (pkg in FamilyKeys.PACKAGES) {
+            val uri = Uri.parse("content://$pkg.link/patron")
+            val client = try {
+                context.contentResolver.acquireUnstableContentProviderClient(uri)
+            } catch (e: Exception) {
+                null
+            } ?: continue
+            try {
+                val cursor = client.query(uri, null, null, null, null) ?: continue
+                val text = cursor.use { if (it.moveToFirst()) it.getString(0) else null } ?: continue
+                if (patronValid(text)) return true
+            } catch (e: Exception) {
+                // not allowed, or it died while answering: not a member from there
+            } finally {
+                client.close()
+            }
+        }
+        return false
+    }
+
+    /** A date that cannot be read counts as run out: never a free membership. */
+    private fun patronValid(text: String): Boolean = try {
+        val json = org.json.JSONObject(text)
+        if (!json.optBoolean("active", false)) {
+            false
+        } else {
+            val until = json.optString("until", "")
+            until.isEmpty() || parseUtc(until)?.after(java.util.Date()) == true
+        }
+    } catch (e: Exception) {
+        false
+    }
+
+    /** Dart writes 2026-11-11T12:00:00.000Z; the plain form is accepted too. Null if unreadable. */
+    private fun parseUtc(text: String): java.util.Date? {
+        for (pattern in arrayOf("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss'Z'")) {
+            try {
+                val f = java.text.SimpleDateFormat(pattern, java.util.Locale.US)
+                f.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                f.isLenient = false
+                return f.parse(text)
+            } catch (e: Exception) {
+                // try the next form
+            }
+        }
+        return null
     }
 
     /** Asks one family app's provider for its feed. Never throws. */
