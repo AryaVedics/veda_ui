@@ -1,0 +1,20 @@
+name: veda_ads
+description: "The one small banner ad every Véda app except Cycle carries: same look, same consent step, same rules. Lives apart from veda_ui so an app without ads (Cycle) never links the ad library."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Google's ad library. An app that uses this package MUST declare an AdMob
+  # App ID in its Android manifest (meta-data
+  # com.google.android.gms.ads.APPLICATION_ID) and Info.plist
+  # (GADApplicationIdentifier), or the library stops the app at launch.
+  google_mobile_ads: ^9.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
