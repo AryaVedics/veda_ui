@@ -195,7 +195,7 @@ class ForestFriendsPage extends StatelessWidget {
         foregroundColor: colors.textPrimary,
         elevation: 0,
         title: Text(
-          'Friends of the Forest',
+          'The Little Vedafolk',
           style: TextStyle(fontSize: 15, color: colors.textPrimary),
         ),
       ),

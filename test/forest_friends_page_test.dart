@@ -44,7 +44,7 @@ void main() {
       addTearDown(t.view.reset);
       await t.pumpWidget(host(const ForestFriendsPage()));
       await t.pump();
-      expect(find.text('Friends of the Forest'), findsOneWidget);
+      expect(find.text('The Little Vedafolk'), findsOneWidget);
       final row = find.byKey(const Key('friendRow-Vesna'));
       await t.ensureVisible(row);
       await t.pump();
