@@ -153,7 +153,7 @@ class ForestFriendsPeek extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Meet all ${kForestFriends.length} friends',
+                    'Meet all ${kForestFriends.length} of the Vedafolk',
                     style: TextStyle(fontSize: 13.5, color: colors.accentText),
                   ),
                 ),

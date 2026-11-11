@@ -127,7 +127,9 @@ numbers; do not eyeball them.
 - Sentences, captions and button labels are not titles: they stay in sentence
   case ("Add a part", "Check off today's products").
 
-## The forest friends
+## The Little Vedafolk (the forest friends)
+
+The cast's name is "The Little Vedafolk"; "the Vedafolk" in everyday text. The code keeps the names `ForestFriend`, `kForestFriends` and so on.
 
 - The forest friends are in the shared library: their drawings and
   peek-out (`forest_animals.dart`: `paintAnimalHead`, `ForestPeeker`), and their

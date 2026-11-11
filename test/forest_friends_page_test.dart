@@ -80,7 +80,7 @@ void main() {
       expect(find.byKey(const Key('friend-Tara')), findsOneWidget);
       expect(find.byKey(const Key('friend-Vesna')), findsNothing);
       expect(
-        find.text('Meet all ${kForestFriends.length} friends'),
+        find.text('Meet all ${kForestFriends.length} of the Vedafolk'),
         findsOneWidget,
       );
       await t.tap(find.byKey(const Key('friend-Tara')));
