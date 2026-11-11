@@ -24,6 +24,13 @@ double petalOffsetDegrees(int count) => count.isEven ? 180 / count : 0;
 double ghostFraction(int i) =>
     (0.45 + 0.35 * math.sin(i * 2.1 + 0.6)).clamp(0.25, 0.95);
 
+/// How far out every ghost PETAL reaches, as a fraction of the way between the
+/// shortest and the longest a real petal can be. All the same: an empty petal
+/// chart previews a regular flower, never a lopsided one that could be read as
+/// a claim about someone's skin (or as some petals being "unfilled"). Rings and
+/// bars keep [ghostFraction]'s gentle variation. One rule for the constellation.
+const double kGhostPetalFraction = 0.7;
+
 /// The ghost chart for [keys] (keys of [metricInfoByKey]) in the chosen style.
 class GhostMetricChart extends StatelessWidget {
   const GhostMetricChart({
@@ -597,12 +604,12 @@ class _PlaceholderPetalsPainter extends CustomPainter {
       Offset along(double t) => center + a * (maxLen * t);
       Offset out(Offset base, double t) => base + p * (baseWidth * t);
 
-      // A ghost of what an actual reading's uneven petal lengths look
-      // like — a deterministic wave rather than any real value, so it
-      // never reads as a claim about the user's own skin. Drawn under
-      // the guide outline, in the metric's own identity color at a very
-      // low alpha, the same shape language the real chart uses.
-      final ghostLen = maxLen * (minLen + (1 - minLen) * ghostFraction(i));
+      // A ghost petal: the same length for every petal (kGhostPetalFraction),
+      // never a real value, so it cannot read as a claim about the user's own
+      // skin. Drawn under the guide outline, in the metric's own identity
+      // color at a very low alpha, the same shape language the real chart
+      // uses.
+      final ghostLen = maxLen * (minLen + (1 - minLen) * kGhostPetalFraction);
       Offset ghostAlong(double t) => center + a * (ghostLen * t);
       Offset ghostOut(Offset base, double t) => base + p * (baseWidth * t);
       final gTip = ghostAlong(1.0);
