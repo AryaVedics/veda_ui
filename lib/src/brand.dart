@@ -53,8 +53,20 @@ class VedaBrandScope extends InheritedWidget {
 /// A very faint version of the app's mark at the bottom of the screen, the
 /// same treatment as Véda's medallion watermark: 5% opacity, felt rather
 /// than noticed.
+///
+/// On a Today screen, where a strong centerpiece sits right on top of it, the
+/// mark is [quiet]: 40% of that strength (2%), so it stops competing with the
+/// centerpiece. It fades between the two as the person changes tabs.
 class BrandWatermark extends StatelessWidget {
-  const BrandWatermark({super.key});
+  const BrandWatermark({super.key, this.quiet = false});
+
+  /// 5% opacity normally.
+  static const double opacity = 0.05;
+
+  /// The share of [opacity] kept when [quiet].
+  static const double quietShare = 0.4;
+
+  final bool quiet;
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +78,9 @@ class BrandWatermark extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: Transform.translate(
           offset: const Offset(0, 22),
-          child: Opacity(
-            opacity: 0.05,
+          child: AnimatedOpacity(
+            opacity: quiet ? opacity * quietShare : opacity,
+            duration: const Duration(milliseconds: 250),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final side = constraints.maxWidth;
