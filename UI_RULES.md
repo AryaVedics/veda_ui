@@ -136,7 +136,7 @@ The cast's name is "The Little Vedafolk"; "the Vedafolk" in everyday text. The c
   names, stories and round faces (`forest_friends.dart`: `kForestFriends`,
   `forestFriendFor`, `ForestHeadIcon`). Draw them with these, never a copy.
 - They belong in Routine and Kitchen. They have no place in Véda (the flagship,
-  work-of-art feel) or Cycle (private and serious). Lifestyle may offer them,
-  off by default and light. Sun only if it truly fits.
+  work-of-art feel) or Cycle (private and serious). Lifestyle and Allergy may offer them,
+  off by default and light (in Allergy, one rises now and then from behind the grass beside the tree). Sun only if it truly fits.
 - They are company, not a judge: they never comment on numbers, a missed day or
   a streak.
