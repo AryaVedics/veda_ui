@@ -183,6 +183,26 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayLight: _overlayLight,
   );
 
+  /// Véda Allergy: moss, a deep olive green (hue about 85°), so it is never
+  /// mistaken for Routine's peacock blue-green (about 200°) or Sun's umber.
+  /// Provisional until the owner confirms the colour.
+  static const moss = AppColors(
+    canvas: Color(0xFF2F3B1E),
+    canvasDeep: Color(0xFF27321A),
+    card: Color(0xFF45542C),
+    cardSunken: Color(0xFF3A4825),
+    accent: _accent,
+    accentDim: _accentDim,
+    accentText: _accentText,
+    onAccent: _onAccent,
+    textPrimary: Color(0xFFF4F6EA),
+    textSecondary: Color(0xFFDDE3C6),
+    textMuted: Color(0xFFC2CBA3),
+    divider: Color(0xFF5A6B3A),
+    overlay: _overlay,
+    overlayLight: _overlayLight,
+  );
+
   static const all = {
     'midnight': midnight,
     'peacock': peacock,
@@ -190,6 +210,7 @@ class AppColors extends ThemeExtension<AppColors> {
     'wine': wine,
     'umber': umber,
     'chilli': chilli,
+    'moss': moss,
   };
 
   @override
