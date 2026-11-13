@@ -102,6 +102,9 @@ enum LinkStatus {
 
   /// The person has unlinked this app from the other one.
   unlinked,
+
+  /// Linked, but this app does not use that app's entries, so none are fetched.
+  notRead,
 }
 
 class LinkFeed {
@@ -126,12 +129,23 @@ class LinkRead {
 }
 
 class LinkBridge extends ChangeNotifier {
-  LinkBridge(this.self, {MethodChannel? channel, DateTime Function()? clock})
-    : _channel = channel ?? const MethodChannel('com.aryavedics.veda_ui/link'),
-      _clock = clock ?? DateTime.now;
+  LinkBridge(
+    this.self, {
+    Set<LinkApp>? reads,
+    MethodChannel? channel,
+    DateTime Function()? clock,
+  }) : _reads = reads,
+       _channel = channel ?? const MethodChannel('com.aryavedics.veda_ui/link'),
+       _clock = clock ?? DateTime.now;
 
   /// The app this is running inside.
   final LinkApp self;
+
+  /// The apps whose entries this one really uses. Only these are fetched; the
+  /// rest are still listed and can be linked or unlinked, but their data is
+  /// never asked for, so an app does not receive what it has no use for. Null
+  /// means every app that publishes.
+  final Set<LinkApp>? _reads;
 
   final MethodChannel _channel;
   final DateTime Function() _clock;
@@ -158,6 +172,10 @@ class LinkBridge extends ChangeNotifier {
   /// The other apps this one can look at: the ones that publish something.
   Iterable<LinkApp> get others =>
       LinkApp.values.where((a) => a != self && a.publishes);
+
+  /// The linked apps this one actually fetches entries from.
+  Iterable<LinkApp> get readsFrom =>
+      others.where((a) => _reads == null || _reads.contains(a));
 
   Map<String, Object?>? _lastPublished;
 
@@ -252,7 +270,9 @@ class LinkBridge extends ChangeNotifier {
     _use = on;
     if (on) {
       for (final app in others) {
-        _others[app] = const LinkRead(LinkStatus.unknown); // "checking…"
+        _others[app] = readsFrom.contains(app)
+            ? const LinkRead(LinkStatus.unknown) // "checking…"
+            : const LinkRead(LinkStatus.notRead);
       }
     } else {
       _others.clear();
@@ -305,6 +325,8 @@ class LinkBridge extends ChangeNotifier {
       for (final app in others)
         (_unlinked.contains(app)
                 ? Future.value(const LinkRead(LinkStatus.unlinked))
+                : !readsFrom.contains(app)
+                ? Future.value(const LinkRead(LinkStatus.notRead))
                 : _readOne(app))
             .then((r) {
               if (!_use) return;

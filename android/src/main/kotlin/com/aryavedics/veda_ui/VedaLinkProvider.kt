@@ -52,9 +52,32 @@ class VedaLinkProvider : ContentProvider() {
         }
         val file = feedFile(ctx)
         if (file.exists()) {
-            cursor.addRow(arrayOf<Any?>(file.readText(Charsets.UTF_8), file.lastModified()))
+            cursor.addRow(arrayOf<Any?>(feedFor(ctx, file.readText(Charsets.UTF_8)), file.lastModified()))
         }
         return cursor
+    }
+
+    /**
+     * The feed as this caller may see it. An app can mark parts of its data as
+     * Véda's alone by listing their names under data.veda_only (Lifestyle's food
+     * log); every other caller gets the feed with those parts removed. A feed
+     * that cannot be read is withheld from other callers rather than passed on.
+     */
+    private fun feedFor(ctx: android.content.Context, text: String): String {
+        val callers = ctx.packageManager.getPackagesForUid(Binder.getCallingUid()) ?: emptyArray()
+        if (VEDA_PACKAGE in callers) return text
+        return try {
+            val json = org.json.JSONObject(text)
+            val data = json.optJSONObject("data")
+            val only = data?.optJSONArray("veda_only")
+            if (data != null && only != null) {
+                for (i in 0 until only.length()) data.remove(only.getString(i))
+                data.remove("veda_only")
+            }
+            json.toString()
+        } catch (e: Exception) {
+            "{}"
+        }
     }
 
     /**

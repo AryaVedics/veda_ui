@@ -146,6 +146,8 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
      */
     private fun readPatron(): Boolean {
         for (pkg in FamilyKeys.PACKAGES) {
+            // Only an app of ours, signed with our certificate, can vouch for Patron.
+            if (FamilyKeys.checkAuthority(context, "$pkg.link") != FamilyKeys.Authority.OURS) continue
             val uri = Uri.parse("content://$pkg.link/patron")
             val client = try {
                 context.contentResolver.acquireUnstableContentProviderClient(uri)
@@ -195,6 +197,13 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
 
     /** Asks one family app's provider for its feed. Never throws. */
     private fun read(authority: String): Map<String, Any?> {
+        // Whatever answers for this name must be one of ours: a look-alike app
+        // that took the package name would otherwise be believed.
+        when (FamilyKeys.checkAuthority(context, authority)) {
+            FamilyKeys.Authority.OTHER -> return mapOf("status" to "denied")
+            FamilyKeys.Authority.NONE -> return notThere(authority)
+            FamilyKeys.Authority.OURS -> {}
+        }
         val uri = Uri.parse("content://$authority/feed")
         // Unstable: if the other app dies while answering, this one survives.
         val client = try {

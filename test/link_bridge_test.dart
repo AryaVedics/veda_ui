@@ -11,6 +11,7 @@ class FakePhone {
   String? published;
   List<Object?>? blocked;
   final Map<String, Map<String, Object?>> providers = {};
+  final List<String> asked = [];
 
   Future<Object?> handle(MethodCall call) async {
     if (call.method == 'publish') {
@@ -19,6 +20,7 @@ class FakePhone {
       return true;
     }
     if (call.method == 'read') {
+      asked.add(call.arguments['authority'] as String);
       return providers[call.arguments['authority']] ?? {'status': 'missing'};
     }
     throw MissingPluginException();
@@ -149,6 +151,44 @@ void main() {
     for (final self in LinkApp.values.where((a) => a.publishes)) {
       expect(bridge(self).others, isNot(contains(LinkApp.cycle)));
     }
+  });
+
+  test('an app asks only for the feeds it uses, and still lists and links the rest', () async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (final id in ['skin', 'sun', 'routine']) {
+      phone.providers['com.aryavedics.$id.link'] = {
+        'status': 'ok',
+        'feed': jsonEncode({'data': {}}),
+        'updated_at': now,
+      };
+    }
+    final b = LinkBridge(
+      LinkApp.lifestyle,
+      reads: {LinkApp.skin, LinkApp.sun},
+      channel: channel,
+    );
+    await b.load();
+    await b.publish({'days': {}});
+    await b.connectAll(true);
+    expect(phone.asked.toSet(), {
+      'com.aryavedics.skin.link',
+      'com.aryavedics.sun.link',
+    }, reason: 'Routine is linked but its entries are never fetched');
+    expect(b.readOf(LinkApp.sun).status, LinkStatus.connected);
+    expect(b.readOf(LinkApp.routine).status, LinkStatus.notRead);
+    expect(b.feedOf(LinkApp.routine), isNull);
+    // Still listed and counted, so the person can link or unlink it.
+    expect(b.others, containsAll([LinkApp.skin, LinkApp.sun, LinkApp.routine]));
+    expect(b.linkedCount, 3);
+    // Cycle shares nothing: never listed as a source, never asked.
+    expect(b.others, isNot(contains(LinkApp.cycle)));
+    expect(phone.asked, isNot(contains('com.aryavedics.cycle.link')));
+    // An unlinked app is turned away, as before.
+    phone.asked.clear();
+    await b.setLinked(LinkApp.sun, false);
+    await b.refresh();
+    expect(phone.asked, ['com.aryavedics.skin.link']);
+    expect(b.readOf(LinkApp.sun).status, LinkStatus.unlinked);
   });
 
   test('the switches are remembered', () async {

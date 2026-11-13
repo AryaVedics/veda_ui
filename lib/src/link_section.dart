@@ -76,7 +76,9 @@ class _LinkSectionState extends State<LinkSection> {
 
   bool _installed(LinkApp app) {
     final st = bridge.readOf(app).status;
-    return st != LinkStatus.notInstalled && st != LinkStatus.unknown;
+    return st != LinkStatus.notInstalled &&
+        st != LinkStatus.unknown &&
+        st != LinkStatus.notRead;
   }
 
   /// An installed app that is not linked, or linked but not working.
@@ -115,6 +117,8 @@ class _LinkSectionState extends State<LinkSection> {
         return 'did not answer in time; open it once and come back';
       case LinkStatus.unlinked:
         return 'not linked';
+      case LinkStatus.notRead:
+        return 'linked';
       case LinkStatus.unknown:
         return 'checking…';
     }
@@ -329,6 +333,18 @@ class _LinkSectionState extends State<LinkSection> {
                   if (app == LinkApp.skin && widget.link != null)
                     _vedaDetail(context, colors),
                 ],
+                // Véda Cycle shares nothing, so it has no switch and no feed:
+                // it is listed only so the person can see it is not part of this.
+                if (bridge.self != LinkApp.cycle)
+                  ProfileRow(
+                    key: const Key('linkCycleRow'),
+                    iconWidget: LinkSection._iconFor(
+                      LinkApp.cycle,
+                      colors.textMuted,
+                    ),
+                    title: LinkApp.cycle.name,
+                    subtitle: LinkApp.cycle.gives,
+                  ),
                 Divider(height: 8, color: colors.divider),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),

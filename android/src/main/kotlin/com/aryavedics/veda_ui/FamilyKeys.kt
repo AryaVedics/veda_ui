@@ -46,6 +46,31 @@ object FamilyKeys {
         return packages.any { it in PACKAGES && signedByUs(pm, it) }
     }
 
+    /** What stands behind a content authority on this phone. */
+    enum class Authority { NONE, OURS, OTHER }
+
+    /**
+     * The reading side of [isFamily]: before this app asks [authority] for
+     * anything (a feed, a backup, a restore, a Patron flag), find out which app
+     * answers for it. OURS is one of the family's apps, signed with one of our
+     * certificates, answering for its own "<package>.link" authority; OTHER is
+     * anything else (an app that took the name, or an authority that is not its
+     * package's); NONE means nothing answers, which the caller reports as not
+     * installed. Checked afresh on every call, never remembered.
+     */
+    fun checkAuthority(context: Context, authority: String): Authority {
+        val pm = context.packageManager
+        val provider = try {
+            pm.resolveContentProvider(authority, 0)
+        } catch (e: Exception) {
+            null
+        } ?: return Authority.NONE
+        val pkg = provider.packageName
+        if (authority != "$pkg.link") return Authority.OTHER
+        if (pkg == context.packageName) return Authority.OURS
+        return if (pkg in PACKAGES && signedByUs(pm, pkg)) Authority.OURS else Authority.OTHER
+    }
+
     private fun signedByUs(pm: PackageManager, pkg: String): Boolean = try {
         val certs: List<ByteArray> = if (Build.VERSION.SDK_INT >= 28) {
             val info = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES)

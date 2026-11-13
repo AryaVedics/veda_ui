@@ -168,3 +168,15 @@ Store subscriptions belong to one app, so Véda publishes a small `patron` entry
 other feeds: only "active" and the date it runs to, nothing about the person. The companions read it (with the link
 switch on) to switch off their ads and turn on Patron extras. An app installed on its own can offer "Restore Patron".
 Never sent to a server; never published by Cycle or read by it.
+
+## Reading is checked too, and each app reads only what it uses (2026-11-12)
+- **Who answers.** Before an app asks another for a feed, a backup, a restore or the Patron flag, `FamilyKeys.checkAuthority`
+  finds which app holds that authority: it must be a family package, answering for its own `<package>.link`, signed with one
+  of our two pinned certificates. Anything else gets "denied". Checked on every call, never remembered.
+- **What it fetches.** `LinkBridge(reads: {...})` limits which feeds an app asks for (Routine skin+sun+lifestyle, Lifestyle
+  skin+sun, Cycle skin+lifestyle, Sun skin). Every other app is still listed and can be linked or unlinked; it shows as
+  "linked" and is never asked for data.
+- **Véda's alone.** A feed may list parts under `data.veda_only` (Lifestyle: `food`). `VedaLinkProvider` removes those parts
+  for every caller except Véda. **iPhone gap:** the App Group feed is one shared file that any family app can open, so on
+  iPhone the food part still has to move into its own file that only Véda opens, before iPhone Link ships.
+- **Véda Cycle** is listed in the other apps as "Reads only, shares nothing", with no switch.
