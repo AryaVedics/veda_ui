@@ -11,9 +11,16 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'brand.dart';
 import 'theme.dart';
+import 'ui_scale.dart';
 
-/// Véda's own ring size beside its message box.
-const double kMiniRingSize = 132;
+/// The ring's size beside the message box on a screen [kReferenceScreenWidth]
+/// wide. See [miniRingSizeOf] for the size on the phone in hand.
+const double kMiniRingSize = 116;
+
+/// The ring's size on this phone: the same size on the glass on every phone,
+/// whatever its display-size setting (see ui_scale.dart).
+double miniRingSizeOf(BuildContext context) =>
+    kMiniRingSize * uiScaleOf(context);
 
 /// The warm white of Véda's end line.
 const _markerWhite = Color(0xFFFFFDF5);

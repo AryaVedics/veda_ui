@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
 import 'mini_ring.dart';
+import 'ui_scale.dart';
 
 /// How long a message stays after it is first shown.
 const kNoticeLifetime = Duration(days: 14);
@@ -100,11 +101,12 @@ class NoticeCarousel extends StatefulWidget {
   /// empty, as on Véda's own Today. Null leaves just the ring.
   final String Function(DateTime now)? greeting;
 
-  /// Véda's own size: the message box is 112 high, with a 3px track under it.
-  /// On a short screen (under 700 high) the box is smaller, with smaller text,
-  /// so the page keeps its room for the things that matter on it.
-  static const _cardHeight = 112.0;
-  static const _compactCardHeight = 84.0;
+  /// The message box is 100 high on a screen 411 dp wide (scaled to the phone:
+  /// see ui_scale.dart), with a 3px track under it. On a short screen (under
+  /// 700 high) the box is smaller, with smaller text, so the page keeps its
+  /// room for the things that matter on it: the centrepiece.
+  static const _cardHeight = 100.0;
+  static const _compactCardHeight = 76.0;
   static const _trackHeight = 3.0;
   static const _shortScreen = 700.0;
 
@@ -171,9 +173,11 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     // message.
     if (shown == null) return const SizedBox.shrink();
     final greet = widget.greeting;
+    final ring = miniRingSizeOf(context);
+    final scale = uiScaleOf(context);
     if (shown.isEmpty && greet == null) {
       return Center(
-        child: SizedBox.square(dimension: kMiniRingSize, child: widget.leading),
+        child: SizedBox.square(dimension: ring, child: widget.leading),
       );
     }
     // With nothing left to show, the greeting is the one message.
@@ -195,15 +199,17 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox.square(dimension: kMiniRingSize, child: widget.leading),
+        SizedBox.square(dimension: ring, child: widget.leading),
         const SizedBox(width: 20),
         Expanded(
           child: Column(
             children: [
               SizedBox(
-                height: compact
-                    ? NoticeCarousel._compactCardHeight
-                    : NoticeCarousel._cardHeight,
+                height:
+                    scale *
+                    (compact
+                        ? NoticeCarousel._compactCardHeight
+                        : NoticeCarousel._cardHeight),
                 child: PageView(
                   controller: _controller,
                   onPageChanged: (i) => setState(() => _page = i),
