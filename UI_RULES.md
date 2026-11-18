@@ -76,6 +76,19 @@ numbers; do not eyeball them.
 - A line chart is always drawn smooth, with a dot on each reading and a ringed
   marker on the latest, exactly as Véda's Trends chart (the shared `TrendChart`).
 
+## Popups (bottom sheets)
+
+- A popup that changes something gets a closing button, pinned at the foot where a thumb
+  finds it: **Save** when nothing is kept until it is pressed (an editor), **Done** when
+  every tap is kept as it is made (a check-in, a checklist, ticking off doses). Done only
+  closes the sheet; it never adds a step. Use the shared `GoldButton`, labelled exactly
+  "Done" or "Save".
+- A read-only popup (a tutorial, an explanation, a list to pick from) gets no button: it is
+  read at a glance and closed by swiping down, tapping outside or the back gesture. Keep its
+  drag handle visible. A long one that scrolls may carry a small close mark in its header,
+  never a button.
+- Dialogs keep their own action buttons (Cancel, Delete, OK).
+
 ## Life in the centrepiece
 
 - A centrepiece that is a line (Lifestyle's Pulse) draws itself out like an ECG
