@@ -1,5 +1,5 @@
 name: veda_patron
-description: "Véda Patron for the companion apps: buy or restore the one membership that covers every Véda app except Cycle, tied to a Google or Apple sign-in. Lives apart from veda_ui so an app that sells nothing (Cycle) never links billing or sign-in."
+description: "Véda Patron for the companion apps: buy or restore the one membership that covers every Véda app except Cycle and Curio (each its own purchase), tied to a Google or Apple sign-in. Lives apart from veda_ui so an app that sells nothing (Cycle) never links billing or sign-in."
 publish_to: 'none'
 version: 0.1.0
 

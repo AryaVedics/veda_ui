@@ -1,5 +1,6 @@
 /// Véda Patron for the companion apps: the one membership that covers every
-/// Véda app except Cycle, tied to a Google or Apple sign-in.
+/// Véda app except Cycle and Curio (each its own purchase), tied to a Google
+/// or Apple sign-in.
 library;
 
 export 'src/patron_identity.dart';

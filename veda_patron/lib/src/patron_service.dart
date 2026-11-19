@@ -4,7 +4,8 @@
 // The rules:
 // - Free users never sign in. The sign-in is asked for only to buy or restore.
 // - A membership belongs to the sign-in, so the same Google or Apple account
-//   unlocks it in every Véda app except Cycle.
+//   unlocks it in every Véda app except Cycle and Curio (each its own
+//   purchase).
 // - With no store key built in, nothing is sold and nobody is a member.
 // - The membership is also told to the other Véda apps on this phone
 //   (PatronLink), and one found there counts here too, so a Patron who never

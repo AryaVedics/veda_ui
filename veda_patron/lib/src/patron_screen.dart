@@ -28,8 +28,8 @@ const kSharedPatronPerks = <PatronPerk>[
     icon: PhosphorIconsThin.squaresFour,
     title: 'Every Véda app',
     body:
-        'One membership covers Véda and its companion apps (Véda Cycle is '
-        'separate).',
+        'One membership covers Véda and its companion apps (Véda Cycle and '
+        'Véda Curio are bought separately).',
   ),
   (
     icon: PhosphorIconsThin.heart,
