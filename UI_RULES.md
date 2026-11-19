@@ -26,6 +26,10 @@
   never sharp straight segments or jagged joins.
 - Every accessory app's trend chart draws its line the same way as Véda's
   Trends chart. Véda's chart is the reference.
+- Draw any chart line with `softLinePath(points)` from veda_ui (it is Véda's
+  curve, in one place); never build a line with `lineTo`. For a line broken by
+  missing days, draw one `softLinePath` per unbroken run. In a PDF, use the same
+  curve as the equal cubic (see Routine's skin_summary_pdf.dart).
 
 ## Véda is the basis
 
