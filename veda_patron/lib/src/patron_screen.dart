@@ -462,8 +462,8 @@ class _PatronScreenState extends State<PatronScreen> {
         const SizedBox(height: 10),
         Text(
           'You sign in with $providers first, so your membership works in '
-          'every Véda app. Only a coded number from that account is kept, '
-          'never your email or name.',
+          'every Véda app. Our server checks the sign-in and keeps nothing: '
+          'only a coded number goes to the store, never your email or name.',
           key: const Key('patronSignInNote'),
           textAlign: TextAlign.center,
           style: TextStyle(

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:veda_patron/veda_patron.dart';
 import 'package:veda_ui/veda_ui.dart';
@@ -76,13 +80,26 @@ class FakeSignIn implements PatronSignIn {
   List<PatronProvider> get providers => list;
 
   @override
-  Future<String> accountId(PatronProvider provider) async {
+  Future<PatronCredential> credential(PatronProvider provider) async {
     if (account == null) throw SignInCancelled();
-    return account!;
+    return PatronCredential(provider, 'token-for-$account');
   }
 
   @override
   Future<void> signOut(PatronProvider provider) async => signOuts++;
+}
+
+/// The server, for pretend: the id is a fixed coding of provider and account,
+/// as the real one is (with its secret).
+String fakeId(PatronProvider p, String account) => 'vp_${p.name}_$account';
+
+class FakeServer implements PatronIdServer {
+  int calls = 0;
+  @override
+  Future<String> customerId(PatronCredential c) async {
+    calls++;
+    return fakeId(c.provider, c.idToken.replaceFirst('token-for-', ''));
+  }
 }
 
 void main() {
@@ -99,25 +116,64 @@ void main() {
     appKey: app,
     store: store,
     signIn: signIn,
+    server: FakeServer(),
     readLink: () async => linked,
     publish: ({required bool active, DateTime? until}) async =>
         published?.add(active),
   );
 
-  group('the customer id', () {
-    test('is the same for the same account in every app', () {
-      expect(
-        patronCustomerId(PatronProvider.google, '1234567890'),
-        patronCustomerId(PatronProvider.google, '1234567890'),
+  group('asking the server', () {
+    test('sends the token and takes the id it answers', () async {
+      late Map body;
+      final server = HttpPatronIdServer(
+        base: 'https://example.test',
+        client: MockClient((r) async {
+          body = jsonDecode(r.body) as Map;
+          return http.Response('{"customer_id": "vp_abc"}', 200);
+        }),
       );
+      final id = await server.customerId(
+        const PatronCredential(PatronProvider.apple, 'tok', nonce: 'raw'),
+      );
+      expect(id, 'vp_abc');
+      expect(body, {'provider': 'apple', 'id_token': 'tok', 'nonce': 'raw'});
     });
 
-    test('differs by account and by provider, and hides the account', () {
-      final a = patronCustomerId(PatronProvider.google, '1234567890');
-      expect(a, isNot(patronCustomerId(PatronProvider.google, '1234567891')));
-      expect(a, isNot(patronCustomerId(PatronProvider.apple, '1234567890')));
-      expect(a, isNot(contains('1234567890')));
-      expect(a, startsWith('vp_'));
+    test('a refused sign-in or a server problem is a plain message', () async {
+      Future<String> with_(int code) => HttpPatronIdServer(
+        base: 'https://example.test',
+        client: MockClient((_) async => http.Response('{}', code)),
+      ).customerId(const PatronCredential(PatronProvider.google, 'tok'));
+      expect(
+        () => with_(401),
+        throwsA(
+          isA<SignInFailure>().having(
+            (e) => e.message,
+            'message',
+            contains('could not be checked'),
+          ),
+        ),
+      );
+      expect(() => with_(503), throwsA(isA<SignInFailure>()));
+    });
+
+    test('no connection says so', () async {
+      final server = HttpPatronIdServer(
+        base: 'https://example.test',
+        client: MockClient((_) async => throw Exception('offline')),
+      );
+      expect(
+        () => server.customerId(
+          const PatronCredential(PatronProvider.google, 'tok'),
+        ),
+        throwsA(
+          isA<SignInFailure>().having(
+            (e) => e.message,
+            'message',
+            contains('No connection'),
+          ),
+        ),
+      );
     });
   });
 
@@ -253,7 +309,7 @@ void main() {
       t,
     ) async {
       final store = FakeStore()
-        ..members.add(patronCustomerId(PatronProvider.google, 'acct-1'));
+        ..members.add(fakeId(PatronProvider.google, 'acct-1'));
       await open(t, store, FakeSignIn('acct-1'));
       await t.tap(find.byKey(const Key('patronBuy')));
       await t.pumpAndSettle();

@@ -24,10 +24,12 @@ class PatronService with WidgetsBindingObserver {
     required this.appKey,
     PatronStore? store,
     PatronSignIn? signIn,
+    PatronIdServer? server,
     Future<bool> Function()? readLink,
     Future<void> Function({required bool active, DateTime? until})? publish,
   }) : _store = store ?? defaultPatronStore(),
        _signIn = signIn ?? PlatformPatronSignIn(),
+       _server = server ?? HttpPatronIdServer(),
        _readLink = readLink ?? PatronLink.read,
        _publish =
            publish ??
@@ -39,6 +41,7 @@ class PatronService with WidgetsBindingObserver {
 
   final PatronStore _store;
   final PatronSignIn _signIn;
+  final PatronIdServer _server;
   final Future<bool> Function() _readLink;
   final Future<void> Function({required bool active, DateTime? until}) _publish;
 
@@ -115,8 +118,9 @@ class PatronService with WidgetsBindingObserver {
   /// whether a membership was found for that account. Throws
   /// [SignInCancelled] if the person backs out.
   Future<bool> signIn(PatronProvider provider) async {
-    final account = await _signIn.accountId(provider);
-    final id = PatronIdentity(provider, patronCustomerId(provider, account));
+    // the server checks the sign-in and gives the id; the phone never makes it
+    final credential = await _signIn.credential(provider);
+    final id = PatronIdentity(provider, await _server.customerId(credential));
     final status = await _store.logIn(id.customerId);
     identity.value = id;
     try {
