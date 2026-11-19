@@ -103,9 +103,14 @@ class GroupMetricsCard extends StatefulWidget {
     required this.groups,
     required this.caveat,
     this.empty,
+    this.emptyAction,
     this.hud = true,
     this.ghostKeys = kVedaMetrics,
   });
+
+  /// A button under the empty-state line (a way to set things up), shown only
+  /// while there is nothing to chart.
+  final Widget? emptyAction;
 
   /// The measurements the ghost chart shows while there is nothing to chart:
   /// the seven Véda ones, or for a card of the person's own wellness parts
@@ -214,6 +219,10 @@ class _GroupMetricsCardState extends State<GroupMetricsCard> {
                     color: colors.textSecondary,
                   ),
                 ),
+                if (widget.emptyAction != null) ...[
+                  const SizedBox(height: 12),
+                  widget.emptyAction!,
+                ],
               ],
             )
           : Column(
