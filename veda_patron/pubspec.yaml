@@ -1,0 +1,28 @@
+name: veda_patron
+description: "Véda Patron for the companion apps: buy or restore the one membership that covers every Véda app except Cycle, tied to a Google or Apple sign-in. Lives apart from veda_ui so an app that sells nothing (Cycle) never links billing or sign-in."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  veda_ui:
+    path: ..
+  # RevenueCat, which wraps Google Play and App Store billing. An app that
+  # uses this package gains the billing permission.
+  purchases_flutter: ^9.0.0
+  # The sign-in that identifies a Patron across apps. Google needs an OAuth
+  # client for each app's package and signing key; Apple needs the Sign in with
+  # Apple capability on the app's identifier.
+  google_sign_in: ^6.3.0
+  sign_in_with_apple: ^6.1.4
+  crypto: ^3.0.6
+  shared_preferences: ^2.3.0
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
