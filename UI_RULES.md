@@ -26,10 +26,13 @@
   never sharp straight segments or jagged joins.
 - Every accessory app's trend chart draws its line the same way as Véda's
   Trends chart. Véda's chart is the reference.
+- The curve passes exactly through every reading (a monotone cubic: no corners,
+  no overshoot), so a dot always sits on the line. Véda's trend_chart.dart has
+  the same maths; change both together.
 - Draw any chart line with `softLinePath(points)` from veda_ui (it is Véda's
   curve, in one place); never build a line with `lineTo`. For a line broken by
-  missing days, draw one `softLinePath` per unbroken run. In a PDF, use the same
-  curve as the equal cubic (see Routine's skin_summary_pdf.dart).
+  missing days, draw one `softLinePath` per unbroken run. In a PDF, draw
+  `softLineSegments` with `curveTo` (see Routine's skin_summary_pdf.dart).
 
 ## Véda is the basis
 

@@ -5,6 +5,8 @@
 // how many days it rests on. Every chart says it shows a difference and not a
 // cause, because a handful of days can look like a pattern and prove nothing.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
@@ -446,33 +448,66 @@ class BrandFooter extends StatelessWidget {
   }
 }
 
-/// A gentle curve through the points rather than straight segments, drawn
-/// exactly as Véda's own Trends chart draws it (mirrors Véda's
-/// trend_chart.dart; change both together): each point is the control point
-/// of a quadratic curve to the midpoint between it and the next one. Every
-/// companion app's trend line uses this, so no line is ever sharp.
+/// One cubic piece of a soft line: from the previous point, steered by [c1]
+/// and [c2], to [to].
+typedef SoftSegment = ({Offset c1, Offset c2, Offset to});
+
+/// Véda's trend curve: a soft line that passes exactly through every point,
+/// with no corners and no overshoot (it never swells above a high reading or
+/// below a low one). A monotone cubic (Fritsch-Carlson): each point's slope is
+/// the average of the slopes either side, flattened at a peak or dip and
+/// limited so the curve cannot bulge. The points must run left to right.
+/// Mirrors Véda's trend_chart.dart; change both together. Every companion
+/// app's trend line, and Routine's PDF, use this.
+List<SoftSegment> softLineSegments(List<Offset> points) {
+  final n = points.length;
+  if (n < 2) return const [];
+  final h = [for (var i = 0; i < n - 1; i++) points[i + 1].dx - points[i].dx];
+  final d = [
+    for (var i = 0; i < n - 1; i++)
+      h[i] == 0 ? 0.0 : (points[i + 1].dy - points[i].dy) / h[i],
+  ];
+  final m = List<double>.filled(n, 0);
+  m[0] = d[0];
+  m[n - 1] = d[n - 2];
+  for (var i = 1; i < n - 1; i++) {
+    m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+  }
+  for (var i = 0; i < n - 1; i++) {
+    if (d[i] == 0) {
+      m[i] = 0;
+      m[i + 1] = 0;
+      continue;
+    }
+    final a = m[i] / d[i];
+    final b = m[i + 1] / d[i];
+    final s = a * a + b * b;
+    if (s > 9) {
+      final t = 3 / math.sqrt(s);
+      m[i] = t * a * d[i];
+      m[i + 1] = t * b * d[i];
+    }
+  }
+  return [
+    for (var i = 0; i < n - 1; i++)
+      (
+        c1: Offset(points[i].dx + h[i] / 3, points[i].dy + m[i] * h[i] / 3),
+        c2: Offset(
+          points[i + 1].dx - h[i] / 3,
+          points[i + 1].dy - m[i + 1] * h[i] / 3,
+        ),
+        to: points[i + 1],
+      ),
+  ];
+}
+
+/// The soft line through [points] as a Path (see [softLineSegments]).
 Path softLinePath(List<Offset> points) {
   final path = Path();
   if (points.isEmpty) return path;
   path.moveTo(points.first.dx, points.first.dy);
-  if (points.length == 1) return path;
-  if (points.length == 2) {
-    path.lineTo(points[1].dx, points[1].dy);
-    return path;
+  for (final s in softLineSegments(points)) {
+    path.cubicTo(s.c1.dx, s.c1.dy, s.c2.dx, s.c2.dy, s.to.dx, s.to.dy);
   }
-  for (var i = 0; i < points.length - 1; i++) {
-    final p0 = points[i];
-    final p1 = points[i + 1];
-    final mid = Offset((p0.dx + p1.dx) / 2, (p0.dy + p1.dy) / 2);
-    path.quadraticBezierTo(p0.dx, p0.dy, mid.dx, mid.dy);
-  }
-  final lastPoint = points.last;
-  final secondLast = points[points.length - 2];
-  path.quadraticBezierTo(
-    secondLast.dx,
-    secondLast.dy,
-    lastPoint.dx,
-    lastPoint.dy,
-  );
   return path;
 }
