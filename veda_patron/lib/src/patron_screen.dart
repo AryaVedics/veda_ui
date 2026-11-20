@@ -463,7 +463,10 @@ class _PatronScreenState extends State<PatronScreen> {
         Text(
           'You sign in with $providers first, so your membership works in '
           'every Véda app. Our server checks the sign-in and keeps nothing: '
-          'only a coded number goes to the store, never your email or name.',
+          'only a coded number goes to the store, never your email or name.'
+          '${_service.providers.length > 1 ? ' Google and Apple are '
+              'separate sign-ins: if you also use Véda on an Android phone, '
+              'choose Google on both.' : ''}',
           key: const Key('patronSignInNote'),
           textAlign: TextAlign.center,
           style: TextStyle(
