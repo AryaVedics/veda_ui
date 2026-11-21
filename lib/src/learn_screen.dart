@@ -161,11 +161,14 @@ class _LearnScreenState extends State<LearnScreen> {
                         color: colors.accentText,
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        'Search the notes',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: colors.textSecondary,
+                      // wraps rather than running off the edge at large text
+                      Expanded(
+                        child: Text(
+                          'Search the notes',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colors.textSecondary,
+                          ),
                         ),
                       ),
                     ],
