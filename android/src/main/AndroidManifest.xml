@@ -15,11 +15,19 @@
         <package android:name="com.aryavedics.lifestyle" />
         <package android:name="com.aryavedics.cycle" />
         <package android:name="com.aryavedics.routine" />
+        <package android:name="com.aryavedics.allergy" />
+        <package android:name="com.aryavedics.curio" />
+        <package android:name="com.aryavedics.kitchen" />
+        <package android:name="com.aryavedics.sleep" />
+        <package android:name="com.aryavedics.hair" />
+        <package android:name="com.aryavedics.today" />
         <provider android:authorities="com.aryavedics.sun.link" />
         <provider android:authorities="com.aryavedics.lifestyle.link" />
         <provider android:authorities="com.aryavedics.cycle.link" />
         <provider android:authorities="com.aryavedics.routine.link" />
         <provider android:authorities="com.aryavedics.skin.link" />
+        <provider android:authorities="com.aryavedics.sleep.link" />
+        <provider android:authorities="com.aryavedics.hair.link" />
     </queries>
 
     <application>

@@ -33,6 +33,7 @@ object FamilyKeys {
         "com.aryavedics.kitchen",
         "com.aryavedics.sleep",
         "com.aryavedics.hair",
+        "com.aryavedics.today",
     )
 
     /** SHA-256 fingerprints of our signing certificates, upper-case with colons. */

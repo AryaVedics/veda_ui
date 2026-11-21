@@ -179,7 +179,7 @@ void main() {
     expect(b.feedOf(LinkApp.routine), isNull);
     // Still listed and counted, so the person can link or unlink it.
     expect(b.others, containsAll([LinkApp.skin, LinkApp.sun, LinkApp.routine]));
-    expect(b.linkedCount, 3);
+    expect(b.linkedCount, b.others.length); // every app that shares
     // Cycle shares nothing: never listed as a source, never asked.
     expect(b.others, isNot(contains(LinkApp.cycle)));
     expect(phone.asked, isNot(contains('com.aryavedics.cycle.link')));

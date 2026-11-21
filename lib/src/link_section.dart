@@ -58,6 +58,7 @@ class LinkSection extends StatefulWidget {
         LinkApp.sleep => Icon(PhosphorIconsThin.moonStars, color: color),
         LinkApp.allergy => Icon(PhosphorIconsThin.tree, color: color),
         LinkApp.hair => Icon(PhosphorIconsThin.drop, color: color),
+        LinkApp.today => Icon(PhosphorIconsThin.sunHorizon, color: color),
         LinkApp.skin => Image.asset(
           'packages/veda_ui/assets/branding/veda_mark.png',
           filterQuality: FilterQuality.medium,
