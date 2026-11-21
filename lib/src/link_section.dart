@@ -55,6 +55,9 @@ class LinkSection extends StatefulWidget {
         LinkApp.routine => ShelfGlyph(color: color),
         LinkApp.cycle => Icon(PhosphorIconsThin.flowerLotus, color: color),
         LinkApp.sun => Icon(PhosphorIconsThin.sun, color: color),
+        LinkApp.sleep => Icon(PhosphorIconsThin.moonStars, color: color),
+        LinkApp.allergy => Icon(PhosphorIconsThin.tree, color: color),
+        LinkApp.hair => Icon(PhosphorIconsThin.drop, color: color),
         LinkApp.skin => Image.asset(
           'packages/veda_ui/assets/branding/veda_mark.png',
           filterQuality: FilterQuality.medium,

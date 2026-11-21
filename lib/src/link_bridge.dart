@@ -52,6 +52,30 @@ enum LinkApp {
     'com.aryavedics.skin.link',
     'Véda',
     'Skin readings, food and check-ins',
+  ),
+  // Véda Sleep, Allergy and Hair only read Véda's skin results, for their Skin
+  // tab: they publish nothing yet, so no other app lists them or asks them for
+  // a feed (as with Cycle).
+  sleep(
+    'sleep',
+    'com.aryavedics.sleep.link',
+    'Véda Sleep',
+    'Reads your skin results, shares nothing',
+    publishes: false,
+  ),
+  allergy(
+    'allergy',
+    'com.aryavedics.allergy.link',
+    'Véda Allergy',
+    'Reads your skin results, shares nothing',
+    publishes: false,
+  ),
+  hair(
+    'hair',
+    'com.aryavedics.hair.link',
+    'Véda Hair',
+    'Reads your skin results, shares nothing',
+    publishes: false,
   );
 
   const LinkApp(
