@@ -28,6 +28,7 @@ export 'src/forest_friends.dart';
 export 'src/forest_friends_page.dart';
 export 'src/ui_scale.dart';
 export 'src/vedafolk.dart';
+export 'src/vedafolk_visits.dart';
 export 'src/group_metrics.dart';
 export 'src/hud_bars.dart' show HudBar;
 export 'src/heart_pulse_icon.dart';
