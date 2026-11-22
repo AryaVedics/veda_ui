@@ -14,7 +14,9 @@ Future<double> _opacity(WidgetTester t, {required bool quiet}) async {
     MaterialApp(
       home: VedaBrandScope(
         brand: _brand,
-        child: Scaffold(body: Stack(children: [BrandWatermark(quiet: quiet)])),
+        child: Scaffold(
+          body: Stack(children: [BrandWatermark(quiet: quiet)]),
+        ),
       ),
     ),
   );

@@ -6,18 +6,21 @@ import 'package:veda_ui/veda_ui.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('off by default, on by default when the app asks, and remembered', () async {
-    final off = VedafolkPref();
-    await off.load();
-    expect(off.on.value, isFalse);
-    final on = VedafolkPref(defaultOn: true, prefKey: 'garden_friends');
-    await on.load();
-    expect(on.on.value, isTrue);
-    await on.set(false);
-    final again = VedafolkPref(defaultOn: true, prefKey: 'garden_friends');
-    await again.load();
-    expect(again.on.value, isFalse); // the person's choice beats the default
-  });
+  test(
+    'off by default, on by default when the app asks, and remembered',
+    () async {
+      final off = VedafolkPref();
+      await off.load();
+      expect(off.on.value, isFalse);
+      final on = VedafolkPref(defaultOn: true, prefKey: 'garden_friends');
+      await on.load();
+      expect(on.on.value, isTrue);
+      await on.set(false);
+      final again = VedafolkPref(defaultOn: true, prefKey: 'garden_friends');
+      await again.load();
+      expect(again.on.value, isFalse); // the person's choice beats the default
+    },
+  );
 
   test('a visit rises, waits and sinks', () {
     final f = kForestFriends.first;

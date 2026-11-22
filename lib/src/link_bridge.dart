@@ -70,12 +70,7 @@ enum LinkApp {
     'Reads your skin results, shares nothing',
     publishes: false,
   ),
-  hair(
-    'hair',
-    'com.aryavedics.hair.link',
-    'Véda Hair',
-    'Hair-care days',
-  ),
+  hair('hair', 'com.aryavedics.hair.link', 'Véda Hair', 'Hair-care days'),
   today(
     'today',
     'com.aryavedics.today.link',

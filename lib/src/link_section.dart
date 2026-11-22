@@ -6,9 +6,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'app_colors.dart';
 import 'common.dart';
-import 'heart_pulse_icon.dart';
+import 'app_glyphs.dart';
 import 'link_bridge.dart';
-import 'shelf_glyph.dart';
 import 'theme.dart';
 import 'veda_link.dart';
 
@@ -46,26 +45,10 @@ class LinkSection extends StatefulWidget {
   /// Score next to your sleep and water."
   final String? why;
 
-  /// Each app's own tab icon, so the list looks like the apps it names.
-  static Widget _iconFor(LinkApp app, Color color) => SizedBox.square(
-    dimension: 22,
-    child: FittedBox(
-      child: switch (app) {
-        LinkApp.lifestyle => HeartPulseIcon(selected: false, color: color),
-        LinkApp.routine => ShelfGlyph(color: color),
-        LinkApp.cycle => Icon(PhosphorIconsThin.flowerLotus, color: color),
-        LinkApp.sun => Icon(PhosphorIconsThin.sun, color: color),
-        LinkApp.sleep => Icon(PhosphorIconsThin.moonStars, color: color),
-        LinkApp.allergy => Icon(PhosphorIconsThin.tree, color: color),
-        LinkApp.hair => Icon(PhosphorIconsThin.drop, color: color),
-        LinkApp.today => Icon(PhosphorIconsThin.sunHorizon, color: color),
-        LinkApp.skin => Image.asset(
-          'packages/veda_ui/assets/branding/veda_mark.png',
-          filterQuality: FilterQuality.medium,
-        ),
-      },
-    ),
-  );
+  /// Each app's own sign (as on Today's clock), so the list looks like the
+  /// apps it names.
+  static Widget _iconFor(LinkApp app, Color color) =>
+      vedaAppGlyph(app.id, color);
 
   @override
   State<LinkSection> createState() => _LinkSectionState();

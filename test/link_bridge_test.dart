@@ -71,10 +71,7 @@ void main() {
     expect(phone.published, isNotNull);
     expect(
       phone.blocked,
-      containsAll([
-        'com.aryavedics.sun',
-        'com.aryavedics.routine',
-      ]),
+      containsAll(['com.aryavedics.sun', 'com.aryavedics.routine']),
     );
     expect(phone.blocked, isNot(contains('com.aryavedics.skin')));
 

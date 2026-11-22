@@ -661,8 +661,15 @@ void paintShopFairies(Canvas canvas, ShopFrame f, double t) =>
     paintFairiesIn(canvas, f.inner, f.k, t);
 
 /// Little fairies flitting about [inner], each trailing light; [k] is the
-/// size factor. Any centrepiece can have them (Today's clock does).
-void paintFairiesIn(Canvas canvas, Rect inner, double k, double t) {
+/// size factor and [scale] how big the fairies are (smaller below 1.4). Any
+/// centrepiece can have them (Today's clock does).
+void paintFairiesIn(
+  Canvas canvas,
+  Rect inner,
+  double k,
+  double t, {
+  double scale = 1.4,
+}) {
   const tints = [
     Color(0xFFF7C6DA),
     Color(0xFFC9E8C0),
@@ -697,7 +704,7 @@ void paintFairiesIn(Canvas canvas, Rect inner, double k, double t) {
     final facing = ahead.dx >= p.dx ? 1.0 : -1.0;
     canvas.save();
     canvas.translate(p.dx, p.dy);
-    canvas.scale(1.4);
+    canvas.scale(scale);
     canvas.translate(-p.dx, -p.dy);
     // the glow
     final glow = Rect.fromCircle(center: p, radius: 14 * k);

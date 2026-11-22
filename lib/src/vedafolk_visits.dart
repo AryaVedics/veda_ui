@@ -230,9 +230,8 @@ class VedafolkPeekOver extends StatelessWidget {
           child: IgnorePointer(
             child: VedafolkVisits(
               pref: pref,
-              builder: (context, visit) => CustomPaint(
-                painter: _PeekOverPainter(visit, radius),
-              ),
+              builder: (context, visit) =>
+                  CustomPaint(painter: _PeekOverPainter(visit, radius)),
             ),
           ),
         ),
@@ -277,9 +276,6 @@ class VedafolkRow extends StatelessWidget {
   final String where;
 
   @override
-  Widget build(BuildContext context) => VedafolkSwitchRow(
-    on: pref.on,
-    onChanged: pref.set,
-    where: where,
-  );
+  Widget build(BuildContext context) =>
+      VedafolkSwitchRow(on: pref.on, onChanged: pref.set, where: where);
 }
