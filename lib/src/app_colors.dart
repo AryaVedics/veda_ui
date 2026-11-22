@@ -38,6 +38,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.divider,
     required this.overlay,
     required this.overlayLight,
+    this.gleam = false,
   });
 
   final Color canvas;
@@ -66,6 +67,10 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Magenta. Camera guides and photo overlays only.
   final Color overlay;
   final Color overlayLight;
+
+  /// A polished, metallic base (a copper pot): the backdrop carries a soft
+  /// sheen, a bright streak and a bloom of light, as on shiny cookware.
+  final bool gleam;
 
   static const _accent = Color(0xFFD9B863);
   static const _accentDim = Color(0xFF544019);
@@ -229,6 +234,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? divider,
     Color? overlay,
     Color? overlayLight,
+    bool? gleam,
   }) {
     return AppColors(
       canvas: canvas ?? this.canvas,
@@ -245,6 +251,7 @@ class AppColors extends ThemeExtension<AppColors> {
       divider: divider ?? this.divider,
       overlay: overlay ?? this.overlay,
       overlayLight: overlayLight ?? this.overlayLight,
+      gleam: gleam ?? this.gleam,
     );
   }
 
@@ -267,6 +274,7 @@ class AppColors extends ThemeExtension<AppColors> {
       divider: l(divider, other.divider),
       overlay: l(overlay, other.overlay),
       overlayLight: l(overlayLight, other.overlayLight),
+      gleam: t < 0.5 ? gleam : other.gleam,
     );
   }
 }

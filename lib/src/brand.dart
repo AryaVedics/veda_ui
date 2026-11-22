@@ -112,7 +112,8 @@ class BrandWatermark extends StatelessWidget {
 
 /// A soft vignette behind a screen's content: canvas toward the upper
 /// middle, easing out to canvasDeep at the corners. Deliberately subtle, so
-/// it reads as depth rather than as a gradient.
+/// it reads as depth rather than as a gradient. A polished base (see
+/// [AppColors.gleam]) also carries the sheen of shiny cookware.
 class CanvasBackdrop extends StatelessWidget {
   const CanvasBackdrop({super.key, required this.child});
 
@@ -121,7 +122,7 @@ class CanvasBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return DecoratedBox(
+    final backdrop = DecoratedBox(
       decoration: BoxDecoration(
         gradient: RadialGradient(
           center: const Alignment(0, -0.4),
@@ -132,5 +133,86 @@ class CanvasBackdrop extends StatelessWidget {
       ),
       child: child,
     );
+    if (!colors.gleam) return backdrop;
+    return Stack(
+      children: [
+        Positioned.fill(child: backdrop),
+        // the sheen sits over the colour and under the content
+        Positioned.fill(
+          child: IgnorePointer(child: CustomPaint(painter: _GleamPainter())),
+        ),
+        // the content is drawn again above the sheen: the sheen must not wash
+        // over text, so the child is the second layer, not the first
+        Positioned.fill(child: child),
+      ],
+    );
   }
+}
+
+/// The sheen of polished copper: a broad soft light from the upper left, two
+/// bright streaks slanting across, and a darker edge, all faint enough that
+/// text on it keeps its contrast.
+class _GleamPainter extends CustomPainter {
+  const _GleamPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = Offset.zero & size;
+    // a bloom of light where the lamp would catch the metal
+    canvas.drawRect(
+      r,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-0.7, -0.8),
+          radius: 1.0,
+          colors: [
+            const Color(0xFFFFE9CF).withValues(alpha: 0.22),
+            const Color(0xFFFFE9CF).withValues(alpha: 0.05),
+            const Color(0x00FFE9CF),
+          ],
+          stops: const [0, 0.45, 1],
+        ).createShader(r),
+    );
+    // two slanting streaks, a broad soft one and a narrow bright one beside it
+    for (final (centre, width, alpha) in const [
+      (0.30, 0.10, 0.12),
+      (0.36, 0.025, 0.2),
+      (0.72, 0.06, 0.07),
+    ]) {
+      canvas.drawRect(
+        r,
+        Paint()
+          ..shader = LinearGradient(
+            begin: const Alignment(-1, -0.55),
+            end: const Alignment(1, 0.55),
+            colors: [
+              const Color(0x00FFFFFF),
+              Colors.white.withValues(alpha: alpha),
+              const Color(0x00FFFFFF),
+            ],
+            stops: [
+              (centre - width).clamp(0.0, 1.0),
+              centre,
+              (centre + width).clamp(0.0, 1.0),
+            ],
+          ).createShader(r),
+      );
+    }
+    // the metal darkens toward the lower right, as a curved surface does
+    canvas.drawRect(
+      r,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(0.9, 1.0),
+          radius: 0.9,
+          colors: [
+            Colors.black.withValues(alpha: 0.18),
+            const Color(0x00000000),
+          ],
+        ).createShader(r),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_GleamPainter old) => false;
 }
