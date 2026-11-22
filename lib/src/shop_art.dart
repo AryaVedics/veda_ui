@@ -657,8 +657,12 @@ void paintShopMotes(Canvas canvas, ShopFrame f, double t, AppColors colors) {
 }
 
 /// Little fairies flitting between the plants, each trailing light.
-void paintShopFairies(Canvas canvas, ShopFrame f, double t) {
-  final k = f.k, inner = f.inner;
+void paintShopFairies(Canvas canvas, ShopFrame f, double t) =>
+    paintFairiesIn(canvas, f.inner, f.k, t);
+
+/// Little fairies flitting about [inner], each trailing light; [k] is the
+/// size factor. Any centrepiece can have them (Today's clock does).
+void paintFairiesIn(Canvas canvas, Rect inner, double k, double t) {
   const tints = [
     Color(0xFFF7C6DA),
     Color(0xFFC9E8C0),
