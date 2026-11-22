@@ -31,16 +31,18 @@ class HairGlyph extends StatelessWidget {
 
 /// The plaits round the ring: almonds along it, leaning in and out in turn.
 List<Path> _plaits() {
-  const n = 10, r = 7.6;
+  // many small plaits with a gentle lean, so the ring stays round (ten
+  // leaning hard made corners, like a pentagon)
+  const n = 16, r = 7.7;
   return [
     for (var i = 0; i < n; i++)
       () {
         final a = i / n * math.pi * 2 - math.pi / 2;
         final c = Offset(12 + r * math.cos(a), 12 + r * math.sin(a));
         // along the ring, turned in or out
-        final lean = a + math.pi / 2 + (i.isEven ? 0.55 : -0.55);
-        final u = Offset(math.cos(lean), math.sin(lean)) * 2.9;
-        final v = Offset(-u.dy, u.dx) * 0.42;
+        final lean = a + math.pi / 2 + (i.isEven ? 0.42 : -0.42);
+        final u = Offset(math.cos(lean), math.sin(lean)) * 2.1;
+        final v = Offset(-u.dy, u.dx) * 0.5;
         final p0 = c - u, p1 = c + u;
         return Path()
           ..moveTo(p0.dx, p0.dy)
