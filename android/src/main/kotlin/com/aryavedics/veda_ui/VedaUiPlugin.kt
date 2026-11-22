@@ -135,6 +135,15 @@ class VedaUiPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
+            "installed" -> {
+                // which of the given packages are on this phone (it can only see
+                // the packages its manifest lists under <queries>)
+                val pkgs = call.argument<List<String>>("packages") ?: emptyList()
+                result.success(
+                    pkgs.filter { context.packageManager.getLaunchIntentForPackage(it) != null }
+                )
+            }
+
             else -> result.notImplemented()
         }
     }

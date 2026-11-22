@@ -59,6 +59,8 @@ public class VedaUiPlugin: NSObject, FlutterPlugin {
       }
     case "openApp":
       openApp(args, result: result)
+    case "installed":
+      installedApps(args, result: result)
     default:
       // deviceInfo and the rest: the Dart side already copes on an iPhone
       // (the build gives it the version through --dart-define=APP_VERSION).
@@ -218,6 +220,21 @@ public class VedaUiPlugin: NSObject, FlutterPlugin {
     withFraction.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     if let d = withFraction.date(from: text) { return d }
     return ISO8601DateFormatter().date(from: text)
+  }
+
+  /// Which of the given packages are on this phone, by their link schemes.
+  private func installedApps(_ args: [String: Any], result: @escaping FlutterResult) {
+    DispatchQueue.main.async {
+      let names = (args["packages"] as? [String]) ?? []
+      let found = names.filter { name in
+        guard
+          let id = self.appId(fromName: name),
+          let url = URL(string: "vedalink-\(id)://open")
+        else { return false }
+        return UIApplication.shared.canOpenURL(url)
+      }
+      result(found)
+    }
   }
 
   /// Opens another Véda app by its link scheme.
