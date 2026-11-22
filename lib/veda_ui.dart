@@ -49,6 +49,7 @@ export 'src/month_picker.dart';
 export 'src/open_veda.dart';
 export 'src/patron_link.dart';
 export 'src/today_tab_icon.dart';
+export 'src/shop_art.dart';
 export 'src/today_tile.dart';
 export 'src/metric_info.dart' show MetricInfo, metricInfoByKey, metricInfoList;
 export 'src/metric_ghost.dart' show GhostMetricChart;
