@@ -169,7 +169,7 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayLight: _overlayLight,
   );
 
-  /// Véda Hair: chilli, a spice red. Clearly red (hue about 5°), so it is
+  /// Chilli, a spice red. Not used by an app yet; kept for the next one. Clearly red (hue about 5°), so it is
   /// never mistaken for Cycle's wine (about 330°) or Sun's umber (about 28°).
   static const chilli = AppColors(
     canvas: Color(0xFF5A1A14),
@@ -184,6 +184,26 @@ class AppColors extends ThemeExtension<AppColors> {
     textSecondary: Color(0xFFF3CABF),
     textMuted: Color(0xFFE6A99B),
     divider: Color(0xFF8E3528),
+    overlay: _overlay,
+    overlayLight: _overlayLight,
+  );
+
+  /// Véda Hair: henna, a red-orange like hennaed hair (a chilli leaning toward
+  /// orange: hue about 12 degrees where the chilli is about 5), clear of
+  /// Kitchen's copper, Sun's umber and Cycle's wine.
+  static const henna = AppColors(
+    canvas: Color(0xFF6B2A14),
+    canvasDeep: Color(0xFF5A210F),
+    card: Color(0xFF8A3A1E),
+    cardSunken: Color(0xFF77311A),
+    accent: _accent,
+    accentDim: _accentDim,
+    accentText: _accentText,
+    onAccent: _onAccent,
+    textPrimary: Color(0xFFFEF0E6),
+    textSecondary: Color(0xFFF6D2BE),
+    textMuted: Color(0xFFE8AE95),
+    divider: Color(0xFFA0462A),
     overlay: _overlay,
     overlayLight: _overlayLight,
   );
@@ -236,6 +256,7 @@ class AppColors extends ThemeExtension<AppColors> {
     'wine': wine,
     'umber': umber,
     'chilli': chilli,
+    'henna': henna,
     'copper': copper,
     'moss': moss,
   };
