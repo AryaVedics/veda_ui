@@ -122,27 +122,24 @@ class CanvasBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final backdrop = DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: const Alignment(0, -0.4),
-          radius: 1.3,
-          colors: [colors.canvas, colors.canvas, colors.canvasDeep],
-          stops: const [0, 0.5, 1],
-        ),
+    final decoration = BoxDecoration(
+      gradient: RadialGradient(
+        center: const Alignment(0, -0.4),
+        radius: 1.3,
+        colors: [colors.canvas, colors.canvas, colors.canvasDeep],
+        stops: const [0, 0.5, 1],
       ),
-      child: child,
     );
-    if (!colors.gleam) return backdrop;
+    if (!colors.gleam)
+      return DecoratedBox(decoration: decoration, child: child);
     return Stack(
       children: [
-        Positioned.fill(child: backdrop),
+        Positioned.fill(child: DecoratedBox(decoration: decoration)),
         // the sheen sits over the colour and under the content
         Positioned.fill(
           child: IgnorePointer(child: CustomPaint(painter: _GleamPainter())),
         ),
-        // the content is drawn again above the sheen: the sheen must not wash
-        // over text, so the child is the second layer, not the first
+        // the content sits above the sheen
         Positioned.fill(child: child),
       ],
     );
@@ -158,6 +155,9 @@ class _GleamPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final r = Offset.zero & size;
+    // the sheen is held back from the top of the screen, where the message box
+    // sits, so the words there stay easy to read: it fades in below it
+    canvas.saveLayer(r, Paint());
     // a bloom of light where the lamp would catch the metal
     canvas.drawRect(
       r,
@@ -166,8 +166,8 @@ class _GleamPainter extends CustomPainter {
           center: const Alignment(-0.7, -0.8),
           radius: 1.0,
           colors: [
-            const Color(0xFFFFE9CF).withValues(alpha: 0.22),
-            const Color(0xFFFFE9CF).withValues(alpha: 0.05),
+            const Color(0xFFFFE9CF).withValues(alpha: 0.3),
+            const Color(0xFFFFE9CF).withValues(alpha: 0.07),
             const Color(0x00FFE9CF),
           ],
           stops: const [0, 0.45, 1],
@@ -175,9 +175,9 @@ class _GleamPainter extends CustomPainter {
     );
     // two slanting streaks, a broad soft one and a narrow bright one beside it
     for (final (centre, width, alpha) in const [
-      (0.30, 0.10, 0.12),
-      (0.36, 0.025, 0.2),
-      (0.72, 0.06, 0.07),
+      (0.30, 0.10, 0.17),
+      (0.36, 0.025, 0.28),
+      (0.72, 0.06, 0.1),
     ]) {
       canvas.drawRect(
         r,
@@ -211,6 +211,19 @@ class _GleamPainter extends CustomPainter {
           ],
         ).createShader(r),
     );
+    // keep only what is below the message box
+    canvas.drawRect(
+      r,
+      Paint()
+        ..blendMode = BlendMode.dstIn
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x00FFFFFF), Color(0x00FFFFFF), Color(0xFFFFFFFF)],
+          stops: [0, 0.27, 0.4],
+        ).createShader(r),
+    );
+    canvas.restore();
   }
 
   @override

@@ -169,7 +169,7 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayLight: _overlayLight,
   );
 
-  /// Véda Kitchen: chilli, a spice red. Clearly red (hue about 5°), so it is
+  /// Véda Hair: chilli, a spice red. Clearly red (hue about 5°), so it is
   /// never mistaken for Cycle's wine (about 330°) or Sun's umber (about 28°).
   static const chilli = AppColors(
     canvas: Color(0xFF5A1A14),
@@ -186,6 +186,27 @@ class AppColors extends ThemeExtension<AppColors> {
     divider: Color(0xFF8E3528),
     overlay: _overlay,
     overlayLight: _overlayLight,
+  );
+
+  /// Véda Kitchen: bright copper, like a polished pot or kettle, with a gleam
+  /// (see [gleam]). The cards sit a step deeper than the canvas, so cream text
+  /// on them keeps its contrast on a mid-tone base.
+  static const copper = AppColors(
+    canvas: Color(0xFF9C5328),
+    canvasDeep: Color(0xFF82431D),
+    card: Color(0xFF84451F),
+    cardSunken: Color(0xFF753B19),
+    accent: Color(0xFFF2D58A),
+    accentDim: Color(0xFF7E5A30),
+    accentText: Color(0xFFFFE6A0),
+    onAccent: Color(0xFF3A2410),
+    textPrimary: Color(0xFFFFF7EE),
+    textSecondary: Color(0xFFFAE8D6),
+    textMuted: Color(0xFFF0D4BB),
+    divider: Color(0xFFB8703F),
+    overlay: Color(0xFFF2C79C),
+    overlayLight: Color(0xFFFAE0C4),
+    gleam: true,
   );
 
   /// Véda Allergy: moss, a deep olive green (hue about 85°), so it is never
@@ -215,6 +236,7 @@ class AppColors extends ThemeExtension<AppColors> {
     'wine': wine,
     'umber': umber,
     'chilli': chilli,
+    'copper': copper,
     'moss': moss,
   };
 
