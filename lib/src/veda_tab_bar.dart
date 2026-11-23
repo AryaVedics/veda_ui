@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'line_icons.dart';
 
 class VedaTab {
   const VedaTab({
@@ -17,6 +18,14 @@ class VedaTab {
   final Widget icon;
   final Widget selectedIcon;
   final String label;
+
+  /// A tab with one of the Véda line icons: a fine line when idle, the same
+  /// line in gold with a soft fill when selected.
+  static VedaTab line(AppColors colors, VedaIcon icon, String label) => VedaTab(
+    icon: VedaLineIcon(icon, color: colors.textMuted),
+    selectedIcon: VedaLineIcon(icon, color: colors.accentText, selected: true),
+    label: label,
+  );
 
   /// A tab from a Phosphor icon pair (thin when idle, filled when selected).
   static VedaTab of(

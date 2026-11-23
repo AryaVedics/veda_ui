@@ -202,7 +202,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onAccent: _onAccent,
     textPrimary: Color(0xFFFEF0E6),
     textSecondary: Color(0xFFF6D2BE),
-    textMuted: Color(0xFFE8AE95),
+    textMuted: Color(0xFFEDBEAA),
     divider: Color(0xFFA0462A),
     overlay: _overlay,
     overlayLight: _overlayLight,
@@ -212,10 +212,10 @@ class AppColors extends ThemeExtension<AppColors> {
   /// (see [gleam]). The cards sit a step deeper than the canvas, so cream text
   /// on them keeps its contrast on a mid-tone base.
   static const copper = AppColors(
-    canvas: Color(0xFF9C5328),
-    canvasDeep: Color(0xFF82431D),
-    card: Color(0xFF84451F),
-    cardSunken: Color(0xFF753B19),
+    canvas: Color(0xFF904C25),
+    canvasDeep: Color(0xFF7A3E1C),
+    card: Color(0xFF7C411E),
+    cardSunken: Color(0xFF6C3517),
     accent: Color(0xFFF2D58A),
     accentDim: Color(0xFF7E5A30),
     accentText: Color(0xFFFFE6A0),

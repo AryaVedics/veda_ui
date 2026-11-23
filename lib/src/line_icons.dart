@@ -389,26 +389,34 @@ class _Pen {
     );
   }
 
-  /// Kitchen: a pot with its lid, its knob and two handles.
+  /// Kitchen: a karahi, the two-handled pan, a short foot beneath it and three
+  /// curls of steam above.
   void _kitchen() {
     shape(
       Path()
-        ..moveTo(5, 11.5)
-        ..lineTo(19, 11.5)
-        ..lineTo(18.1, 18.2)
-        ..quadraticBezierTo(17.8, 20, 15.9, 20)
-        ..lineTo(8.1, 20)
-        ..quadraticBezierTo(6.2, 20, 5.9, 18.2)
+        ..moveTo(4.5, 11.5)
+        ..lineTo(19.5, 11.5)
+        ..cubicTo(19.5, 16.2, 16.2, 19.5, 12, 19.5)
+        ..cubicTo(7.8, 19.5, 4.5, 16.2, 4.5, 11.5)
         ..close(),
     );
     stroke(
       Path()
-        ..moveTo(4.6, 11.5)
-        ..quadraticBezierTo(12, 5.6, 19.4, 11.5),
+        ..moveTo(4.5, 12.5)
+        ..cubicTo(2.4, 12.5, 2, 11, 3, 10.2)
+        ..moveTo(19.5, 12.5)
+        ..cubicTo(21.6, 12.5, 22, 11, 21, 10.2),
     );
-    shape(circle(12, 7.0, 1.05));
-    line(5.2, 13.6, 2.9, 13.6);
-    line(18.8, 13.6, 21.1, 13.6);
+    line(9.5, 21, 14.5, 21);
+    stroke(
+      Path()
+        ..moveTo(9, 8.5)
+        ..cubicTo(8, 7, 10, 6, 9, 4.8)
+        ..moveTo(12, 8.5)
+        ..cubicTo(11, 7, 13, 5.8, 12, 4)
+        ..moveTo(15, 8.5)
+        ..cubicTo(14, 7, 16, 6, 15, 4.8),
+    );
   }
 
   /// Curio: a capsule, tilted, its two halves meeting in the middle.
