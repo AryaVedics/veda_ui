@@ -656,19 +656,52 @@ void paintShopMotes(Canvas canvas, ShopFrame f, double t, AppColors colors) {
   }
 }
 
-/// Little fairies flitting between the plants, each trailing light.
+/// How fast a fairy travels along her path at her fastest, in logical pixels a
+/// second at the size factor 1. Measured along the path her average is about
+/// 0.69 of this, 5.4 px/s: the same pace as the motes drifting beside her (see
+/// [paintShopMotes]), so the fairies and the motes move as one company.
+const double kFairySpeed = 7.8;
+
+/// How big a fairy is in the shops, as a factor on her drawing: half of what it
+/// was (0.94), so she is a small light among the plants, not a figure.
+const double kFairyScale = 0.47;
+
+/// The size [kFairyScale] was before it was halved; her trail of light is cut
+/// in the same proportion, so the whole fairy shrinks together.
+const double _fairyFullScale = 0.94;
+
+/// Elapsed seconds for the shops' fairies, taken from their animation's value
+/// (0 to 1 over [cycleSeconds], repeating), so it keeps counting across
+/// the repeats, never jumps, and stands still when the animation does.
+class _FairyTime {
+  static double seconds = 0;
+  static double? _last;
+
+  static double advance(double t, double cycleSeconds) {
+    final last = _last;
+    _last = t;
+    if (last == null) return seconds;
+    var d = t - last;
+    if (d < 0) d += 1;
+    seconds += d * cycleSeconds;
+    return seconds;
+  }
+}
+
+/// Little fairies flitting between the plants, each trailing light. [t] is the
+/// shop's own animation value, which repeats every 20 seconds.
 void paintShopFairies(Canvas canvas, ShopFrame f, double t) =>
-    paintFairiesIn(canvas, f.inner, f.k, t);
+    paintFairiesIn(canvas, f.inner, f.k, _FairyTime.advance(t, 20));
 
 /// Little fairies flitting about [inner], each trailing light; [k] is the
-/// size factor and [scale] how big the fairies are (smaller below 1.4). Any
-/// centrepiece can have them (Today's clock does).
+/// size factor, [seconds] the time that has passed and [scale] how big the
+/// fairies are. They travel at [kFairySpeed]. Any centrepiece can have them.
 void paintFairiesIn(
   Canvas canvas,
   Rect inner,
   double k,
-  double t, {
-  double scale = 1.4,
+  double seconds, {
+  double scale = kFairyScale,
 }) {
   const tints = [
     Color(0xFFF7C6DA),
@@ -676,8 +709,17 @@ void paintFairiesIn(
     Color(0xFFD9CCF5),
     Color(0xFFFFE6A8),
   ];
-  // whole numbers of loops in one turn of [t], so the paths close
   const loops = [(1, 2, 0.1), (2, 3, 0.45), (1, 3, 0.7), (3, 2, 0.25)];
+  // turns a second, so each fairy's fastest moment is [kFairySpeed]
+  double rate(int j) {
+    final (mx, my, _) = loops[j];
+    return kFairySpeed *
+        k /
+        (2 *
+            math.pi *
+            Offset(inner.width * 0.3 * mx, inner.height * 0.18 * my).distance);
+  }
+
   Offset at(int j, double tt) {
     final (mx, my, ph) = loops[j];
     final cx = inner.left + inner.width * (0.2 + 0.6 * ((j * 0.37) % 1));
@@ -692,15 +734,15 @@ void paintFairiesIn(
     final tint = tints[j];
     // the trail of light behind
     for (var q = 1; q <= 10; q++) {
-      final p = at(j, t - q * 0.0025);
+      final p = at(j, rate(j) * (seconds - q * 0.4));
       canvas.drawCircle(
         p,
-        (1.6 - q * 0.1) * k,
+        (1.6 - q * 0.1) * k * (scale / _fairyFullScale),
         Paint()..color = tint.withValues(alpha: 0.5 * (1 - q / 11)),
       );
     }
-    final p = at(j, t);
-    final ahead = at(j, t + 0.002);
+    final p = at(j, rate(j) * seconds);
+    final ahead = at(j, rate(j) * (seconds + 0.4));
     final facing = ahead.dx >= p.dx ? 1.0 : -1.0;
     canvas.save();
     canvas.translate(p.dx, p.dy);
@@ -716,7 +758,7 @@ void paintFairiesIn(
         ).createShader(glow),
     );
     // wings, beating
-    final beat = 0.35 + 0.65 * math.sin(t * 160 * math.pi + j).abs();
+    final beat = 0.35 + 0.65 * math.sin(seconds * 8 * math.pi + j).abs();
     final wing = Paint()..color = Colors.white.withValues(alpha: 0.55);
     for (final s in const [-1.0, 1.0]) {
       for (final (dy, ww, hh) in const [(-1.5, 6.0, 4.0), (1.5, 4.5, 3.0)]) {
