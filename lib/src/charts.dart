@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'brand.dart';
 import 'common.dart';
+import 'logo_menu.dart' show SocialLinksRow;
 import 'theme.dart';
 import 'scaled_box.dart';
 import 'chart_gradient.dart';
@@ -402,6 +403,9 @@ class BrandFooter extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // the accounts, in gold above the mark, as at the foot of Véda's Profile
+            const SocialLinksRow(gold: true),
+            const SizedBox(height: 18),
             Image.asset(brand.markAsset, width: 140, height: 140),
             const SizedBox(height: 8),
             Text(

@@ -65,6 +65,52 @@ const String kTikTokUrl = 'https://www.tiktok.com/@aryavedics';
 void _openUrl(String url) =>
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 
+/// The social accounts as one quiet row of icons, as in Véda: gold at the foot
+/// of a Profile page ([gold]), muted in the logo menu. Tapping one opens the
+/// account in the person's own browser or app; nothing is sent from here.
+class SocialLinksRow extends StatelessWidget {
+  const SocialLinksRow({super.key, this.gold = false, this.onOpen});
+
+  final bool gold;
+
+  /// Opens an address; the menu passes one that closes itself first.
+  final void Function(String url)? onOpen;
+
+  static const links = <(IconData, String, String)>[
+    (PhosphorIconsThin.instagramLogo, 'Instagram', kInstagramUrl),
+    (PhosphorIconsThin.tiktokLogo, 'TikTok', kTikTokUrl),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < links.length; i++) ...[
+          if (i > 0) const SizedBox(width: 22),
+          InkWell(
+            key: Key('social-${links[i].$2}'),
+            customBorder: const CircleBorder(),
+            onTap: () => (onOpen ?? _openUrl)(links[i].$3),
+            child: Tooltip(
+              message: links[i].$2,
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Icon(
+                  links[i].$1,
+                  size: 22,
+                  color: gold ? colors.accent : colors.textMuted,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 /// Opens the menu under the widget [context] belongs to (the logo).
 Future<void> showLogoMenu(BuildContext context) async {
   final items = LogoMenuScope.maybeOf(context) ?? const [];
@@ -230,36 +276,10 @@ class _MenuCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (final (i, (icon, label, url)) in [
-                      (
-                        PhosphorIconsThin.instagramLogo,
-                        'Instagram',
-                        kInstagramUrl,
-                      ),
-                      (PhosphorIconsThin.tiktokLogo, 'TikTok', kTikTokUrl),
-                    ].indexed) ...[
-                      if (i > 0) const SizedBox(width: 22),
-                      InkWell(
-                        key: Key('social-$label'),
-                        customBorder: const CircleBorder(),
-                        onTap: () => pick(c, () => _openUrl(url)),
-                        child: Tooltip(
-                          message: label,
-                          child: Padding(
-                            padding: const EdgeInsets.all(6),
-                            child: Icon(
-                              icon,
-                              size: 22,
-                              color: colors.textMuted,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Center(
+                  child: SocialLinksRow(
+                    onOpen: (url) => pick(c, () => _openUrl(url)),
+                  ),
                 ),
               ),
             ],
