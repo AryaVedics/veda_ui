@@ -50,6 +50,7 @@ export 'src/open_veda.dart';
 export 'src/patron_link.dart';
 export 'src/today_tab_icon.dart';
 export 'src/shop_art.dart';
+export 'src/shop_base.dart';
 export 'src/app_glyphs.dart';
 export 'src/line_icons.dart';
 export 'src/garden_glyph.dart';
