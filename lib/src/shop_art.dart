@@ -458,29 +458,7 @@ void paintShopFront(
   }
 
   // ivy along the underside of the fascia
-  final ivy = math.Random(41);
-  for (var j = 0; j < 26; j++) {
-    final x = w * (j + ivy.nextDouble()) / 26;
-    final len = (6 + ivy.nextDouble() * (j % 4 == 0 ? 26 : 10)) * k;
-    final c = Offset(x, f.fasciaH + len * 0.5);
-    canvas.drawLine(
-      Offset(x, f.fasciaH),
-      Offset(x, f.fasciaH + len),
-      Paint()
-        ..strokeWidth = 0.8 * k
-        ..color = shopGreens[0],
-    );
-    for (var q = 0; q < 3; q++) {
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: c + Offset((q - 1) * 3 * k, (q - 1) * len * 0.35),
-          width: 6 * k,
-          height: 4.5 * k,
-        ),
-        Paint()..color = shopGreens[(j + q) % 3],
-      );
-    }
-  }
+  paintShopIvy(canvas, w, f.fasciaH, k);
 
   // the lanterns, hanging from the fascia
   for (final c in f.lanterns) {
@@ -534,7 +512,6 @@ void paintShopFront(
 
   // hanging baskets on the posts, trailing ivy and flowers down them
   for (final left in const [true, false]) {
-    final s = left ? 1.0 : -1.0;
     final c = Offset(left ? f.postW + 10 * k : w - f.postW - 10 * k, h * 0.205);
     canvas.drawLine(
       Offset(c.dx, f.fasciaH),
@@ -543,96 +520,159 @@ void paintShopFront(
         ..strokeWidth = 0.9 * k
         ..color = shopWoodDark,
     );
-    final rnd = math.Random(left ? 51 : 52);
-    // trailing strands
-    for (var j = 0; j < 4; j++) {
-      final len = h * (0.16 + rnd.nextDouble() * 0.16);
-      final x0 = c.dx + (j - 1.5) * 5 * k;
-      final path = Path()..moveTo(x0, c.dy);
-      final pts = <Offset>[];
-      for (var q = 0; q <= 10; q++) {
-        final u = q / 10;
-        final p = Offset(
-          x0 - s * u * 6 * k + 3 * k * math.sin(u * 7 + j),
-          c.dy + u * len,
-        );
-        pts.add(p);
-        path.lineTo(p.dx, p.dy);
-      }
-      canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.9 * k
-          ..color = shopGreens[0],
+    paintHangingBasket(
+      canvas,
+      c,
+      k,
+      left: left,
+      trail: h * 0.16,
+      trailVar: h * 0.16,
+      seed: left ? 51 : 52,
+    );
+  }
+}
+
+/// Ivy hanging from an edge: short strands of three leaves, a few long ones.
+/// The fascia's, and any rail or beam that wants the same.
+void paintShopIvy(
+  Canvas canvas,
+  double w,
+  double y,
+  double k, {
+  int seed = 41,
+  double shortLen = 10,
+  double longLen = 26,
+}) {
+  final ivy = math.Random(seed);
+  for (var j = 0; j < 26; j++) {
+    final x = w * (j + ivy.nextDouble()) / 26;
+    final len =
+        (shortLen * 0.6 +
+            ivy.nextDouble() * (j % 4 == 0 ? longLen : shortLen)) *
+        k;
+    final c = Offset(x, y + len * 0.5);
+    canvas.drawLine(
+      Offset(x, y),
+      Offset(x, y + len),
+      Paint()
+        ..strokeWidth = 0.8 * k
+        ..color = shopGreens[0],
+    );
+    for (var q = 0; q < 3; q++) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: c + Offset((q - 1) * 3 * k, (q - 1) * len * 0.35),
+          width: 6 * k,
+          height: 4.5 * k,
+        ),
+        Paint()..color = shopGreens[(j + q) % 3],
       );
-      for (var q = 1; q < pts.length; q++) {
-        final p = pts[q];
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: p + Offset((q.isEven ? 3 : -3) * k, 0),
-            width: 6.5 * k,
-            height: 4.5 * k,
-          ),
-          Paint()..color = shopGreens[(q + j) % 3],
-        );
-        if ((q + j) % 4 == 0) {
-          final fc = p + Offset((q.isEven ? -3 : 3) * k, 1 * k);
-          for (var pe = 0; pe < 5; pe++) {
-            final a = pe * math.pi * 2 / 5;
-            canvas.drawCircle(
-              fc + Offset(math.cos(a), math.sin(a)) * 2.2 * k,
-              1.8 * k,
-              Paint()
-                ..color = j.isEven
-                    ? const Color(0xFFE77FA0)
-                    : const Color(0xFFF7F2E6),
-            );
-          }
+    }
+  }
+}
+
+/// A hanging basket of leaves and flowers at [c], with strands of ivy trailing
+/// down from it: each [trail] long, plus up to [trailVar]. [left] is which way
+/// the strands lean. A rope to the basket is the caller's.
+void paintHangingBasket(
+  Canvas canvas,
+  Offset c,
+  double k, {
+  required bool left,
+  required double trail,
+  required double trailVar,
+  required int seed,
+}) {
+  final s = left ? 1.0 : -1.0;
+  final rnd = math.Random(seed);
+  // trailing strands
+  for (var j = 0; j < 4; j++) {
+    final len = trail + rnd.nextDouble() * trailVar;
+    final x0 = c.dx + (j - 1.5) * 5 * k;
+    final path = Path()..moveTo(x0, c.dy);
+    final pts = <Offset>[];
+    for (var q = 0; q <= 10; q++) {
+      final u = q / 10;
+      final p = Offset(
+        x0 - s * u * 6 * k + 3 * k * math.sin(u * 7 + j),
+        c.dy + u * len,
+      );
+      pts.add(p);
+      path.lineTo(p.dx, p.dy);
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.9 * k
+        ..color = shopGreens[0],
+    );
+    for (var q = 1; q < pts.length; q++) {
+      final p = pts[q];
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: p + Offset((q.isEven ? 3 : -3) * k, 0),
+          width: 6.5 * k,
+          height: 4.5 * k,
+        ),
+        Paint()..color = shopGreens[(q + j) % 3],
+      );
+      if ((q + j) % 4 == 0) {
+        final fc = p + Offset((q.isEven ? -3 : 3) * k, 1 * k);
+        for (var pe = 0; pe < 5; pe++) {
+          final a = pe * math.pi * 2 / 5;
           canvas.drawCircle(
-            fc,
-            1.1 * k,
-            Paint()..color = const Color(0xFFF2C14E),
+            fc + Offset(math.cos(a), math.sin(a)) * 2.2 * k,
+            1.8 * k,
+            Paint()
+              ..color = j.isEven
+                  ? const Color(0xFFE77FA0)
+                  : const Color(0xFFF7F2E6),
           );
         }
-      }
-    }
-    // the basket
-    final basket = Path()
-      ..moveTo(c.dx - 17 * k, c.dy - 4 * k)
-      ..quadraticBezierTo(c.dx, c.dy + 22 * k, c.dx + 17 * k, c.dy - 4 * k)
-      ..close();
-    canvas.drawPath(basket, Paint()..color = const Color(0xFF8A6238));
-    for (var q = 0; q < 4; q++) {
-      canvas.drawLine(
-        Offset(c.dx - 15 * k + q * 2 * k, c.dy + q * 3 * k - 2 * k),
-        Offset(c.dx + 15 * k - q * 2 * k, c.dy + q * 3 * k - 2 * k),
-        Paint()
-          ..strokeWidth = 0.8 * k
-          ..color = shopWoodDark.withValues(alpha: 0.7),
-      );
-    }
-    // the leaves and flowers on top
-    for (var j = 0; j < 9; j++) {
-      final a = -math.pi * (0.1 + 0.8 * j / 8);
-      final p = c + Offset(math.cos(a) * 14 * k, math.sin(a) * 9 * k - 3 * k);
-      canvas.drawOval(
-        Rect.fromCenter(center: p, width: 9 * k, height: 6 * k),
-        Paint()..color = shopGreens[j % 3],
-      );
-    }
-    for (var j = 0; j < 3; j++) {
-      final fc = c + Offset((j - 1) * 9 * k, -9 * k - (j == 1 ? 3 * k : 0));
-      for (var pe = 0; pe < 5; pe++) {
-        final a = pe * math.pi * 2 / 5;
         canvas.drawCircle(
-          fc + Offset(math.cos(a), math.sin(a)) * 3 * k,
-          2.6 * k,
-          Paint()..color = const Color(0xFFE77FA0),
+          fc,
+          1.1 * k,
+          Paint()..color = const Color(0xFFF2C14E),
         );
       }
-      canvas.drawCircle(fc, 1.6 * k, Paint()..color = const Color(0xFFF2C14E));
     }
+  }
+  // the basket
+  final basket = Path()
+    ..moveTo(c.dx - 17 * k, c.dy - 4 * k)
+    ..quadraticBezierTo(c.dx, c.dy + 22 * k, c.dx + 17 * k, c.dy - 4 * k)
+    ..close();
+  canvas.drawPath(basket, Paint()..color = const Color(0xFF8A6238));
+  for (var q = 0; q < 4; q++) {
+    canvas.drawLine(
+      Offset(c.dx - 15 * k + q * 2 * k, c.dy + q * 3 * k - 2 * k),
+      Offset(c.dx + 15 * k - q * 2 * k, c.dy + q * 3 * k - 2 * k),
+      Paint()
+        ..strokeWidth = 0.8 * k
+        ..color = shopWoodDark.withValues(alpha: 0.7),
+    );
+  }
+  // the leaves and flowers on top
+  for (var j = 0; j < 9; j++) {
+    final a = -math.pi * (0.1 + 0.8 * j / 8);
+    final p = c + Offset(math.cos(a) * 14 * k, math.sin(a) * 9 * k - 3 * k);
+    canvas.drawOval(
+      Rect.fromCenter(center: p, width: 9 * k, height: 6 * k),
+      Paint()..color = shopGreens[j % 3],
+    );
+  }
+  for (var j = 0; j < 3; j++) {
+    final fc = c + Offset((j - 1) * 9 * k, -9 * k - (j == 1 ? 3 * k : 0));
+    for (var pe = 0; pe < 5; pe++) {
+      final a = pe * math.pi * 2 / 5;
+      canvas.drawCircle(
+        fc + Offset(math.cos(a), math.sin(a)) * 3 * k,
+        2.6 * k,
+        Paint()..color = const Color(0xFFE77FA0),
+      );
+    }
+    canvas.drawCircle(fc, 1.6 * k, Paint()..color = const Color(0xFFF2C14E));
   }
 }
 
