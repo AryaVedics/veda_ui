@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_colors.dart';
+import 'backup.dart' show BackupController;
 import 'mini_ring.dart';
 import 'ui_scale.dart';
 
@@ -83,7 +84,12 @@ class NoticeCarousel extends StatefulWidget {
     required this.leading,
     this.now,
     this.greeting,
+    this.backup,
   });
+
+  /// When given, the monthly backup reminder is the first message in the box
+  /// while a backup is due: tap it to back up, × to be reminded in two weeks.
+  final BackupController? backup;
 
   /// What sits at the left of the message box: the app's own ring, with its
   /// number for today (see MiniRing).
@@ -128,7 +134,9 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
   @override
   void didUpdateWidget(NoticeCarousel old) {
     super.didUpdateWidget(old);
-    if (old.appKey != widget.appKey || old.messages != widget.messages) {
+    if (old.appKey != widget.appKey ||
+        old.messages != widget.messages ||
+        (old.backup == null) != (widget.backup == null)) {
       _load();
     }
   }
@@ -139,14 +147,44 @@ class _NoticeCarouselState extends State<NoticeCarousel> {
       widget.messages,
       now: widget.now ?? DateTime.now(),
     );
+    var due = false;
+    try {
+      due = await widget.backup?.reminderDue() ?? false;
+    } catch (_) {}
     if (!mounted) return;
     setState(() {
-      _shown = shown;
+      _shown = [if (due) _backupNotice, ...shown];
       _page = 0;
     });
   }
 
+  /// The monthly backup reminder, as a message of the box rather than a card.
+  NoticeMessage get _backupNotice => NoticeMessage(
+    'backup',
+    PhosphorIconsThin.archive,
+    'Time for a backup? Tap here to make one. Your data is kept only on this '
+        'phone.',
+    onTap: (context) async {
+      final done = await widget.backup!.backUp(context);
+      if (done && mounted) _removeShown('backup');
+    },
+  );
+
+  void _removeShown(String id) => setState(() {
+    _shown = [
+      for (final s in _shown ?? const <NoticeMessage>[])
+        if (s.id != id) s,
+    ];
+    _page = 0;
+  });
+
   Future<void> _dismiss(NoticeMessage m) async {
+    if (m.id == 'backup') {
+      // not for good: the reminder comes back in two weeks
+      await widget.backup?.snooze();
+      if (mounted) _removeShown('backup');
+      return;
+    }
     await dismissNotice(widget.appKey, m);
     if (!mounted) return;
     setState(() {
