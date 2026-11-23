@@ -39,4 +39,15 @@ void main() {
     expect(find.text('Our website'), findsOneWidget);
     expect(find.text('Support'), findsOneWidget);
   });
+
+  testWidgets('the social accounts are one quiet row at the foot', (t) async {
+    await t.pumpWidget(_app());
+    await t.tap(find.text('logo'));
+    await t.pumpAndSettle();
+    expect(find.byKey(const Key('social-Instagram')), findsOneWidget);
+    expect(find.byKey(const Key('social-TikTok')), findsOneWidget);
+    // the same accounts as Véda's own menu
+    expect(kInstagramUrl, 'https://www.instagram.com/aryavedics/');
+    expect(kTikTokUrl, 'https://www.tiktok.com/@aryavedics');
+  });
 }

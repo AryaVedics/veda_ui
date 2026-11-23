@@ -58,6 +58,10 @@ class LogoMenuScope extends InheritedWidget {
   bool updateShouldNotify(LogoMenuScope old) => false;
 }
 
+/// The social accounts, the same as Véda's own menu: Instagram and TikTok.
+const String kInstagramUrl = 'https://www.instagram.com/aryavedics/';
+const String kTikTokUrl = 'https://www.tiktok.com/@aryavedics';
+
 void _openUrl(String url) =>
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 
@@ -218,6 +222,45 @@ class _MenuCard extends StatelessWidget {
                 PhosphorIconsThin.chatCircle,
                 'Support',
                 () => pick(c, () => _openUrl('$kWebsiteUrl/support')),
+              ),
+              // the social accounts, one quiet row at the foot, as in Véda
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Divider(height: 14, color: colors.divider),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (final (i, (icon, label, url)) in [
+                      (
+                        PhosphorIconsThin.instagramLogo,
+                        'Instagram',
+                        kInstagramUrl,
+                      ),
+                      (PhosphorIconsThin.tiktokLogo, 'TikTok', kTikTokUrl),
+                    ].indexed) ...[
+                      if (i > 0) const SizedBox(width: 22),
+                      InkWell(
+                        key: Key('social-$label'),
+                        customBorder: const CircleBorder(),
+                        onTap: () => pick(c, () => _openUrl(url)),
+                        child: Tooltip(
+                          message: label,
+                          child: Padding(
+                            padding: const EdgeInsets.all(6),
+                            child: Icon(
+                              icon,
+                              size: 22,
+                              color: colors.textMuted,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ],
           ),
