@@ -216,18 +216,20 @@ class _LinkSectionState extends State<LinkSection> {
         final statusKnown = others.any(
           (a) => bridge.readOf(a).status != LinkStatus.unknown,
         );
-        // Decided once, as the card first sees real statuses: folded only if
-        // everything installed is linked and working.
+        // Decided once, as the card first sees real statuses: it starts open
+        // when something needs attention, folded when everything installed is
+        // linked and working. The person can fold or open it either way.
         if (_open == null && statusKnown) _open = attention != null;
         final canFold = installed.isNotEmpty;
-        final open = !canFold || (_open ?? true) || attention != null;
+        final open = !canFold || (_open ?? true);
         final n = bridge.linkedCount;
-        final label = attention != null
-            ? (bridge.isLinked(attention)
-                  ? '${attention.name}: see below'
-                  : '${attention.name} is not linked yet')
-            : open
+        // folded, the line still says if something needs attention
+        final label = open
             ? 'Hide the apps'
+            : attention != null
+            ? (bridge.isLinked(attention)
+                  ? '${attention.name}: needs a look'
+                  : '${attention.name} is not linked yet')
             : installed.length == 1
             ? '${installed.first.name} is connected'
             : 'All ${installed.length} installed apps connected';
@@ -250,9 +252,7 @@ class _LinkSectionState extends State<LinkSection> {
               if (canFold) ...[
                 Divider(height: 8, color: colors.accentDim),
                 InkWell(
-                  onTap: attention != null
-                      ? null
-                      : () => setState(() => _open = !open),
+                  onTap: () => setState(() => _open = !open),
                   borderRadius: BorderRadius.circular(10),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
