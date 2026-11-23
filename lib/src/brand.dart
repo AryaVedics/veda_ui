@@ -146,8 +146,8 @@ class CanvasBackdrop extends StatelessWidget {
   }
 }
 
-/// The sheen of polished copper: a broad soft light from the upper left, two
-/// bright streaks slanting across, and a darker edge, all faint enough that
+/// The glow of polished copper: a broad soft light from the upper left, two
+/// more diffuse pools of warm light, and a darker edge, all faint enough that
 /// text on it keeps its contrast.
 class _GleamPainter extends CustomPainter {
   const _GleamPainter();
@@ -173,28 +173,25 @@ class _GleamPainter extends CustomPainter {
           stops: const [0, 0.45, 1],
         ).createShader(r),
     );
-    // two slanting streaks, a broad soft one and a narrow bright one beside it
-    for (final (centre, width, alpha) in const [
-      (0.30, 0.10, 0.17),
-      (0.36, 0.025, 0.28),
-      (0.72, 0.06, 0.1),
+    // two more pools of warm light, wide and soft with no edge to them: one
+    // low on the left and one high on the right, where the metal would catch
+    // the room
+    for (final (at, radius, alpha) in const [
+      (Alignment(-0.9, 0.35), 0.85, 0.16),
+      (Alignment(0.85, -0.1), 0.75, 0.12),
     ]) {
       canvas.drawRect(
         r,
         Paint()
-          ..shader = LinearGradient(
-            begin: const Alignment(-1, -0.55),
-            end: const Alignment(1, 0.55),
+          ..shader = RadialGradient(
+            center: at,
+            radius: radius,
             colors: [
-              const Color(0x00FFFFFF),
-              Colors.white.withValues(alpha: alpha),
-              const Color(0x00FFFFFF),
+              const Color(0xFFFFE9CF).withValues(alpha: alpha),
+              const Color(0xFFFFE9CF).withValues(alpha: alpha * 0.4),
+              const Color(0x00FFE9CF),
             ],
-            stops: [
-              (centre - width).clamp(0.0, 1.0),
-              centre,
-              (centre + width).clamp(0.0, 1.0),
-            ],
+            stops: const [0, 0.5, 1],
           ).createShader(r),
       );
     }
