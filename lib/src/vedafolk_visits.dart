@@ -53,9 +53,13 @@ class VedafolkPref {
 
 /// One visit: which friend, which side, how far along (0 to 1).
 class VedafolkVisit {
-  const VedafolkVisit(this.friend, this.side, this.progress);
+  const VedafolkVisit(this.friend, this.side, this.progress, {this.slot = 0});
 
   final ForestFriend friend;
+
+  /// A number drawn afresh for each visit, for a place that wants the friend
+  /// somewhere new every time (a dial, say).
+  final int slot;
 
   /// -1 on the left, 1 on the right.
   final double side;
@@ -114,6 +118,7 @@ class _VedafolkVisitsState extends State<VedafolkVisits>
   ForestFriend? _friend;
   ForestFriend? _last;
   var _side = 1.0;
+  var _slot = 0;
 
   @override
   void initState() {
@@ -146,6 +151,7 @@ class _VedafolkVisitsState extends State<VedafolkVisits>
       _friend = pool[_rnd.nextInt(pool.length)];
       _last = _friend;
       _side = -_side; // alternate sides, so it is never the same corner twice
+      _slot = _rnd.nextInt(1 << 20);
       _c.forward(from: 0);
     }
     // the next visit: between 0.7 and 1.3 times the usual gap
@@ -171,7 +177,9 @@ class _VedafolkVisitsState extends State<VedafolkVisits>
       final f = _friend;
       return widget.builder(
         context,
-        f == null || p <= 0 || p >= 1 ? null : VedafolkVisit(f, _side, p),
+        f == null || p <= 0 || p >= 1
+            ? null
+            : VedafolkVisit(f, _side, p, slot: _slot),
       );
     },
   );
