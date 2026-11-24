@@ -65,6 +65,40 @@ const String kTikTokUrl = 'https://www.tiktok.com/@aryavedics';
 void _openUrl(String url) =>
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 
+/// A quiet "Health data privacy" link, set under any switch that reads health
+/// data (a watch, Health Connect, Apple Health). It opens the separate
+/// consumer health data page on the website in the person's own browser.
+class HealthDataLink extends StatelessWidget {
+  const HealthDataLink({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, left: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InkWell(
+          key: const Key('healthDataLink'),
+          onTap: () => _openUrl('$kWebsiteUrl/health-data'),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Text(
+              'Health data privacy',
+              style: TextStyle(
+                fontSize: 12.5,
+                color: colors.accentText,
+                decoration: TextDecoration.underline,
+                decorationColor: colors.accentText,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The social accounts as one quiet row of icons, as in Véda: gold at the foot
 /// of a Profile page ([gold]), muted in the logo menu. Tapping one opens the
 /// account in the person's own browser or app; nothing is sent from here.
