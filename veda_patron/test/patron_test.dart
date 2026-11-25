@@ -11,10 +11,14 @@ import 'package:veda_ui/veda_ui.dart';
 /// A store that sells for pretend: memberships live in [members], by
 /// customer id, the way RevenueCat keeps them.
 class FakeStore implements PatronStore {
-  FakeStore({this.available = true});
+  FakeStore({this.available = true, this.plusOffer = false});
 
   @override
   final bool available;
+
+  /// Sells a Patron Plus app's two plans (Plus and the app's own) instead of
+  /// Patron's monthly and annual.
+  final bool plusOffer;
 
   final members = <String>{};
   String? current;
@@ -41,20 +45,35 @@ class FakeStore implements PatronStore {
   }
 
   @override
-  Future<List<PatronPackage>> packages() async => const [
-    PatronPackage(
-      id: 'monthly',
-      isAnnual: false,
-      priceString: r'$4.99',
-      price: 4.99,
-    ),
-    PatronPackage(
-      id: 'annual',
-      isAnnual: true,
-      priceString: r'$44.99',
-      price: 44.99,
-    ),
-  ];
+  Future<List<PatronPackage>> packages() async => plusOffer
+      ? const [
+          PatronPackage(
+            id: kSinglePackageId,
+            isAnnual: false,
+            priceString: r'$4.99',
+            price: 4.99,
+          ),
+          PatronPackage(
+            id: kPlusPackageId,
+            isAnnual: false,
+            priceString: r'$9.99',
+            price: 9.99,
+          ),
+        ]
+      : const [
+          PatronPackage(
+            id: 'monthly',
+            isAnnual: false,
+            priceString: r'$4.99',
+            price: 4.99,
+          ),
+          PatronPackage(
+            id: 'annual',
+            isAnnual: true,
+            priceString: r'$44.99',
+            price: 44.99,
+          ),
+        ];
 
   @override
   Future<PatronStatus> buy(PatronPackage package) async {
@@ -103,6 +122,7 @@ class FakeServer implements PatronIdServer {
 }
 
 void main() {
+  plusEntitlementTests();
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
@@ -292,6 +312,42 @@ void main() {
       return s;
     }
 
+    testWidgets('a Plus app offers Plus first, then its own plan', (t) async {
+      t.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(t.platformDispatcher.clearAccessibilityFeaturesTestValue);
+      t.view.physicalSize = const Size(420, 1800);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      final store = FakeStore(plusOffer: true);
+      final s = service(store, FakeSignIn('acct-1'));
+      await t.runAsync(s.ready);
+      await t.pumpWidget(
+        MaterialApp(
+          theme: vedaTheme(AppColors.nightfall),
+          home: PatronScreen(
+            service: s,
+            plus: const PlusPitch(appName: 'Véda Allergy'),
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(find.text('Patron Plus'), findsOneWidget);
+      expect(find.text('Best value'), findsOneWidget);
+      expect(find.text('Véda Allergy only'), findsOneWidget);
+      expect(find.textContaining('included with Plus'), findsOneWidget);
+      expect(find.text('Every Véda app'), findsNothing);
+      // Plus is the first plan and starts selected, so the buy button says so
+      expect(find.textContaining(r'$9.99 / month'), findsWidgets);
+      final plus = t.getTopLeft(
+        find.byKey(const ValueKey('plan-$kPlusPackageId')),
+      );
+      final single = t.getTopLeft(
+        find.byKey(const ValueKey('plan-$kSinglePackageId')),
+      );
+      expect(plus.dy, lessThan(single.dy));
+    });
+
     testWidgets('says why it asks for a sign-in, and buys after it', (t) async {
       final store = FakeStore();
       final s = await open(t, store, FakeSignIn('acct-1'));
@@ -359,5 +415,14 @@ void main() {
       expect(store.buys, 1);
       expect(find.textContaining('Signed in with Apple'), findsOneWidget);
     });
+  });
+}
+
+// Patron Plus: which entitlements unlock a Plus app.
+void plusEntitlementTests() {
+  test('a Plus app is unlocked by Plus or its own plan, never by Patron', () {
+    final e = plusEntitlementsFor('allergy');
+    expect(e, {'veda_plus', 'veda_allergy'});
+    expect(e.contains(kPatronEntitlement), isFalse);
   });
 }

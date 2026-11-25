@@ -40,6 +40,46 @@ const kSharedPatronPerks = <PatronPerk>[
   ),
 ];
 
+/// The perks of Patron Plus, in a Patron Plus app. Plus covers every Plus app
+/// with one membership, so none is named here.
+const kPlusPerks = <PatronPerk>[
+  (
+    icon: PhosphorIconsThin.prohibit,
+    title: 'No ads',
+    body: 'A calm, uninterrupted app, in every Patron Plus app.',
+  ),
+  (
+    icon: PhosphorIconsThin.squaresFour,
+    title: 'Every Plus app, one membership',
+    body:
+        'Patron Plus covers all the Patron Plus apps. Sign in once and each '
+        'one opens.',
+  ),
+  (
+    icon: PhosphorIconsThin.heartbeat,
+    title: 'Your Véda skin, beside what you track',
+    body:
+        'The Skin tab is included with Plus, at no extra cost. It uses the '
+        'free Véda app, which reads your skin from a quick photo.',
+  ),
+  (
+    icon: PhosphorIconsThin.heart,
+    title: 'Keeps Véda free for everyone',
+    body:
+        'Your membership helps keep almost all of Véda free for everyone, '
+        'whatever they can pay.',
+  ),
+];
+
+/// Turns a Patron screen into a Patron Plus app's: Plus is the main choice,
+/// with this one app's own monthly plan beside it.
+class PlusPitch {
+  const PlusPitch({required this.appName});
+
+  /// "Véda Allergy": the app this screen is in.
+  final String appName;
+}
+
 bool get _onIos => defaultTargetPlatform == TargetPlatform.iOS;
 String get _storeName => _onIos ? 'App Store' : 'Google Play';
 
@@ -47,9 +87,10 @@ Future<void> openPatronScreen(
   BuildContext context,
   PatronService service, {
   List<PatronPerk> perks = kSharedPatronPerks,
+  PlusPitch? plus,
 }) => Navigator.of(context).push(
   MaterialPageRoute<void>(
-    builder: (_) => PatronScreen(service: service, perks: perks),
+    builder: (_) => PatronScreen(service: service, perks: perks, plus: plus),
   ),
 );
 
@@ -58,10 +99,14 @@ class PatronScreen extends StatefulWidget {
     super.key,
     required this.service,
     this.perks = kSharedPatronPerks,
+    this.plus,
   });
 
   final PatronService service;
   final List<PatronPerk> perks;
+
+  /// Set in a Patron Plus app.
+  final PlusPitch? plus;
 
   @override
   State<PatronScreen> createState() => _PatronScreenState();
@@ -69,6 +114,12 @@ class PatronScreen extends StatefulWidget {
 
 class _PatronScreenState extends State<PatronScreen> {
   PatronService get _service => widget.service;
+  PlusPitch? get _plus => widget.plus;
+
+  List<PatronPerk> get _perkList =>
+      _plus != null && identical(widget.perks, kSharedPatronPerks)
+      ? kPlusPerks
+      : widget.perks;
 
   List<PatronPackage>? _packages;
   PatronPackage? _selected;
@@ -86,9 +137,15 @@ class _PatronScreenState extends State<PatronScreen> {
     setState(() => _loadFailed = false);
     try {
       final all = await _service.packages();
-      // Annual first: it is the plan we'd rather someone chose.
+      // Annual first: it is the plan we'd rather someone chose. In a Plus app,
+      // Plus comes first.
       final packages = [...all]
-        ..sort((a, b) => (b.isAnnual ? 1 : 0) - (a.isAnnual ? 1 : 0));
+        ..sort(
+          (a, b) => _plus != null
+              ? (b.id == kPlusPackageId ? 1 : 0) -
+                    (a.id == kPlusPackageId ? 1 : 0)
+              : (b.isAnnual ? 1 : 0) - (a.isAnnual ? 1 : 0),
+        );
       if (!mounted) return;
       setState(() {
         _packages = packages;
@@ -226,7 +283,7 @@ class _PatronScreenState extends State<PatronScreen> {
         foregroundColor: colors.textPrimary,
         elevation: 0,
         title: Text(
-          'Véda Patron',
+          _plus != null ? 'Véda Patron Plus' : 'Véda Patron',
           style: TextStyle(fontSize: 15, color: colors.textPrimary),
         ),
       ),
@@ -241,7 +298,7 @@ class _PatronScreenState extends State<PatronScreen> {
               const SizedBox(height: 14),
               Center(
                 child: Text(
-                  'Véda Patron',
+                  _plus != null ? 'Véda Patron Plus' : 'Véda Patron',
                   style: TextStyle(
                     fontSize: 26,
                     fontFamily: kDisplayFont,
@@ -252,8 +309,13 @@ class _PatronScreenState extends State<PatronScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Everything you need day to day stays free. Patrons go '
-                'further, with no ads, and help keep Véda open to everyone.',
+                _plus != null
+                    ? 'Everything you need day to day stays free. Plus goes '
+                          'further: no ads, your Véda skin in the Skin tab, '
+                          'and every Plus app with one membership.'
+                    : 'Everything you need day to day stays free. Patrons go '
+                          'further, with no ads, and help keep Véda open to '
+                          'everyone.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5,
@@ -294,24 +356,24 @@ class _PatronScreenState extends State<PatronScreen> {
     ),
     child: Column(
       children: [
-        for (var i = 0; i < widget.perks.length; i++) ...[
+        for (var i = 0; i < _perkList.length; i++) ...[
           if (i > 0) const SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(widget.perks[i].icon, size: 20, color: colors.accentText),
+              Icon(_perkList[i].icon, size: 20, color: colors.accentText),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.perks[i].title,
+                      _perkList[i].title,
                       style: TextStyle(fontSize: 14, color: colors.textPrimary),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      widget.perks[i].body,
+                      _perkList[i].body,
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.4,
@@ -341,7 +403,7 @@ class _PatronScreenState extends State<PatronScreen> {
         child: Column(
           children: [
             Text(
-              "You're a Patron.",
+              _plus != null ? "You're a member." : "You're a Patron.",
               style: TextStyle(fontSize: 15, color: colors.textPrimary),
             ),
             const SizedBox(height: 6),
@@ -465,8 +527,8 @@ class _PatronScreenState extends State<PatronScreen> {
           'every Véda app. Our server checks the sign-in and keeps nothing: '
           'only a coded number goes to the store, never your email or name.'
           '${_service.providers.length > 1 ? ' Google and Apple are '
-              'separate sign-ins: if you also use Véda on an Android phone, '
-              'choose Google on both.' : ''}',
+                    'separate sign-ins: if you also use Véda on an Android phone, '
+                    'choose Google on both.' : ''}',
           key: const Key('patronSignInNote'),
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -491,7 +553,7 @@ class _PatronScreenState extends State<PatronScreen> {
           key: const Key('patronRestore'),
           onPressed: _busy ? null : _restore,
           child: Text(
-            'I already have Patron',
+            _plus != null ? 'I already have Plus' : 'I already have Patron',
             style: TextStyle(color: colors.accentText),
           ),
         ),
@@ -532,6 +594,19 @@ class _PatronScreenState extends State<PatronScreen> {
     ];
   }
 
+  String _planName(PatronPackage p) {
+    final plus = _plus;
+    if (plus == null) return p.isAnnual ? 'Annual' : 'Monthly';
+    return p.id == kPlusPackageId ? 'Patron Plus' : '${plus.appName} only';
+  }
+
+  String? _planNote(PatronPackage p) {
+    if (_plus == null) return null;
+    return p.id == kPlusPackageId
+        ? 'Every Plus app, and the Skin tab in each'
+        : 'This app, and its Skin tab';
+  }
+
   Widget _planTile(
     AppColors colors,
     PatronPackage p, {
@@ -569,12 +644,30 @@ class _PatronScreenState extends State<PatronScreen> {
                   runSpacing: 4,
                   children: [
                     Text(
-                      p.isAnnual ? 'Annual' : 'Monthly',
+                      _planName(p),
                       style: TextStyle(
                         fontSize: 14.5,
                         color: colors.textPrimary,
                       ),
                     ),
+                    if (_plus != null && p.id == kPlusPackageId)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.accent.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Best value',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colors.accentText,
+                          ),
+                        ),
+                      ),
                     if (p.isAnnual && saving != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -595,6 +688,13 @@ class _PatronScreenState extends State<PatronScreen> {
                       ),
                   ],
                 ),
+                if (_planNote(p) case final note?) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    note,
+                    style: TextStyle(fontSize: 12, color: colors.textMuted),
+                  ),
+                ],
                 if (p.trialLabel != null) ...[
                   const SizedBox(height: 3),
                   Text(

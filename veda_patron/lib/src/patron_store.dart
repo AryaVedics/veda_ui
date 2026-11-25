@@ -15,8 +15,25 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 const String _androidKey = String.fromEnvironment('REVENUECAT_ANDROID_KEY');
 const String _iosKey = String.fromEnvironment('REVENUECAT_IOS_KEY');
 
-/// The RevenueCat entitlement that unlocks Patron, the same in every app.
+/// The RevenueCat entitlement that unlocks Patron, the same in every core app
+/// (Véda, Routine, Kitchen, Learn, Today).
 const String kPatronEntitlement = 'veda_patron';
+
+/// The entitlement Patron Plus grants: the same in every Plus app.
+const String kPlusEntitlement = 'veda_plus';
+
+/// The RevenueCat package identifiers of a Patron Plus app's offering: Plus
+/// itself, and this one app's own monthly plan. (Two plain monthly packages
+/// cannot share one offering, so both carry their own identifier.)
+const String kPlusPackageId = 'plus_monthly';
+const String kSinglePackageId = 'single_monthly';
+
+/// What unlocks a Patron Plus app: Patron Plus itself, or that one app's own
+/// single-app plan (`veda_<app>`, "veda_allergy"). Patron alone does not.
+Set<String> plusEntitlementsFor(String appKey) => {
+  kPlusEntitlement,
+  'veda_$appKey',
+};
 
 /// One purchasable plan, flattened to what the screen draws.
 class PatronPackage {
@@ -105,18 +122,29 @@ class _NoStore implements PatronStore {
 }
 
 class _RevenueCatStore implements PatronStore {
-  _RevenueCatStore(this._key);
+  _RevenueCatStore(this._key, this._entitlements);
   final String _key;
+
+  /// Any one of these being active unlocks the app.
+  final Set<String> _entitlements;
 
   @override
   bool get available => true;
 
-  static PatronStatus _status(CustomerInfo info) {
-    final e = info.entitlements.active[kPatronEntitlement];
-    if (e == null) return PatronStatus.none;
-    final until = e.expirationDate == null
-        ? null
-        : DateTime.tryParse(e.expirationDate!);
+  PatronStatus _status(CustomerInfo info) {
+    final active = [
+      for (final id in _entitlements)
+        if (info.entitlements.active[id] case final e?) e,
+    ];
+    if (active.isEmpty) return PatronStatus.none;
+    // Several can be active at once (a single-app plan and Plus): the status
+    // runs to the latest end, and has no end if any of them has none.
+    DateTime? until;
+    for (final e in active) {
+      if (e.expirationDate == null) return const PatronStatus(active: true);
+      final d = DateTime.tryParse(e.expirationDate!);
+      if (d != null && (until == null || d.isAfter(until))) until = d;
+    }
     return PatronStatus(active: true, until: until);
   }
 
@@ -150,7 +178,9 @@ class _RevenueCatStore implements PatronStore {
     final plans = [
       for (final p in current.availablePackages)
         if (p.packageType == PackageType.monthly ||
-            p.packageType == PackageType.annual)
+            p.packageType == PackageType.annual ||
+            p.identifier == kPlusPackageId ||
+            p.identifier == kSinglePackageId)
           p,
     ];
     // Google only offers a free trial to an account that can still have it.
@@ -230,9 +260,14 @@ class _RevenueCatStore implements PatronStore {
 
 /// RevenueCat when this build carries a key, otherwise a store that sells
 /// nothing.
-PatronStore defaultPatronStore() {
+///
+/// [entitlements] are the ones that unlock this app: Patron for a core app, or
+/// [plusEntitlementsFor] for a Patron Plus app.
+PatronStore defaultPatronStore({
+  Set<String> entitlements = const {kPatronEntitlement},
+}) {
   final key = defaultTargetPlatform == TargetPlatform.iOS
       ? _iosKey
       : _androidKey;
-  return key.isEmpty ? _NoStore() : _RevenueCatStore(key);
+  return key.isEmpty ? _NoStore() : _RevenueCatStore(key, entitlements);
 }

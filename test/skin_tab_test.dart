@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -158,5 +160,169 @@ void main() {
     await t.tap(find.byType(Switch));
     await t.pumpAndSettle();
     expect(SkinTabPref.instance.shown.value, isTrue);
+  });
+
+  group('the Patron Plus lock', () {
+    Future<VedaLinkStore> emptyLink() async {
+      SharedPreferences.setMockInitialValues({});
+      final link = VedaLinkStore(file: MemoryJsonFile());
+      await link.load();
+      return link;
+    }
+
+    testWidgets('a non-member sees the lock, and can get Plus', (t) async {
+      await still(t);
+      final link = await emptyLink();
+      var asked = 0;
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.sleep),
+            lock: SkinTabLock(
+              unlocked: ValueNotifier(false),
+              ready: Future.value(),
+              onGetPlus: () => asked++,
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      await t.pump();
+      expect(
+        find.text('Your skin, beside everything you track'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('included'), findsOneWidget);
+      expect(find.text('Get Véda'), findsOneWidget);
+      // not the open invitation a member sees
+      expect(find.text('See your skin here too'), findsNothing);
+      await t.tap(find.byKey(const Key('skinGetPlus')));
+      expect(asked, 1);
+    });
+
+    testWidgets('a non-member sees none of Véda\'s results behind the lock', (
+      t,
+    ) async {
+      await still(t);
+      final link = await emptyLink();
+      await link.takeLive({
+        'readings': [
+          VedaReading(
+            takenAt: DateTime.now(),
+            skinScore: 84,
+            scores: const {'redness': 80, 'texture': 82},
+          ).toJson(),
+        ],
+      });
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.sleep),
+            cards: const [Text('an app card')],
+            lock: SkinTabLock(
+              unlocked: ValueNotifier(false),
+              ready: Future.value(),
+              onGetPlus: () {},
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      await t.pump();
+      expect(
+        find.text('Your skin, beside everything you track'),
+        findsOneWidget,
+      );
+      expect(find.text('an app card'), findsNothing);
+      expect(find.text('Skin Score, last 30 days'), findsNothing);
+    });
+
+    testWidgets('a member sees the tab, told it is included with Plus', (
+      t,
+    ) async {
+      await still(t);
+      final link = await emptyLink();
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.sleep),
+            lock: SkinTabLock(
+              unlocked: ValueNotifier(true),
+              ready: Future.value(),
+              onGetPlus: () {},
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      await t.pump();
+      expect(find.text('See your skin here too'), findsOneWidget);
+      expect(
+        find.textContaining('included with your Plus membership'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('skinGetPlus')), findsNothing);
+    });
+
+    testWidgets('nothing flashes up before the membership check ends', (
+      t,
+    ) async {
+      await still(t);
+      final link = await emptyLink();
+      final ready = Completer<void>();
+      final unlocked = ValueNotifier(false);
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.sleep),
+            lock: SkinTabLock(
+              unlocked: unlocked,
+              ready: ready.future,
+              onGetPlus: () {},
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      expect(find.byKey(const Key('skinGetPlus')), findsNothing);
+      expect(find.text('See your skin here too'), findsNothing);
+      // a member: the check ends with Plus found, and the tab opens
+      unlocked.value = true;
+      ready.complete();
+      await t.pump();
+      await t.pump();
+      expect(find.text('See your skin here too'), findsOneWidget);
+      expect(find.byKey(const Key('skinGetPlus')), findsNothing);
+    });
+
+    testWidgets('buying Plus opens the tab at once', (t) async {
+      await still(t);
+      final link = await emptyLink();
+      final unlocked = ValueNotifier(false);
+      await t.pumpWidget(
+        _app(
+          SkinTabScreen(
+            link: link,
+            bridge: LinkBridge(LinkApp.sleep),
+            lock: SkinTabLock(
+              unlocked: unlocked,
+              ready: Future.value(),
+              onGetPlus: () {},
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      await t.pump();
+      expect(find.byKey(const Key('skinGetPlus')), findsOneWidget);
+      unlocked.value = true;
+      await t.pump();
+      expect(find.byKey(const Key('skinGetPlus')), findsNothing);
+      expect(find.text('See your skin here too'), findsOneWidget);
+    });
   });
 }

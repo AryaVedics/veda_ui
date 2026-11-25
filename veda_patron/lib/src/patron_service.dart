@@ -23,19 +23,33 @@ import 'patron_store.dart';
 class PatronService with WidgetsBindingObserver {
   PatronService({
     required this.appKey,
+    Set<String> entitlements = const {kPatronEntitlement},
+    bool sharesViaLink = true,
     PatronStore? store,
     PatronSignIn? signIn,
     PatronIdServer? server,
     Future<bool> Function()? readLink,
     Future<void> Function({required bool active, DateTime? until})? publish,
-  }) : _store = store ?? defaultPatronStore(),
+  }) : _store = store ?? defaultPatronStore(entitlements: entitlements),
        _signIn = signIn ?? PlatformPatronSignIn(),
        _server = server ?? HttpPatronIdServer(),
-       _readLink = readLink ?? PatronLink.read,
+       // A Patron Plus app keeps out of the Patron link: Patron does not unlock
+       // it, and a Plus purchase does not unlock the core apps. Plus is found
+       // across the Plus apps by the shared sign-in instead.
+       _readLink = readLink ?? (sharesViaLink ? PatronLink.read : _never),
        _publish =
            publish ??
-           (({required bool active, DateTime? until}) =>
-               PatronLink.publish(app: appKey, active: active, until: until));
+           (sharesViaLink
+               ? ({required bool active, DateTime? until}) =>
+                     PatronLink.publish(
+                       app: appKey,
+                       active: active,
+                       until: until,
+                     )
+               : _nothing);
+
+  static Future<bool> _never() async => false;
+  static Future<void> _nothing({required bool active, DateTime? until}) async {}
 
   /// This app's id for PatronLink ("lifestyle", "sun", ...).
   final String appKey;

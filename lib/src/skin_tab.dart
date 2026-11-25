@@ -5,6 +5,7 @@
 // when turning it off. Without Véda it is still there, as a soft ghost chart
 // and an invitation, because that is how a person learns Véda exists.
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -112,6 +113,28 @@ class SkinTabSection extends StatelessWidget {
 }
 
 /// The Skin tab itself.
+/// Gates a Patron Plus app's Skin tab: only a member of the app (Plus, or its
+/// own single-app plan) sees the person's Véda skin results here. Everyone else
+/// sees a card that says so, that the tab is included with Plus, and how to get
+/// Véda. Patron in Véda itself is not needed.
+class SkinTabLock {
+  const SkinTabLock({
+    required this.unlocked,
+    required this.ready,
+    required this.onGetPlus,
+  });
+
+  /// Whether this person is a member of this app.
+  final ValueListenable<bool> unlocked;
+
+  /// Completes once the first membership check has run, so a member never sees
+  /// the lock flash up first.
+  final Future<void> ready;
+
+  /// Opens the app's Plus purchase screen.
+  final VoidCallback onGetPlus;
+}
+
 class SkinTabScreen extends StatelessWidget {
   const SkinTabScreen({
     super.key,
@@ -122,7 +145,11 @@ class SkinTabScreen extends StatelessWidget {
     this.showTrend = true,
     this.ringSize = 148,
     this.hud = false,
+    this.lock,
   });
+
+  /// Set in a Patron Plus app: the Skin tab then needs a membership.
+  final SkinTabLock? lock;
 
   final VedaLinkStore link;
   final LinkBridge bridge;
@@ -167,11 +194,36 @@ class SkinTabScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gate = lock;
+    if (gate == null) return _body(context, included: false);
+    return FutureBuilder<void>(
+      future: gate.ready,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        return ValueListenableBuilder<bool>(
+          valueListenable: gate.unlocked,
+          builder: (context, member, _) => member
+              ? _body(context, included: true)
+              : PinnedHeaderList(
+                  header: const ScreenHeader(title: 'Skin'),
+                  children: [
+                    const SizedBox(height: 8),
+                    _Locked(bridge: bridge, onGetPlus: gate.onGetPlus),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _body(BuildContext context, {required bool included}) {
     final colors = context.colors;
     final readings = link.data.readings;
     final children = <Widget>[const SizedBox(height: 8)];
     if (readings.isEmpty) {
-      children.add(_Invite(bridge: bridge));
+      children.add(_Invite(bridge: bridge, included: included));
     } else {
       final today = DateTime.now();
       final latest =
@@ -384,9 +436,12 @@ class _Latest extends StatelessWidget {
 
 /// Without any Véda readings here yet: a ghost of the chart and what to do.
 class _Invite extends StatelessWidget {
-  const _Invite({required this.bridge});
+  const _Invite({required this.bridge, this.included = false});
 
   final LinkBridge bridge;
+
+  /// In a Patron Plus app, for a member: says the Skin tab is part of Plus.
+  final bool included;
 
   @override
   Widget build(BuildContext context) {
@@ -425,7 +480,9 @@ class _Invite extends StatelessWidget {
                           'what you track.'
                     : 'Véda is our skin app. It reads your skin from a quick '
                           'photo, and its results show up here, beside what '
-                          'you track. Nothing leaves your phone.',
+                          'you track. Nothing leaves your phone.'
+                          '${included ? ' This tab is included with your Plus '
+                                    'membership, at no extra cost.' : ''}',
                 style: TextStyle(
                   fontSize: 13.5,
                   height: 1.45,
@@ -443,6 +500,82 @@ class _Invite extends StatelessWidget {
                     colors: colors,
                   ),
                 ),
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton(
+                  onPressed: openVeda,
+                  child: Text(installed ? 'Open Véda' : 'Get Véda'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// What a person who is not a member sees in a Patron Plus app's Skin tab.
+class _Locked extends StatelessWidget {
+  const _Locked({required this.bridge, required this.onGetPlus});
+
+  final LinkBridge bridge;
+  final VoidCallback onGetPlus;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return ListenableBuilder(
+      listenable: bridge,
+      builder: (context, _) {
+        final status = bridge.readOf(LinkApp.skin).status;
+        final installed =
+            status != LinkStatus.notInstalled && status != LinkStatus.unknown;
+        return CardBox(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your skin, beside everything you track',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: kDisplayFont,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Véda reads your skin from a quick photo, and its results '
+                'appear here, in every Patron Plus app. This tab is included '
+                'with Patron Plus, at no extra cost. Nothing leaves your '
+                'phone.',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  height: 1.45,
+                  color: colors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 200,
+                child: ValueListenableBuilder<MetricStyle>(
+                  valueListenable: ChartStylePref.instance.style,
+                  builder: (context, style, _) => GhostMetricChart(
+                    style: style,
+                    keys: const ['redness', 'texture', 'pores', 'spots'],
+                    colors: colors,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              GoldButton(
+                key: const Key('skinGetPlus'),
+                label: 'Get Patron Plus',
+                onPressed: onGetPlus,
+                quiet: false,
               ),
               const SizedBox(height: 10),
               Align(
