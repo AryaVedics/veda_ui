@@ -23,6 +23,7 @@ export 'src/scaled_box.dart';
 export 'src/charts.dart';
 export 'src/common.dart';
 export 'src/data_reveal.dart';
+export 'src/deciduous_tree.dart';
 export 'src/fine_star.dart';
 export 'src/forest_animals.dart';
 export 'src/forest_friends.dart';
