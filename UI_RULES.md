@@ -160,3 +160,16 @@ The cast's name is "The Little Vedafolk"; "the Vedafolk" in everyday text. The c
   off by default and light (in Allergy, one rises now and then from behind the grass beside the tree). Sun only if it truly fits.
 - They are company, not a judge: they never comment on numbers, a missed day or
   a streak.
+
+## Stars
+
+- A star drawn as a star (a lit star in a constellation, a featured star in a
+  night sky) is the family's star: `paintFineStar` in the shared library
+  (`fine_star.dart`), which is Véda Lifestyle's twinkling star from its
+  centrepiece: a soft halo, a bright heart, four long fine rays and four short
+  ones, each ray tapering to nothing. Draw it with this, never a plus sign, a
+  bare dot or a copy of it.
+- A small star (on a dial, beside an icon) uses a small `scale`, with `minRay`
+  and `heartScale` lowered to match; the look stays the same.
+- The tiny background stars that fill a night sky are plain soft dots and stay
+  so: only a star that is meant to be seen as a star is this one.
